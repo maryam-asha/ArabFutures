@@ -1,0 +1,63 @@
+"use server";
+
+import { createDeleteAction, createFormDataParser, createProtectedAction, defaultOrder } from "@lib/action-handler";
+import { dbClient } from "@root/dal/client";
+import i18nAppConfig from "@root/i18n/config";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+import { CategoryFormSchema } from "./category.schema";
+import { CategoryForm, CategoryFormState } from "./category.types";
+
+const parseCategoryFormData = createFormDataParser({
+  booleanFields: ["isActive"],
+});
+
+const saveCategoryHandler = async (data: CategoryForm): Promise<CategoryFormState> => {
+  const { categoryId, isActive, translations } = data;
+  let currentCategoryId = categoryId;
+
+  await dbClient.executeTransaction(async (trx) => {
+    if (currentCategoryId) {
+      await trx.update("termCategories", { isActive }, { categoryId: currentCategoryId });
+    } else {
+      const result = await trx.insert("termCategories", {
+        isActive,
+        displayOrder: defaultOrder,
+      });
+      currentCategoryId = result.insertId;
+    }
+
+    if (!currentCategoryId) throw new Error("Failed to get category ID.");
+
+    for (const locale of i18nAppConfig.locales) {
+      const name = translations?.[locale]?.name;
+      if (name) {
+        await trx.modify(
+          `INSERT INTO termCategoryTranslations (categoryRef, locale, name) VALUES (?, ?, ?)
+           ON DUPLICATE KEY UPDATE name = VALUES(name);`,
+          [currentCategoryId, locale, name],
+        );
+      }
+    }
+  });
+
+  revalidatePath("/dashboard/term-categories", "layout");
+
+  if (!categoryId) {
+    redirect(`/dashboard/term-categories`);
+  }
+
+  return {
+    success: true,
+    message: `Category successfully ${categoryId ? "updated" : "created"}.`,
+  };
+};
+
+export const saveCategoryAction = createProtectedAction(CategoryFormSchema, saveCategoryHandler, parseCategoryFormData);
+
+export const deleteTermCategoryAction = createDeleteAction({
+  tableName: "termCategories",
+  pkColumn: "categoryId",
+  revalidatePaths: ["/dashboard/term-categories"],
+});

@@ -1,0 +1,79 @@
+{
+  "Header": {
+    "brandName": "HOMAM",
+    "homeAriaLabel": "HOMAM Home"
+  },
+  "HeroSection": {
+    "titleLine1": "Design furniture for",
+    "titleLine2": "spaces that breathe.",
+    "subtitle": "Designed in Belgium, crafted to endure — timeless pieces for modern living.",
+    "shipping": "Free shipping",
+    "delivery": "Delivered in 6 weeks",
+    "guarantee": "Lifetime guarantee"
+  },
+  "FeaturedProducts": {
+    "title": "Featured",
+    "titleItalic": "Collection",
+    "description": "Discover our most beloved pieces, each crafted with meticulous attention to detail and timeless design principles."
+  },
+  "CollectionStrip": {
+    "title": "Explore Our Collections",
+    "description": "Each collection tells a unique story of craftsmanship and design philosophy, curated for the discerning eye.",
+    "dragHint": "Drag to explore"
+  },
+  "MaterialsSection": {
+    "description": "Every piece begins with the finest materials, carefully selected for their beauty, durability, and sustainable origins. Our craftspeople honor traditional techniques while embracing modern precision.",
+    "materials": [
+      { "id": "pistachio", "name": "Pistachio" },
+      { "id": "lunar", "name": "Lunar" },
+      { "id": "martian", "name": "Martian" }
+    ]
+  },
+  "NewsletterSection": {
+    "title": "Stay ahead of ",
+    "titleItalic": "quiet luxury.",
+    "description": "Be the first to discover new collections, design insights, and exclusive access to limited pieces.",
+    "emailPlaceholder": "Enter your email address",
+    "buttonText": "Subscribe to Newsletter",
+    "validationError": "Please enter a valid email address",
+    "successTitle": "Welcome to HOMAM",
+    "successDescription": "Thank you for subscribing. You'll receive our next newsletter with exclusive insights and new arrivals.",
+    "privacyPolicy": "We respect your privacy. Unsubscribe at any time. Read our <link>Privacy Policy</link>."
+  },
+  "Footer": {
+    "brandName": "HOMAM",
+    "brandDescription": "Architected in Belgium, built to last. We create timeless furniture pieces for spaces that breathe.",
+    "headings": {
+      "shop": "Shop",
+      "company": "Company",
+      "support": "Support"
+    },
+    "links": {
+      "newArrivals": "New Arrivals",
+      "chairs": "Chairs",
+      "tables": "Tables",
+      "storage": "Storage",
+      "lighting": "Lighting",
+      "about": "About",
+      "craftsmanship": "Craftsmanship",
+      "sustainability": "Sustainability",
+      "careers": "Careers",
+      "press": "Press",
+      "contact": "Contact",
+      "sizeGuide": "Size Guide",
+      "careInstructions": "Care Instructions",
+      "shipping": "Shipping",
+      "returns": "Returns"
+    },
+    "copyright": "© {currentYear} HOMAM Studio. All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "cookies": "Cookies"
+  },
+  "QuickLookModal": {
+    "dimensions": "DIMENSIONS",
+    "features": "FEATURES",
+    "addToCart": "Add to Cart",
+    "featureList": ["Sustainably sourced materials", "Hand-finished edges", "Made to order in Belgium", "Lifetime repair program"]
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "Header": {
+    "brandName": "HOMAM",
+    "homeAriaLabel": "HOMAM Ana Sayfa"
+  },
+  "HeroSection": {
+    "titleLine1": "Nefes alan mekanlar için",
+    "titleLine2": "tasarım mobilyalar.",
+    "subtitle": "Belçika'da tasarlandı, uzun ömürlü olması için üretildi — modern yaşam için zamansız parçalar.",
+    "shipping": "Ücretsiz Kargo",
+    "delivery": "6 haftada teslimat",
+    "guarantee": "Ömür boyu garanti"
+  },
+  "FeaturedProducts": {
+    "title": "Öne Çıkan",
+    "titleItalic": "Koleksiyon",
+    "description": "Titiz detaylara ve zamansız tasarım ilkelerine gösterilen özenle hazırlanmış en sevilen parçalarımızı keşfedin."
+  },
+  "CollectionStrip": {
+    "title": "Koleksiyonlarımızı Keşfedin",
+    "description": "Her koleksiyon, seçkin gözler için özenle hazırlanmış benzersiz bir işçilik ve tasarım felsefesi hikayesi anlatır.",
+    "dragHint": "Keşfetmek için sürükleyin"
+  },
+  "MaterialsSection": {
+    "description": "Her parça, güzellikleri, dayanıklılıkları ve sürdürülebilir kökenleri nedeniyle özenle seçilmiş en iyi malzemelerle başlar. Zanaatkarlarımız modern hassasiyeti benimserken geleneksel tekniklere saygı duyar.",
+    "materials": [
+      { "id": "pistachio", "name": "Fıstık" },
+      { "id": "lunar", "name": "Ay Grisi" },
+      { "id": "martian", "name": "Mars Kırmızısı" }
+    ]
+  },
+  "NewsletterSection": {
+    "title": "Sessiz lüksün ",
+    "titleItalic": "önünde olun.",
+    "description": "Yeni koleksiyonları, tasarım anlayışlarını ve sınırlı sayıdaki parçalara özel erişimi ilk keşfeden siz olun.",
+    "emailPlaceholder": "E-posta adresinizi girin",
+    "buttonText": "Bültene Abone Ol",
+    "validationError": "Lütfen geçerli bir e-posta adresi girin",
+    "successTitle": "HOMAM'a Hoş Geldiniz",
+    "successDescription": "Abone olduğunuz için teşekkür ederiz. Özel bilgiler ve yeni gelenlerle bir sonraki bültenimizi alacaksınız.",
+    "privacyPolicy": "Gizliliğinize saygı duyuyoruz. İstediğiniz zaman abonelikten çıkabilirsiniz. <link>Gizlilik Politikamızı</link> okuyun."
+  },
+  "Footer": {
+    "brandName": "HOMAM",
+    "brandDescription": "Belçika'da tasarlandı, uzun ömürlü olması için üretildi. Nefes alan mekanlar için zamansız mobilya parçaları yaratıyoruz.",
+    "headings": {
+      "shop": "Mağaza",
+      "company": "Şirket",
+      "support": "Destek"
+    },
+    "links": {
+      "newArrivals": "Yeni Gelenler",
+      "chairs": "Sandalyeler",
+      "tables": "Masalar",
+      "storage": "Depolama",
+      "lighting": "Aydınlatma",
+      "about": "Hakkımızda",
+      "craftsmanship": "İşçilik",
+      "sustainability": "Sürdürülebilirlik",
+      "careers": "Kariyer",
+      "press": "Basın",
+      "contact": "İletişim",
+      "sizeGuide": "Beden Rehberi",
+      "careInstructions": "Bakım Talimatları",
+      "shipping": "Kargo",
+      "returns": "İadeler"
+    },
+    "copyright": "© {currentYear} HOMAM Studio. Tüm hakları saklıdır.",
+    "privacyPolicy": "Gizlilik Politikası",
+    "termsOfService": "Hizmet Şartları",
+    "cookies": "Çerezler"
+  },
+  "QuickLookModal": {
+    "dimensions": "BOYUTLAR",
+    "features": "ÖZELLİKLER",
+    "addToCart": "Sepete Ekle",
+    "featureList": ["Sürdürülebilir kaynaklı malzemeler", "El yapımı kenarlar", "Belçika'da sipariş üzerine üretilmiştir", "Ömür boyu onarım programı"]
+  }
+}

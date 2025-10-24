@@ -1,0 +1,80 @@
+import { createTranslationsSchema } from "@i18n/Translatable";
+import { z } from "zod";
+
+// =================================================================
+// TERM CATEGORIES
+// =================================================================
+export const TermCategoryTranslationDbSchema = z.object({
+  name: z.string(),
+});
+
+export const TermCategoryDbSchema = z.object({
+  categoryId: z.number(),
+  displayOrder: z.number(),
+  isActive: z.coerce.boolean(),
+  translations: createTranslationsSchema(TermCategoryTranslationDbSchema),
+});
+
+// For dropdowns in the form
+export const TermCategoryOptionSchema = z.object({
+  categoryId: z.number(),
+  name: z.string(),
+});
+
+export const TermCategoryWithCountDbSchema = z.object({
+  categoryId: z.number(),
+  displayOrder: z.number(),
+  isActive: z.coerce.boolean(),
+  termCount: z.number(),
+  translations: createTranslationsSchema(TermCategoryTranslationDbSchema),
+});
+
+// =================================================================
+// TAGS
+// =================================================================
+export const TagTranslationDbSchema = z.object({
+  name: z.string(),
+});
+
+export const TagDbSchema = z.object({
+  tagId: z.number(),
+  translations: createTranslationsSchema(TagTranslationDbSchema),
+});
+
+// For dropdowns/multi-select in the form
+export const TagOptionSchema = z.object({
+  tagId: z.number(),
+  name: z.string(),
+});
+
+// =================================================================
+// TERMS
+// =================================================================
+export const TermTranslationDbSchema = z.object({
+  title: z.string(),
+  briefDescription: z.string().nullable(),
+  fullDetail: z.string().nullable(),
+});
+
+// This schema is now more complex to fetch related data efficiently
+export const TermDbSchema = z.object({
+  termId: z.number(),
+  categoryRef: z.number().nullable(),
+  status: z.enum(["pending", "published"]),
+  isFeatured: z.coerce.boolean(),
+  translations: createTranslationsSchema(TermTranslationDbSchema),
+  // We'll fetch the category name and tags directly in our query
+  categoryName: z.string().nullable(),
+  // tags: z
+  //   .string()
+  //   .transform((str) => (str ? JSON.parse(str) : []))
+  //   .pipe(z.array(z.object({ tagId: z.number(), name: z.string() }))),
+  tags: z.any(),
+});
+
+export const TermForEditDbSchema = TermDbSchema.extend({
+  tagIds: z
+    .string() // The database will return a comma-separated string of IDs
+    .nullable()
+    .transform((str) => (str ? str.split(",").map(Number) : [])),
+});

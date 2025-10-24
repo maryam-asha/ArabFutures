@@ -1,0 +1,79 @@
+{
+  "Header": {
+    "brandName": "HOMAM",
+    "homeAriaLabel": "HOMAM Startseite"
+  },
+  "HeroSection": {
+    "titleLine1": "Designmöbel für",
+    "titleLine2": "Räume, die atmen.",
+    "subtitle": "In Belgien entworfen, für die Ewigkeit gebaut – zeitlose Stücke für modernes Wohnen.",
+    "shipping": "Kostenloser Versand",
+    "delivery": "Lieferung in 6 Wochen",
+    "guarantee": "Lebenslange Garantie"
+  },
+  "FeaturedProducts": {
+    "title": "Besondere",
+    "titleItalic": "Kollektion",
+    "description": "Entdecken Sie unsere beliebtesten Stücke, jedes mit akribischer Liebe zum Detail und zeitlosen Designprinzipien gefertigt."
+  },
+  "CollectionStrip": {
+    "title": "Entdecken Sie unsere Kollektionen",
+    "description": "Jede Kollektion erzählt eine einzigartige Geschichte von Handwerkskunst und Designphilosophie, kuratiert für das anspruchsvolle Auge.",
+    "dragHint": "Zum Erkunden ziehen"
+  },
+  "MaterialsSection": {
+    "description": "Jedes Stück beginnt mit den feinsten Materialien, sorgfältig ausgewählt nach Schönheit, Haltbarkeit und nachhaltiger Herkunft. Unsere Handwerker ehren traditionelle Techniken und nutzen moderne Präzision.",
+    "materials": [
+      { "id": "pistachio", "name": "Pistazie" },
+      { "id": "lunar", "name": "Lunar" },
+      { "id": "martian", "name": "Mars" }
+    ]
+  },
+  "NewsletterSection": {
+    "title": "Bleiben Sie dem ",
+    "titleItalic": "stillen Luxus voraus.",
+    "description": "Seien Sie der Erste, der neue Kollektionen, Design-Einblicke und exklusiven Zugang zu limitierten Stücken entdeckt.",
+    "emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein",
+    "buttonText": "Newsletter abonnieren",
+    "validationError": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    "successTitle": "Willkommen bei HOMAM",
+    "successDescription": "Danke für Ihre Anmeldung. Sie erhalten unseren nächsten Newsletter mit exklusiven Einblicken und Neuheiten.",
+    "privacyPolicy": "Wir respektieren Ihre Privatsphäre. Jederzeit abbestellbar. Lesen Sie unsere <link>Datenschutzrichtlinie</link>."
+  },
+  "Footer": {
+    "brandName": "HOMAM",
+    "brandDescription": "In Belgien entworfen, für die Ewigkeit gebaut. Wir schaffen zeitlose Möbelstücke für Räume, die atmen.",
+    "headings": {
+      "shop": "Shop",
+      "company": "Unternehmen",
+      "support": "Hilfe"
+    },
+    "links": {
+      "newArrivals": "Neuheiten",
+      "chairs": "Stühle",
+      "tables": "Tische",
+      "storage": "Aufbewahrung",
+      "lighting": "Beleuchtung",
+      "about": "Über uns",
+      "craftsmanship": "Handwerkskunst",
+      "sustainability": "Nachhaltigkeit",
+      "careers": "Karriere",
+      "press": "Presse",
+      "contact": "Kontakt",
+      "sizeGuide": "Größentabelle",
+      "careInstructions": "Pflegehinweise",
+      "shipping": "Versand",
+      "returns": "Rücksendungen"
+    },
+    "copyright": "© {currentYear} HOMAM Studio. Alle Rechte vorbehalten.",
+    "privacyPolicy": "Datenschutzrichtlinie",
+    "termsOfService": "Nutzungsbedingungen",
+    "cookies": "Cookies"
+  },
+  "QuickLookModal": {
+    "dimensions": "ABMESSUNGEN",
+    "features": "MERKMALE",
+    "addToCart": "In den Warenkorb",
+    "featureList": ["Nachhaltig gewonnene Materialien", "Handgefertigte Kanten", "Auf Bestellung in Belgien gefertigt", "Lebenslanges Reparaturprogramm"]
+  }
+}
