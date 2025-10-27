@@ -88,7 +88,12 @@ export const TermDbSchema = z.object({
 
 export const TermForEditDbSchema = TermDbSchema.extend({
   tagIds: z
-    .string() // The database will return a comma-separated string of IDs
+    .preprocess(
+      // This handles if the DB driver returns a JSON string '[1,2]' or a pre-parsed array [1,2].
+      (val) => (typeof val === "string" && val ? JSON.parse(val) : val),
+      z.array(z.number()),
+    )
     .nullable()
-    .transform((str) => (str ? str.split(",").map(Number) : [])),
+    // This ensures that if the result is null, we get a clean empty array.
+    .transform((arr) => arr || []),
 });
