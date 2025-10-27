@@ -6,17 +6,19 @@ import { Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
-import { deleteManyTagsAction } from "./actions";
+import { BulkAction } from "../___blocks/data-table/data-table.type";
+import { tagBulkDeleteAction } from "./actions";
 
 export default async function TagsPage() {
   const tags = await findTags();
-  const t = await getTranslations("Dashboard");
+  const tTag = await getTranslations("Dashboard.pages.tags");
   const tActions = await getTranslations("Common.actions");
-
+  const tPlaceholdlders = await getTranslations("Dashboard.forms.placeholders");
+  const tagBulkActions: BulkAction[] = [{ label: "delete", action: tagBulkDeleteAction, isDestructive: true }];
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">{t("sidebar.tags")}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{tTag("title")}</h1>
         <Button asChild>
           <Link href="/dashboard/tags/create">
             <Plus className="w-4 h-4 me-2" />
@@ -25,7 +27,7 @@ export default async function TagsPage() {
         </Button>
       </div>
       <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <DataTable columns={columns} data={tags} filterColumnId="name" filterColumnPlaceholder={t("forms.placeholders.search")} deleteManyAction={deleteManyTagsAction} pkColumn="tagId" />
+        <DataTable columns={columns} data={tags} filterColumnId="name" filterColumnPlaceholder={tPlaceholdlders("search")} pkColumn="tagId" />
       </div>
     </div>
   );

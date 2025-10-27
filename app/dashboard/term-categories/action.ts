@@ -1,19 +1,19 @@
 "use server";
 
 import i18nAppConfig from "@i18n/config";
-import { createActionParser, createProtectedAction } from "@lib/action-handler";
+import { createActionParser, createBulkDeleteAction, createDeleteAction, createProtectedAction } from "@lib/action-handler";
 import { dbClient } from "@root/dal/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { CategoryFormSchema } from "../category.schema";
-import { CategoryForm, CategoryFormState } from "../category.types";
+import { CategoryFormSchema } from "./category.schema";
+import { CategoryForm, CategoryFormState } from "./category.types";
 
-const parseCategoryFormData = createActionParser({
+const termCategoryParser = createActionParser({
   booleanFields: ["isActive"],
 });
 
-const saveCategoryHandler = async (data: CategoryForm): Promise<CategoryFormState> => {
+const termCategorySaveHandler = async (data: CategoryForm): Promise<CategoryFormState> => {
   const { categoryId, isActive, translations } = data;
   let currentCategoryId = categoryId;
 
@@ -51,4 +51,12 @@ const saveCategoryHandler = async (data: CategoryForm): Promise<CategoryFormStat
   };
 };
 
-export const saveCategoryAction = createProtectedAction(CategoryFormSchema, saveCategoryHandler, parseCategoryFormData);
+export const termCategorySaveAction = createProtectedAction(CategoryFormSchema, termCategorySaveHandler, termCategoryParser);
+
+export const termCategoryDeleteAction = createDeleteAction({
+  tableName: "termCategories",
+  pkColumn: "categoryId",
+  revalidatePaths: ["/dashboard/categories"],
+});
+
+export const termCategoryBulkDeleteAction = createBulkDeleteAction({ tableName: "termCategories", pkColumn: "categoryId", revalidatePaths: ["/dashboard/categories"] });

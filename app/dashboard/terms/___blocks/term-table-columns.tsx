@@ -40,6 +40,10 @@ export const termColumns: ColumnDef<TermDb>[] = [
       const title = row.original.translations?.[i18nAppConfig.defaultLocale]?.title || "N/A";
       return <div className="font-medium">{title}</div>;
     },
+    filterFn: (row, id, value) => {
+      const title = row.original.translations?.[i18nAppConfig.defaultLocale]?.title?.toLowerCase();
+      return title ? title.includes((value as string).toLowerCase()) : false;
+    },
   },
   {
     accessorKey: "categoryName",

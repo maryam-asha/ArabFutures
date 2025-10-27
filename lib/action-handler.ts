@@ -11,7 +11,10 @@ import { z } from "zod";
 
 import { auth } from "./auth";
 
-export type ServerAction<TState> = (prevState: TState, formData: FormData) => Promise<ActionState<TState>>;
+// export type ServerAction<TState> = (prevState: TState, formData: FormData) => Promise<ActionState<TState>>;
+// export type ActionHandler<TInput> = (data: TInput) => Promise<ActionState<TInput>>;
+
+export type ServerAction<TInput> = (prevState: ActionState<TInput>, formData: FormData) => Promise<ActionState<TInput>>;
 
 export type ActionHandler<TInput> = (data: TInput) => Promise<ActionState<TInput>>;
 
@@ -63,8 +66,8 @@ export function createActionParser(
   };
 }
 
-export function createProtectedAction<TInput, TState extends ActionState<TInput>>(schema: z.ZodSchema<TInput>, handler: ActionHandler<TInput>, parser: (formData: FormData) => Record<string, any>): ServerAction<TState> {
-  return async function protectedAction(prevState: TState, formData: FormData): Promise<ActionState<TState>> {
+export function createProtectedAction<TInput>(schema: z.ZodSchema<TInput>, handler: ActionHandler<TInput>, parser: (formData: FormData) => Record<string, any>): ServerAction<TInput> {
+  return async function protectedAction(prevState: ActionState<TInput>, formData: FormData): Promise<ActionState<TInput>> {
     try {
       await auth.protectAction(undefined, formData);
       const newCsrfToken = await getCsrfTokenAction();
@@ -78,7 +81,7 @@ export function createProtectedAction<TInput, TState extends ActionState<TInput>
           success: false,
           message: "Validation failed. Please check the fields for errors.",
           errors: z.treeifyError(parsed.error),
-        } as ActionState<TState>;
+        };
       }
 
       const result = await handler(parsed.data);
@@ -92,8 +95,8 @@ export function createProtectedAction<TInput, TState extends ActionState<TInput>
       return {
         success: false,
         message: (e as Error).message || "An unexpected server error occurred.",
-        errors: {},
-      } as ActionState<TState>;
+        errors: {} as any,
+      };
     }
   };
 }

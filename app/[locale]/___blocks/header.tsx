@@ -1,36 +1,83 @@
-"use client";
-
-import { Link, usePathname } from "@i18n/navigation";
-import { cn } from "@lib/utils";
+import { Link } from "@i18n/navigation";
+import { Button } from "@ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@ui/dropdown-menu";
+import { MenuIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-export default function PublicHeader() {
-  const t = useTranslations("Public.nav");
-  const pathname = usePathname();
-  const navLinks = ["about", "work", "projects", "blogs", "contact"];
+const navLinks = [
+  { label: "vision", href: "/#vision", color: "hsl(195, 80%, 60%)" },
+  { label: "work", href: "/#work", color: "hsl(45, 90%, 60%)" },
+  { label: "about", href: "/#about", color: "hsl(260, 90%, 70%)" },
+  { label: "home", href: "/", color: "hsl(var(--primary))" },
+  { label: "blogs", href: "", color: "hsl(340, 90%, 70%)" }, // Points to the /terms page
+  { label: "projects", href: "/terms", color: "hsl(340, 90%, 70%)" }, // Points to the /terms page
+  { label: "contact", href: "/contact", color: "hsl(145, 70%, 55%)" },
+];
 
+const HomeIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M8 14V9.5" />
+    <path d="M12 14V9.5" />
+    <path d="M16 14V9.5" />
+    <path d="M7 14h10" />
+  </svg>
+);
+
+const Navbar = () => {
+  const tNav = useTranslations("Public.nav");
+
+  // const HomeIcon = ({ className }: { className?: string }) => (
+  //   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+  //     <circle cx="12" cy="12" r="10" />
+  //     <path d="M8 14V9.5" />
+  //     <path d="M12 14V9.5" />
+  //     <path d="M16 14V9.5" />
+  //     <path d="M7 14h10" />
+  //   </svg>
+  // );
   return (
-    <header className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="container mx-auto flex h-20 items-center justify-center">
-        <nav className="flex">
-          <ul className="flex items-center gap-8 text-base font-medium">
-            {navLinks.map((key) => (
-              <li key={key}>
-                <Link href={key === "about" ? "/#about" : `/${key}`} className={cn("group relative text-muted-foreground transition-colors hover:text-foreground", (pathname === `/${key}` || (pathname === "/" && key === "about")) && "text-foreground")}>
-                  <span
-                    className={cn(
-                      "absolute -start-4 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-primary opacity-0 transition-opacity",
-                      "group-hover:opacity-100",
-                      (pathname === `/${key}` || (pathname === "/" && key === "about")) && "opacity-100",
-                    )}
-                  ></span>
-                  {t(key)}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+    <header className="bg-background fixed w-full top-0 z-50">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-8 px-4 py-7 sm:px-6">
+        <div className="text-muted-foreground  flex-1 items-center gap-8 font-medium hidden md:flex md:justify-center lg:gap-16">
+          {navLinks.map((item) =>
+            item.label === "home" ? (
+              <Link key={`${item.label}`} href={item.href}>
+                <HomeIcon className="w-12 h-12" />
+              </Link>
+            ) : (
+              <Link key={`${item.label}`} href={item.href}>
+                {tNav(item.label)}
+              </Link>
+            ),
+          )}
+        </div>
+
+        <div className="flex items-center gap-6">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="md:hidden" asChild>
+              <Button variant="outline" size="icon">
+                <MenuIcon />
+                <span className="sr-only">Menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end">
+              <DropdownMenuGroup>
+                {navLinks
+                  .filter((item) => item.label !== "home")
+                  .map((item, index) => (
+                    <DropdownMenuItem key={index}>
+                      <Link href={item.href}>{tNav(item.label)}</Link>
+                      {/* <a href={item.href}>{item.title}</a> */}
+                    </DropdownMenuItem>
+                  ))}
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </header>
   );
-}
+};
+
+export default Navbar;

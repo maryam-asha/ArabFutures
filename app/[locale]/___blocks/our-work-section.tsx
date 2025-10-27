@@ -5,8 +5,8 @@ export default async function OurWorkSection() {
   const features = t.raw("features");
 
   return (
-    <section id="work" className="container mx-auto py-16">
-      <div className="mx-auto mb-16 max-w-3xl text-center">
+    <section id="work" className="container mx-auto py-8 scroll-mt-header">
+      <div className="mx-auto max-w-3xl text-center">
         <h2 className="text-pretty text-4xl font-bold lg:text-5xl">{t("title")}</h2>
       </div>
       <div className="grid gap-8 lg:grid-cols-2">

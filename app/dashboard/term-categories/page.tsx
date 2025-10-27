@@ -7,13 +7,12 @@ import Link from "next/link";
 import { DataTable } from "../___blocks/data-table";
 import { BulkAction } from "../___blocks/data-table/data-table.type";
 import { columns } from "./___blocks/category-table-columns";
+import { termCategoryBulkDeleteAction } from "./action";
 
 export default async function TermCategoriesPage() {
   const categories = await findTermCategories();
-
   const tCategories = await getTranslations("Dashboard.pages.categories");
-  const categoryBulkActions: BulkAction[] = [];
-
+  const categoryBulkActions: BulkAction[] = [{ label: "delete", action: termCategoryBulkDeleteAction, isDestructive: true }];
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

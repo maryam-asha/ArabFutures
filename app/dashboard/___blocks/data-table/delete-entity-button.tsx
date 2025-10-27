@@ -4,11 +4,12 @@ import { Button } from "@components/ui/button";
 import { DropdownMenuItem } from "@components/ui/dropdown-menu";
 import { type ActionState } from "@root/types";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@ui/alert-dialog";
-import { useCsrf } from "@waelhabbaldev/next-jwt-auth/client";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useState, useTransition } from "react";
 import { toast } from "sonner";
+
+import { useReactiveCsrf } from "../csrf-provider-client";
 
 type DeleteAction = (prevState: any, formData: FormData) => Promise<ActionState<any>>;
 
@@ -25,8 +26,8 @@ export function DeleteEntityButton({ entityId, entityName, deleteAction, onSucce
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const csrfToken = useCsrf() || "";
-  // const t = useTranslations("Dashboard");
+  const { csrfToken } = useReactiveCsrf() || "";
+
   const tCommon = useTranslations("Common");
   const tDailog = useTranslations("Dashboard.dialogs");
   const tToast = useTranslations("Dashboard.toasts");
@@ -87,7 +88,7 @@ export function DeleteEntityButton({ entityId, entityName, deleteAction, onSucce
         <AlertDialogFooter>
           <AlertDialogCancel>{tCommon("actions.cancel")}</AlertDialogCancel>
           <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90" disabled={isPending}>
-            {isPending ? tCommon("actions.deleting") : tDailog("deletePermanently")}
+            {isPending ? tCommon("deleting") : tDailog("deletePermanently")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

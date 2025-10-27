@@ -16,7 +16,7 @@ import { useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { saveTagAction } from "../actions";
+import { tagSaveAction } from "../actions";
 import { TagFormSchema } from "../tag.schema";
 import { type TagForm, type TagFormState } from "../tag.types";
 
@@ -30,7 +30,7 @@ export function TagForm({ initialData }: { initialData: Partial<TagForm> }) {
   const isEditMode = !!initialData?.tagId;
   const locale = useLocale();
   const router = useRouter();
-  const [state, formAction] = useActionState(saveTagAction, initialFormState);
+  const [state, formAction] = useActionState(tagSaveAction, initialFormState);
   const tLabels = useTranslations("Dashboard.forms.labels");
   const tCommon = useTranslations("Common");
 

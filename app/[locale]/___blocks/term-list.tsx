@@ -2,11 +2,13 @@
 
 import TermCard from "@app/[locale]/___blocks/term-card";
 import { loadMoreTermsAction } from "@app/public-actions";
-import { usePathname, useRouter } from "@i18n/navigation";
 import { TermDb } from "@root/dal/dal.types";
 import { AppLocale } from "@root/i18n/config";
 import { Button } from "@ui/button";
+import { Input } from "@ui/input";
+import { Search } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
@@ -15,52 +17,69 @@ import { TermDialog } from "./term-dialog";
 
 interface TermListProps {
   initialTerms: TermDb[];
-  query: string;
+  initialQuery: string;
 }
 
-export function TermList({ initialTerms, query }: TermListProps) {
+export function TermList({ initialTerms, initialQuery }: TermListProps) {
   const [terms, setTerms] = useState<TermDb[]>(initialTerms);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialTerms.length > 0);
   const [selectedTerm, setSelectedTerm] = useState<TermDb | null>(null);
-  const [isPending, startTransition] = useTransition();
 
-  const [searchQuery, setSearchQuery] = useState(query);
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [debouncedQuery] = useDebounce(searchQuery, 500);
 
+  const [isSearching, startSearchTransition] = useTransition();
+  const [isLoadingMore, startLoadMoreTransition] = useTransition();
+
   const router = useRouter();
-  const pathname = usePathname();
   const locale = useLocale() as AppLocale;
   const t = useTranslations("Public.featuredTerms");
   const commonT = useTranslations("Common");
   const tableT = useTranslations("Dashboard.tables");
 
-  // Effect to update URL when text search changes
+  // This effect handles ALL search logic, including clearing the input.
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (debouncedQuery) {
-      params.set("query", debouncedQuery);
-    } else {
-      params.delete("query");
+    // --- 2. FIX FOR CLEARING SEARCH ---
+    // We compare the current debounced query with what's in the URL params.
+    // This reliably detects changes, including clearing the input.
+    const currentUrlQuery = new URLSearchParams(window.location.search).get("query") || "";
+    if (debouncedQuery === currentUrlQuery) {
+      return; // Do nothing if the query hasn't actually changed.
     }
 
-    router.replace(`${pathname}?${params.toString()}`);
-  }, [debouncedQuery, pathname, router]);
+    startSearchTransition(async () => {
+      // Update the URL without a full page reload
+      const params = new URLSearchParams(window.location.search);
+      if (debouncedQuery) {
+        params.set("query", debouncedQuery);
+      } else {
+        params.delete("query");
+      }
+      window.history.pushState(null, "", `?${params.toString()}`);
 
-  // Reset list when the initial props change (because the URL has changed)
+      // Fetch the new set of terms for page 0
+      const newTerms = await loadMoreTermsAction(locale, 0, debouncedQuery);
+      setTerms(newTerms);
+      setPage(1); // Reset pagination
+      setHasMore(newTerms.length > 0);
+    });
+  }, [debouncedQuery, locale]);
+
+  // Sync state if user navigates (e.g., back/forward buttons)
   useEffect(() => {
     setTerms(initialTerms);
+    setSearchQuery(initialQuery);
     setPage(1);
     setHasMore(initialTerms.length > 0);
-  }, [initialTerms]);
+  }, [initialTerms, initialQuery]);
 
   const loadMore = () => {
-    startTransition(async () => {
+    startLoadMoreTransition(async () => {
       try {
-        // Updated to only pass query, not categories
-        const newTerms = await loadMoreTermsAction(locale, page, query);
+        const newTerms = await loadMoreTermsAction(locale, page, debouncedQuery);
         if (newTerms.length > 0) {
-          setPage(page + 1);
+          setPage((prev) => prev + 1);
           setTerms((prev) => [...prev, ...newTerms]);
         } else {
           setHasMore(false);
@@ -73,43 +92,34 @@ export function TermList({ initialTerms, query }: TermListProps) {
 
   return (
     <>
-      {/*
-        =====================================================================
-        CATEGORY FILTER UI - Temporarily hidden for initial launch.
-        To re-enable, uncomment this block and restore the props 
-        (allCategories, initialSelectedCategories) to this component.
-        =====================================================================
-
-        <div className="mt-12">
-            <div className="flex flex-wrap justify-center gap-2">
-                {allCategories.map(cat => (
-                    <Button 
-                        key={cat.categoryId} 
-                        variant={selectedCategories.includes(cat.categoryId) ? "default" : "outline"}
-                        onClick={() => toggleCategory(cat.categoryId)}
-                    >
-                        {cat.name}
-                        {selectedCategories.includes(cat.categoryId) && <X className="ms-2 h-4 w-4" />}
-                    </Button>
-                ))}
-            </div>
-        </div>
-      */}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
-        {terms.map((term) => (
-          <TermCard key={term.termId} term={term} onSelect={() => setSelectedTerm(term)} />
-        ))}
+      <div className="relative mt-12 max-w-2xl mx-auto">
+        <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground rtl:left-auto rtl:right-4" />
+        <Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t("searchPlaceholder")} className="w-full text-lg h-14 pl-12 rtl:pl-4 rtl:pr-12 rounded-full shadow-sm" />
       </div>
 
-      {terms.length === 0 && <p className="text-center text-muted-foreground text-lg mt-16">{tableT("noResults")}</p>}
+      {/* --- 1. FIX FOR "NO RESULTS" FLICKERING --- */}
+      {/* We only show the loading state. The "No Results" message is now handled below. */}
+      {isSearching ? (
+        <p className="text-center text-muted-foreground text-lg mt-16">{commonT("loading")}</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-16">
+            {terms.map((term) => (
+              <TermCard key={term.termId} term={term} onSelect={() => setSelectedTerm(term)} />
+            ))}
+          </div>
 
-      {hasMore && (
-        <div className="flex justify-center mt-12">
-          <Button onClick={loadMore} disabled={isPending} size="lg">
-            {isPending ? commonT("loading") : t("loadMore")}
-          </Button>
-        </div>
+          {/* Show "No Results" only when NOT searching and the terms array is empty */}
+          {terms.length === 0 && !isSearching && <p className="text-center text-muted-foreground text-lg mt-16">{tableT("noResults")}</p>}
+
+          {hasMore && (
+            <div className="flex justify-center mt-12">
+              <Button onClick={loadMore} disabled={isLoadingMore} size="lg">
+                {isLoadingMore ? commonT("loading") : t("loadMore")}
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       <TermDialog term={selectedTerm} onClose={() => setSelectedTerm(null)} />

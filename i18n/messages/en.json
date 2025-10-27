@@ -33,6 +33,7 @@
       "description": "A collective of Arab futurists, foresight practitioners, and researchers united to ensure Arab futures are imagined, shaped, and owned by Arabs."
     },
     "nav": {
+      "vision": "Vision",
       "about": "About Us",
       "work": "Our Work",
       "projects": "Our Projects",
@@ -72,7 +73,21 @@
       "text": "To be the leading platform for foresight excellence in the region, cultivating leadership, ethical innovation, and futures literacy grounded in Arab values to shape meaningful, just, and regenerative futures."
     },
     "mission": { "title": "Our Mission", "text": "To build and democratize foresight capacity across the Arab world by developing context-rooted tools, nurturing practitioners, and making futures thinking accessible, relevant, and actionable for all." },
-    "projects": { "title": "Our Projects" },
+    "projects": {
+      "title": "Our Projects",
+      "viewProject": "Explore the Project",
+      "features": [
+        {
+          "id": "lexicon",
+          "label": "Flagship Initiative",
+          "heading": "The Arab Futures Lexicon",
+          "subheading": "معجم المستقبلات العربية",
+          "description": "For decades, futures terminology has been scattered across translations and institutions, creating barriers for researchers and policymakers. This initiative creates a living, collaborative, and authoritative reference for Arabic foresight terminology, serving as both a knowledge base and a community platform.",
+          "image": "/future-foresight-terms-project.jpg",
+          "url": "/terms"
+        }
+      ]
+    },
     "featuredTerms": {
       "title": "Featured Terms",
       "description": "Explore a curated selection of key terms from the Arab Futures Lexicon. Each term is a gateway to understanding the evolving language of foresight in our region.",
@@ -83,15 +98,43 @@
     },
     "termCard": { "readMore": "Read More", "noDescription": "No description available." },
     "termDialog": { "fullDescription": "Full Detail", "category": "Category", "tags": "Tags", "references": "References" },
-    "friends": { "title": "Our Friends & Partners", "logoAlt": "Partner logo {number}" },
+    "friends": {
+      "title": "Our Friends & Partners",
+      "yourLogoAlt": "Arab Futures Society Logo",
+      "partnerLogoAlt": "Logo of partner organization {number}"
+    },
     "contact": {
-      "title": "Contact Us",
-      "description": "Have a question or want to collaborate? Send us a message.",
+      "title": "Let's Shape the Future Together",
+      "description": "Whether you are a researcher, a policymaker, a student, or a practitioner, your voice is essential. Connect with us to collaborate, learn more, or join the conversation.",
+      "formTitle": "Send Us a Message",
       "name": "Your Name",
       "email": "Your Email",
       "message": "Your Message",
       "sendMessage": "Send Message",
-      "sending": "Sending..."
+      "whyConnectTitle": "Why Connect?",
+      "reasons": {
+        "collaborate": {
+          "title": "Collaborate on Research",
+          "description": "Partner with us on projects that advance Arab cultural and contextual foresight."
+        },
+        "learn": {
+          "title": "Learn & Grow",
+          "description": "Inquire about our capacity-building workshops, training, and educational programs."
+        },
+        "speak": {
+          "title": "Speaking & Consulting",
+          "description": "Invite us to guide your institution or speak at your event on future-oriented action."
+        },
+        "join": {
+          "title": "Join the Community",
+          "description": "Become part of our network of futurists and practitioners shaping tomorrow."
+        }
+      },
+      "contactInfoTitle": "Contact Information",
+      "emailAddress": "info@arabfutures.org",
+      "socialTitle": "Follow Our Journey",
+      "successMessage": "Thank you! Your message has been sent successfully.",
+      "errorMessage": "An error occurred. Please try again."
     },
     "signin": {
       "title": "Welcome Back",

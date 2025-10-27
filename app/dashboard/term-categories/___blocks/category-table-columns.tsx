@@ -12,7 +12,7 @@ import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
-import { termCategoryDeleteAction } from "../actions/delete";
+import { termCategoryDeleteAction } from "../action";
 
 export const columns: ColumnDef<TermCategoryWithCount>[] = [
   {
@@ -43,7 +43,6 @@ export const columns: ColumnDef<TermCategoryWithCount>[] = [
       return name ? name.includes((value as string).toLowerCase()) : false;
     },
   },
-  // Column for Status
   {
     accessorKey: "isActive",
     header: () => {

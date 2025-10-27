@@ -1,15 +1,17 @@
 "use server";
 
-import { createDeleteAction, createFormDataParser, createProtectedAction } from "@lib/action-handler";
+import { createActionParser, createBulkDeleteAction, createDeleteAction, createProtectedAction } from "@lib/action-handler";
 import { dbClient } from "@root/dal/client";
 import i18nAppConfig from "@root/i18n/config";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { DeleteManyTagsSchema, TagFormSchema } from "./tag.schema";
-import { DeleteManyTagsData, DeleteManyTagsState, TagForm, TagFormState } from "./tag.types";
+import { TagFormSchema } from "./tag.schema";
+import { TagForm, TagFormState } from "./tag.types";
 
-const saveTagHandler = async (data: TagForm): Promise<TagFormState> => {
+const tagActionParser = createActionParser();
+
+const tagSaveHandler = async (data: TagForm): Promise<TagFormState> => {
   const { tagId, translations } = data;
   let currentTagId = tagId;
 
@@ -45,26 +47,12 @@ const saveTagHandler = async (data: TagForm): Promise<TagFormState> => {
   };
 };
 
-export const saveTagAction = createProtectedAction(
-  TagFormSchema,
-  saveTagHandler,
-  createFormDataParser({}), // No boolean fields needed
-);
+export const tagSaveAction = createProtectedAction(TagFormSchema, tagSaveHandler, tagActionParser);
 
-export const deleteTagAction = createDeleteAction({
+export const tagDeleteAction = createDeleteAction({
   tableName: "tags",
   pkColumn: "tagId",
-  revalidatePaths: ["/dashboard/tags"],
+  revalidatePaths: ["/dashboard/terms", "/dashboard/tags"],
 });
 
-const deleteManyTagsHandler = async (data: DeleteManyTagsData): Promise<DeleteManyTagsState> => {
-  await dbClient.delete("tags", { tagId: { in: data.ids } });
-  revalidatePath("/dashboard/tags", "layout");
-  return { success: true, message: "Selected tags deleted successfully." };
-};
-
-export const deleteManyTagsAction = createProtectedAction(DeleteManyTagsSchema, deleteManyTagsHandler, async (formData) => {
-  return {
-    ids: JSON.parse(formData.get("ids") as string),
-  };
-});
+export const tagBulkDeleteAction = createBulkDeleteAction({ tableName: "tags", pkColumn: "tagId", revalidatePaths: ["/dashboard/tags", "layout"] });

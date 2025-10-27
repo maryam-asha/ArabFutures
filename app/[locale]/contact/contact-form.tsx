@@ -1,3 +1,4 @@
+// File: app/[locale]/contact/contact-form.tsx
 "use client";
 
 import { contactAction } from "@app/public-actions";
@@ -13,9 +14,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+// File: app/[locale]/contact/contact-form.tsx
+
+// File: app/[locale]/contact/contact-form.tsx
+
 const ContactSchema = z.object({
   name: z.string().min(2, "Name is required."),
-  email: z.email("Please enter a valid email."),
+  email: z.string().email("Please enter a valid email."),
   message: z.string().min(10, "Message must be at least 10 characters long."),
 });
 type ContactFormValues = z.infer<typeof ContactSchema>;
@@ -27,19 +32,21 @@ export function ContactForm() {
   const t = useTranslations("Public.contact");
   const commonT = useTranslations("Common");
   const formRef = useRef<HTMLFormElement>(null);
+
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(ContactSchema),
     defaultValues: { name: "", email: "", message: "" },
   });
 
   useEffect(() => {
+    // Use specific success/error messages from translations
     if (state.success) {
-      toast.success(state.message);
+      toast.success(t("successMessage"));
       form.reset();
     } else if (state.message && form.formState.isSubmitted) {
-      toast.error(state.message);
+      toast.error(t("errorMessage"));
     }
-  }, [state, form]);
+  }, [state, form, t]);
 
   return (
     <Form {...form}>
@@ -87,7 +94,7 @@ export function ContactForm() {
             <FormItem>
               <FormLabel>{t("message")}</FormLabel>
               <FormControl>
-                <Textarea placeholder={t("message")} rows={6} {...field} />
+                <Textarea placeholder={t("message")} rows={5} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

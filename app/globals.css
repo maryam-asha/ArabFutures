@@ -147,18 +147,21 @@
 }
 
 /* from here ..................... */
-
+:root {
+  scroll-behavior: smooth;
+}
 :root[lang="ar"] {
-  /* Apply Tajawal for sans-serif, as it's the primary UI font */
   --font-sans: "Tajawal", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
 
-  /* You may choose to also update serif and mono, or just let them fall back
-     to a suitable system font if Tajawal isn't appropriate for those styles.
-     For simplicity and common use, only sans is essential. */
   --font-serif: "Tajawal", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
+
 [data-slot="tabs-content"][data-state="inactive"] {
   display: none;
+}
+
+.scroll-mt-header {
+  scroll-margin-top: 6rem; /* Adjust this value if your header height changes */
 }
 
 @layer utilities {
@@ -167,4 +170,32 @@
       transform: translate(calc(-50% - 0.5rem));
     }
   }
+}
+
+.term-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px; /* The thickness of the border */
+  background-color: hsl(var(--primary)); /* Uses your primary theme color */
+  transform: scaleY(0); /* Initially hidden */
+  transform-origin: center; /* Animates from the center outwards */
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Animate the border on hover */
+.term-card:hover::before {
+  transform: scaleY(1);
+}
+
+/* --- Directional Awareness --- */
+/* For English (LTR), the border appears on the left */
+[dir="ltr"] .term-card::before {
+  left: 0;
+}
+
+/* For Arabic (RTL), the border appears on the right */
+[dir="rtl"] .term-card::before {
+  right: 0;
 }

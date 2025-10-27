@@ -1,10 +1,8 @@
 "use client";
 
 import { Button } from "@components/ui/button";
-import { Input } from "@components/ui/input";
 import { Link } from "@i18n/navigation";
 import { TermCategoryOption, TermDb } from "@root/dal/dal.types";
-import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -32,12 +30,7 @@ export function FeaturedTermsSection({ terms, categories }: { terms: TermDb[]; c
         </div>
       </div>
 
-      <div className="relative">
-        <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground" />
-        <Input placeholder={t("searchPlaceholder")} className="w-full text-lg h-14 pl-12 rounded-full shadow-sm" />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
         {terms.map((term) => (
           <TermCard key={term.termId} term={term} onSelect={() => setSelectedTerm(term)} />
         ))}

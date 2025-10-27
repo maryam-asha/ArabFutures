@@ -29,7 +29,7 @@ export function BulkActionMenuItem<TData>({ table, pkColumn, label, action, acti
     }
 
     startTransition(() => {
-      toast.promise(action(null, formData), {
+      toast.promise(action({} as any, formData), {
         loading: tCommon("processing"),
         success: (result) => {
           if (result.success) {

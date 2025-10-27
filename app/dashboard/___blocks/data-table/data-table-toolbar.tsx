@@ -82,7 +82,7 @@ function BulkActionMenuItem<TData>({ table, pkColumn, label, action, actionType,
     startTransition(() => {
       toast.promise(
         // We call the action with the FormData object, which matches the ServerAction type.
-        action(null, formData),
+        action({} as any, formData),
         {
           loading: tActions("title"),
           success: (result) => {

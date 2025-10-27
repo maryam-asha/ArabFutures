@@ -61,7 +61,8 @@ export const TermTranslationDbSchema = z.object({
   title: z.string(),
   briefDescription: z.string().nullable(),
   fullDetail: z.string().nullable(),
-  references: z.preprocess((val) => (val ? JSON.parse(val as string) : []), z.array(TermReferenceDbSchema)),
+  // references: z.preprocess((val) => (val ? JSON.parse(val as string) : []), z.array(TermReferenceDbSchema)),
+  references: z.array(TermReferenceDbSchema).nullable().default([]),
 });
 
 // This schema is now more complex to fetch related data efficiently
@@ -70,7 +71,8 @@ export const TermDbSchema = z.object({
   categoryRef: z.number().nullable(),
   status: z.enum(["pending", "published"]),
   isFeatured: z.coerce.boolean(),
-  translations: createTranslationsSchema(TermTranslationDbSchema),
+  translations: z.preprocess((val) => (typeof val === "string" ? JSON.parse(val) : val), createTranslationsSchema(TermTranslationDbSchema)),
+
   // We'll fetch the category name and tags directly in our query
   categoryName: z.string().nullable(),
   tags: z.preprocess(

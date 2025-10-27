@@ -23,7 +23,8 @@ const tajawal = Tajawal({
   weight: ["400", "500", "700"],
 });
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata(params: Promise<{ locale: string }>): Promise<Metadata> {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Public.metadata" });
   const title = t("title");
   const description = t("description");
@@ -63,7 +64,7 @@ export default async function LocaleLayout({
     <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} className={locale === "ar" ? `${tajawal.variable} font-sans-arabic` : `${inter.variable} font-sans antialiased`}>
       <body className="bg-background text-foreground overflow-x-hidden">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <div className="flex flex-col min-h-screen">
+          <div className="flex flex-col min-h-dvh">
             <PublicHeader />
             <main className="grow">{children}</main>
             <PublicFooter />

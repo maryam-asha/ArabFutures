@@ -8,7 +8,7 @@ import { FeaturedTermsSection } from "./___blocks/featured-terms-section";
 import FriendsSection from "./___blocks/friends-section";
 import HeroSection from "./___blocks/hero-section";
 import OurWorkSection from "./___blocks/our-work-section";
-import ProjectsSection from "./___blocks/project-section";
+import ProjectsSection from "./___blocks/projects-section";
 import VisionMissionSection from "./___blocks/vision-mission-section";
 
 export default async function LandingPage() {
@@ -18,7 +18,7 @@ export default async function LandingPage() {
   const t = await getTranslations("Public");
 
   return (
-    <div className="flex flex-col space-y-24 md:space-y-32 lg:space-y-40">
+    <div className="flex flex-col space-y-8 md:space-y-16 lg:space-y-24">
       <HeroSection categories={categories} />
       <VisionMissionSection />
       <OurWorkSection />

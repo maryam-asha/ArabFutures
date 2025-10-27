@@ -5,7 +5,7 @@ export default async function AboutSection() {
   const values = t.raw("values");
 
   return (
-    <section id="about" className="container mx-auto py-16">
+    <section id="about" className="container mx-auto py-8 scroll-mt-header">
       <div className="mb-14 grid gap-5 text-center md:grid-cols-2 md:text-left items-center">
         <h1 className="text-5xl font-bold">{t("title")}</h1>
         <p className="text-lg text-muted-foreground">{t("p1")}</p>

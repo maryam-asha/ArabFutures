@@ -1,80 +1,106 @@
 "use client";
 
+import i18nAppConfig, { AppLocale } from "@i18n/config";
 import { TermDb } from "@root/dal/dal.types";
-import i18nAppConfig, { AppLocale } from "@root/i18n/config";
 import { Badge } from "@ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@ui/dialog";
+import { Separator } from "@ui/separator";
+import { FileTextIcon, LinkIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 interface TermDialogProps {
   term: TermDb | null;
   onClose: () => void;
 }
+
+// Reusable Section Component for consistent styling
+const DetailSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <div>
+    <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">{title}</h3>
+    {children}
+  </div>
+);
+
 export function TermDialog({ term, onClose }: TermDialogProps) {
   const isOpen = !!term;
   const t = useTranslations("Public.termDialog");
   const commonT = useTranslations("Common");
   const currentLocale = useLocale() as AppLocale;
+
   if (!term) {
     return null;
   }
+
   const otherLocale = i18nAppConfig.locales.find((l) => l !== currentLocale) || currentLocale;
   const primaryTranslation = term.translations?.[currentLocale];
   const secondaryTranslation = term.translations?.[otherLocale];
+
+  const title = primaryTranslation?.title || commonT("notAvailable");
+  const briefDescription = primaryTranslation?.briefDescription;
+  const dir = currentLocale === "ar" ? "rtl" : "ltr";
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle className="text-3xl font-bold">{primaryTranslation?.title}</DialogTitle>
-          {secondaryTranslation?.title && <DialogDescription className="text-lg">{secondaryTranslation.title}</DialogDescription>}
-        </DialogHeader>
-        <div className="max-h-[70vh] overflow-y-auto p-1 pr-4 space-y-8 mt-4">
-          <p className="text-lg text-muted-foreground">{primaryTranslation?.briefDescription}</p>
+      <DialogContent className="max-w-3xl p-0">
+        <div className="max-h-[85vh] overflow-y-auto">
+          <div className="term-dialog-content relative p-8 md:p-12">
+            <div className="pl-6">
+              <DialogHeader>
+                {term.categoryName && <span className="font-semibold text-primary mb-2">{term.categoryName}</span>}
+                <DialogTitle className="text-3xl font-bold leading-tight md:text-4xl">{title}</DialogTitle>
+                {secondaryTranslation?.title && <DialogDescription className="text-lg pt-1 text-muted-foreground/80">{secondaryTranslation.title}</DialogDescription>}
+              </DialogHeader>
 
-          {primaryTranslation?.fullDetail && (
-            <div className="space-y-2">
-              <h3 className="font-semibold text-xl border-b pb-2">{t("fullDescription")}</h3>
-              <p className="text-muted-foreground whitespace-pre-wrap">{primaryTranslation.fullDetail}</p>
-            </div>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <h3 className="font-semibold text-xl border-b pb-2">{t("category")}</h3>
-              <p className="text-muted-foreground">{term.categoryName || commonT("notAvailable")}</p>
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold text-xl border-b pb-2">{t("tags")}</h3>
-              {term.tags?.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {term.tags.map((tag: any) => (
-                    <Badge key={tag.tagId} variant="secondary" className="text-base px-3 py-1">
-                      {tag.name}
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground">{commonT("notAvailable")}</p>
-              )}
+              {briefDescription && <p className="mt-6 text-lg text-foreground/80 leading-relaxed">{briefDescription}</p>}
+
+              <Separator className="my-8" />
+
+              <div className="space-y-10">
+                {primaryTranslation?.fullDetail && (
+                  <DetailSection title={t("fullDescription")}>
+                    <div className="prose prose-sm max-w-none text-muted-foreground whitespace-pre-wrap leading-relaxed">{primaryTranslation.fullDetail}</div>
+                  </DetailSection>
+                )}
+
+                {/* Tags Section */}
+                {term.tags && term.tags.length > 0 && (
+                  <DetailSection title={t("tags")}>
+                    <div className="flex flex-wrap gap-2">
+                      {term.tags.map((tag: any) => (
+                        <Badge key={tag.tagId} variant="secondary" className="text-sm px-3 py-1">
+                          {tag.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </DetailSection>
+                )}
+
+                {/* References Section */}
+                {primaryTranslation?.references && primaryTranslation.references.length > 0 && (
+                  <DetailSection title={t("references")}>
+                    <ul className="space-y-4">
+                      {primaryTranslation.references.map((ref) => (
+                        <li key={ref.referenceId} className="flex items-start gap-3 text-base">
+                          {ref.url ? (
+                            <>
+                              <LinkIcon className="h-4 w-4 shrink-0 mt-1 text-primary" />
+                              <a href={ref.url} target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline wrap-break-word">
+                                {ref.content || ref.url}
+                              </a>
+                            </>
+                          ) : (
+                            <>
+                              <FileTextIcon className="h-4 w-4 shrink-0 mt-1 text-muted-foreground" />
+                              <span className="text-muted-foreground wrap-break-word">{ref.content}</span>
+                            </>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </DetailSection>
+                )}
+              </div>
             </div>
           </div>
-          {primaryTranslation?.references && primaryTranslation.references.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="font-semibold text-xl border-b pb-2">{t("references")}</h3>
-              <ul className="space-y-3 list-disc pl-5 text-muted-foreground">
-                {primaryTranslation.references.map((ref) => (
-                  <li key={ref.referenceId}>
-                    {ref.url ? (
-                      <a href={ref.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                        {ref.content}
-                      </a>
-                    ) : (
-                      <span>{ref.content}</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </DialogContent>
     </Dialog>

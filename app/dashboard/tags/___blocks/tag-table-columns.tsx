@@ -11,7 +11,7 @@ import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
-import { deleteTagAction } from "../actions";
+import { tagDeleteAction } from "../actions";
 
 export const columns: ColumnDef<TagWithCount>[] = [
   {
@@ -71,7 +71,7 @@ export const columns: ColumnDef<TagWithCount>[] = [
                 <Link href={`/dashboard/tags/${tag.tagId}`}>{tActions("edit")}</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DeleteEntityButton entityId={tag.tagId} entityName="tag" deleteAction={deleteTagAction} asChild>
+              <DeleteEntityButton entityId={tag.tagId} entityName="tag" deleteAction={tagDeleteAction} asChild>
                 <span className="text-destructive focus:bg-destructive/10">{tActions("delete")}</span>
               </DeleteEntityButton>
             </DropdownMenuContent>

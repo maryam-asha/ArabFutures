@@ -1,7 +1,6 @@
 "use client";
 
 import { SubmitButton } from "@app/dashboard/___blocks/submit-button";
-import { saveCategoryAction } from "@app/dashboard/term-categories/actions";
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,6 +17,7 @@ import { useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { termCategorySaveAction } from "../action";
 import { CategoryFormSchema } from "../category.schema";
 import { type CategoryForm, CategoryFormState } from "../category.types";
 
@@ -30,7 +30,7 @@ const initialFormState: CategoryFormState = {
 export function CategoryForm({ initialData }: { initialData: Partial<CategoryForm> }) {
   const isEditMode = !!initialData?.categoryId;
   const router = useRouter();
-  const [state, formAction] = useActionState(saveCategoryAction, initialFormState);
+  const [state, formAction] = useActionState(termCategorySaveAction, initialFormState);
   const locale = useLocale();
   const tLabels = useTranslations("Dashboard.forms.labels");
   const tCommonActions = useTranslations("Common.actions");
