@@ -1,79 +1,235 @@
 {
-  "Header": {
-    "brandName": "HOMAM",
-    "homeAriaLabel": "HOMAM Home"
+  "Common": {
+    "notAvailable": "N/A",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "error": "An unexpected error occurred. Please try again.",
+    "yes": "Yes",
+    "no": "No",
+    "actions": {
+      "title": "Actions",
+      "add": "Add New",
+      "edit": "Edit",
+      "delete": "Delete",
+      "approve": "Approve",
+      "pending": "pending",
+      "feature": "featured",
+      "unfeature": "unfeatured",
+      "reject": "Reject",
+      "save": "Save Changes",
+      "create": "Create",
+      "cancel": "Cancel",
+      "reset": "Reset",
+      "deleteSelected": "Delete Selected",
+      "close": "Close",
+      "openMenu": "Open menu",
+      "search": "Search..."
+    }
   },
-  "HeroSection": {
-    "titleLine1": "Design furniture for",
-    "titleLine2": "spaces that breathe.",
-    "subtitle": "Designed in Belgium, crafted to endure — timeless pieces for modern living.",
-    "shipping": "Free shipping",
-    "delivery": "Delivered in 6 weeks",
-    "guarantee": "Lifetime guarantee"
-  },
-  "FeaturedProducts": {
-    "title": "Featured",
-    "titleItalic": "Collection",
-    "description": "Discover our most beloved pieces, each crafted with meticulous attention to detail and timeless design principles."
-  },
-  "CollectionStrip": {
-    "title": "Explore Our Collections",
-    "description": "Each collection tells a unique story of craftsmanship and design philosophy, curated for the discerning eye.",
-    "dragHint": "Drag to explore"
-  },
-  "MaterialsSection": {
-    "description": "Every piece begins with the finest materials, carefully selected for their beauty, durability, and sustainable origins. Our craftspeople honor traditional techniques while embracing modern precision.",
-    "materials": [
-      { "id": "pistachio", "name": "Pistachio" },
-      { "id": "lunar", "name": "Lunar" },
-      { "id": "martian", "name": "Martian" }
-    ]
-  },
-  "NewsletterSection": {
-    "title": "Stay ahead of ",
-    "titleItalic": "quiet luxury.",
-    "description": "Be the first to discover new collections, design insights, and exclusive access to limited pieces.",
-    "emailPlaceholder": "Enter your email address",
-    "buttonText": "Subscribe to Newsletter",
-    "validationError": "Please enter a valid email address",
-    "successTitle": "Welcome to HOMAM",
-    "successDescription": "Thank you for subscribing. You'll receive our next newsletter with exclusive insights and new arrivals.",
-    "privacyPolicy": "We respect your privacy. Unsubscribe at any time. Read our <link>Privacy Policy</link>."
-  },
-  "Footer": {
-    "brandName": "HOMAM",
-    "brandDescription": "Architected in Belgium, built to last. We create timeless furniture pieces for spaces that breathe.",
-    "headings": {
-      "shop": "Shop",
-      "company": "Company",
-      "support": "Support"
+  "Public": {
+    "metadata": {
+      "title": "Arab Futures Society",
+      "description": "A collective of Arab futurists, foresight practitioners, and researchers united to ensure Arab futures are imagined, shaped, and owned by Arabs."
     },
-    "links": {
-      "newArrivals": "New Arrivals",
-      "chairs": "Chairs",
-      "tables": "Tables",
-      "storage": "Storage",
-      "lighting": "Lighting",
-      "about": "About",
-      "craftsmanship": "Craftsmanship",
-      "sustainability": "Sustainability",
-      "careers": "Careers",
-      "press": "Press",
-      "contact": "Contact",
-      "sizeGuide": "Size Guide",
-      "careInstructions": "Care Instructions",
-      "shipping": "Shipping",
-      "returns": "Returns"
+    "nav": {
+      "about": "About Us",
+      "work": "Our Work",
+      "projects": "Our Projects",
+      "blogs": "Blogs",
+      "contact": "Contact Us"
     },
-    "copyright": "© {currentYear} HOMAM Studio. All rights reserved.",
-    "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service",
-    "cookies": "Cookies"
+    "hero": {
+      "title": "Futures by Arabs, for Arabs",
+      "slogan": "A collective of Arab futurists, foresight practitioners, and researchers united to ensure Arab futures are imagined, shaped, and owned by Arabs.",
+      "ctaPrimary": "Suggest a Term",
+      "ctaSecondary": "Explore the Lexicon"
+    },
+    "about": {
+      "title": "About Us",
+      "p1": "We exist to build a foresight ecosystem that speaks our language, reflects our diversity, and reclaims our agency in shaping tomorrow.",
+      "breakoutTitle": "A Cultural Right",
+      "breakoutDescription": "We believe foresight is not only a discipline but a cultural right: the right to imagine futures on our own terms.",
+      "valuesTitle": "Our Values",
+      "values": {
+        "participatory": { "label": "Participatory", "value": "Fostering inclusion and collective ownership of the future." },
+        "agency": { "label": "Agency", "value": "Empowering individuals and institutions to shape their own trajectories." },
+        "representation": { "label": "Representation", "value": "Ensuring Arab futures are told by Arab voices." },
+        "pioneering": { "label": "Pioneering", "value": "Driven to challenge, adapt, and create what our region needs." }
+      }
+    },
+    "ourWork": {
+      "title": "Building a Sustainable Foresight Ecosystem",
+      "features": [
+        { "label": "FOR CONTEXT", "heading": "Localizing Tools", "description": "Adapting and developing foresight tools and frameworks to align with Arab contexts, mindsets, and languages." },
+        { "label": "FOR CULTURE", "heading": "Researching Futures", "description": "Investigating cultural and social futures, amplifying local narratives of change, and advancing Arab contextual foresight." },
+        { "label": "FOR CAPACITY", "heading": "Building Skills", "description": "Strengthening regional capabilities through targeted training, education, and collaboration across all sectors." },
+        { "label": "FOR ACTION", "heading": "Guidance & Innovation", "description": "Consulting and speaking to guide institutions, policymakers, and innovators toward future-oriented action." }
+      ]
+    },
+    "vision": {
+      "title": "Our Vision",
+      "text": "To be the leading platform for foresight excellence in the region, cultivating leadership, ethical innovation, and futures literacy grounded in Arab values to shape meaningful, just, and regenerative futures."
+    },
+    "mission": { "title": "Our Mission", "text": "To build and democratize foresight capacity across the Arab world by developing context-rooted tools, nurturing practitioners, and making futures thinking accessible, relevant, and actionable for all." },
+    "projects": { "title": "Our Projects" },
+    "featuredTerms": {
+      "title": "Featured Terms",
+      "description": "Explore a curated selection of key terms from the Arab Futures Lexicon. Each term is a gateway to understanding the evolving language of foresight in our region.",
+      "suggestTerm": "Suggest a Term",
+      "viewAll": "View All Terms",
+      "searchPlaceholder": "Search terms...",
+      "loadMore": "Load More"
+    },
+    "termCard": { "readMore": "Read More", "noDescription": "No description available." },
+    "termDialog": { "fullDescription": "Full Detail", "category": "Category", "tags": "Tags", "references": "References" },
+    "friends": { "title": "Our Friends & Partners", "logoAlt": "Partner logo {number}" },
+    "contact": {
+      "title": "Contact Us",
+      "description": "Have a question or want to collaborate? Send us a message.",
+      "name": "Your Name",
+      "email": "Your Email",
+      "message": "Your Message",
+      "sendMessage": "Send Message",
+      "sending": "Sending..."
+    },
+    "signin": {
+      "title": "Welcome Back",
+      "description": "Sign in to access the dashboard.",
+      "username": "Username",
+      "usernamePlaceholder": "e.g., admin",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••••••••••",
+      "rememberMe": "Remember Me",
+      "forgotPassword": "Forgot Password?",
+      "cta": "Sign In",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    }
   },
-  "QuickLookModal": {
-    "dimensions": "DIMENSIONS",
-    "features": "FEATURES",
-    "addToCart": "Add to Cart",
-    "featureList": ["Sustainably sourced materials", "Hand-finished edges", "Made to order in Belgium", "Lifetime repair program"]
+  "Dashboard": {
+    "home": "Home",
+    "overview": "Dashboard",
+    "welcome": "Welcome! Here's an overview of the platform's content.",
+    "getStarted": "Use the navigation on the left to manage content.",
+    "sidebar": {
+      "title": "Sidebar",
+      "description": "Main navigation sidebar.",
+      "toggle": "Toggle Sidebar",
+      "overview": "Overview",
+      "contentManagement": "Content Management",
+      "terms": "Lexicon Terms",
+      "termCategories": "Term Categories",
+      "tags": "Tags",
+      "approvals": "Approvals"
+    },
+    "profile": {
+      "myAccount": "My Account",
+      "settings": "Settings",
+      "billing": "Billing",
+      "manageTeam": "Manage Team",
+      "customization": "Customization",
+      "addTeam": "Add Team Account",
+      "logout": "Logout"
+    },
+    "pages": {
+      "terms": {
+        "title": "Lexicon Terms",
+        "addTitle": "Add New Lexicon Term",
+        "addDescription": "Fill out the details for the new term.",
+        "editTitle": "Edit Lexicon Term",
+        "editDescription": "Modify the details for \"{entityName}\"."
+      },
+      "categories": {
+        "title": "Term Categories",
+        "addTitle": "Add New Term Category",
+        "addDescription": "Fill out the details for the new category.",
+        "editTitle": "Edit Term Category",
+        "editDescription": "Modify the details for \"{entityName}\"."
+      },
+      "tags": {
+        "title": "Tags",
+        "addTitle": "Add New Tag",
+        "addDescription": "Create a new tag to organize lexicon terms.",
+        "editTitle": "Edit Tag",
+        "editDescription": "Modify the details for \"{entityName}\"."
+      },
+      "home": {
+        "title": "Home",
+        "welcome": "change here by text writer",
+        "totalTools": "Total Foresight Tools",
+        "publishedTerms": "Published Lexicon Terms",
+        "pendingSuggestions": "Pending Suggestions",
+        "dataToBePopulated": "(Data to be populated)"
+      }
+    },
+    "forms": {
+      "labels": {
+        "title": "Title",
+        "name": "Name",
+        "briefDescription": "Brief Description",
+        "fullDetail": "Full Detail",
+        "category": "Category",
+        "tags": "Tags",
+        "status": "Status",
+        "featured": "Featured",
+        "active": "Active",
+        "inactive": "Inactive",
+        "visibility": "Visibility",
+        "organization": "Organization",
+        "references": "References",
+        "addReference": "Add Reference",
+        "referenceContent": "Reference Content",
+        "referenceUrl": "URL (Optional)"
+      },
+      "placeholders": {
+        "select": "Select...",
+        "selectCategory": "Select a category",
+        "selectTags": "Select tags...",
+        "selectStatus": "Select status",
+        "search": "Search..."
+      },
+      "statuses": { "published": "Published", "pending": "Pending" },
+      "errors": {
+        "titleMin": "Title must be at least 3 characters.",
+        "nameMin": "Name must be at least 3 characters.",
+        "nameMin2": "Name must be at least 2 characters.",
+        "categoryRequired": "Please select a category.",
+        "invalidUrl": "Please enter a valid URL.",
+        "contentRequired": "Content is required.",
+        "atLeastOneTitle": "At least one language must have a title."
+      }
+    },
+    "tables": {
+      "noResults": "No results found.",
+      "rowsPerPage": "Rows per page",
+      "selectedRows": "{count, plural, zero {0 rows selected} one {# row selected} other {# rows selected}} of {total}",
+      "pageIndicator": "Page {page} of {totalPages}",
+      "goToFirstPage": "Go to first page",
+      "goToPreviousPage": "Go to previous page",
+      "goToNextPage": "Go to next page",
+      "goToLastPage": "Go to last page",
+      "selectAll": "Select all",
+      "selectRow": "Select row"
+    },
+    "dialogs": {
+      "areYouSure": "Are you absolutely sure?",
+      "noUndo": "This action cannot be undone.",
+      "confirmDelete": "This will permanently delete the {entityName}.",
+      "confirmBulkDelete": "This will permanently delete {count, plural, one {the selected item} other {all # selected items}}.",
+      "deletePermanently": "Delete Permanently"
+    },
+    "toasts": {
+      "createSuccess": "{entityName} created successfully.",
+      "updateSuccess": "{entityName} updated successfully.",
+      "deleteSuccess": "{entityName} deleted successfully.",
+      "deleteError": "Failed to delete {entityName}.",
+      "bulkDeleteSuccess": "Selected items deleted successfully.",
+      "bulkDeleteError": "Failed to delete selected items.",
+      "approveSuccess": "Term approved successfully.",
+      "approveError": "Failed to approve term.",
+      "suggestionSuccess": "Thank you! Your suggestion has been submitted for review.",
+      "suggestionError": "Failed to submit suggestion. Please try again."
+    }
   }
 }

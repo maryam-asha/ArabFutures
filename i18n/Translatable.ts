@@ -22,10 +22,7 @@ import { z } from "zod";
  */
 export function createTranslationsSchema<T extends z.ZodRawShape>(contentSchema: z.ZodObject<T>) {
   const { locales } = routing;
-
   const localeSchemas = Object.fromEntries(locales.map((locale) => [locale, contentSchema.nullable()])) as Record<AppLocale, z.ZodNullable<z.ZodObject<T>>>;
-
-  // Use .partial() to allow any subset of locales to be present.
   return z.object(localeSchemas).partial();
 }
 
@@ -64,10 +61,8 @@ export function createTranslationsSchema<T extends z.ZodRawShape>(contentSchema:
  */
 export function createSqlTranslationsSubquery<T extends z.ZodRawShape>(mainTableAlias: string, pkColumn: string, translationTable: string, refColumn: string, translationSchema: z.ZodObject<T>, locales?: AppLocale[]): string {
   const translationFields = Object.keys(translationSchema.shape);
-  const fieldsObject = translationFields.map((field) => `'${field}', ${field}`).join(", ");
+  const fieldsObject = translationFields.map((field) => `'${field}', \`${field}\``).join(", ");
   const localesToQuery = locales && locales.length > 0 ? locales : routing.locales;
-
   const subqueries = localesToQuery?.map((locale) => `'${locale}', (SELECT JSON_OBJECT(${fieldsObject}) FROM ${translationTable} t WHERE t.${refColumn} = ${mainTableAlias}.${pkColumn} AND t.locale = '${locale}')`).join(", ");
-
   return `JSON_OBJECT(${subqueries})`;
 }

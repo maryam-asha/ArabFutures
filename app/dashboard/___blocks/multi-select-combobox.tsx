@@ -6,6 +6,7 @@ import { cn } from "@lib/utils";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@ui/popover";
 import { Check, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 export interface Option {
@@ -22,6 +23,7 @@ interface MultiSelectProps {
 }
 
 export function MultiSelectCombobox({ options, selected, onChange, className, placeholder = "Select..." }: MultiSelectProps) {
+  const t = useTranslations("Dashboard");
   const [open, setOpen] = React.useState(false);
 
   const selectedOptions = selected.map((val) => options.find((opt) => opt.value === val)).filter(Boolean) as Option[];
@@ -47,16 +49,16 @@ export function MultiSelectCombobox({ options, selected, onChange, className, pl
                 </Badge>
               ))
             ) : (
-              <span>{placeholder}</span>
+              <span>{placeholder || t("forms.placeholders.select")}</span>
             )}
           </div>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
         <Command>
-          <CommandInput placeholder="Search..." />
+          <CommandInput placeholder={t("forms.placeholders.search")} />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>{t("tables.noResults")}</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
                 <CommandItem

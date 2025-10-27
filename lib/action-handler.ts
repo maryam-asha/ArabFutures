@@ -1,3 +1,6 @@
+import { getCsrfTokenAction } from "@app/auth-actions";
+import { BulkDeleteSchema } from "@app/dashboard/schemas";
+import { BulkDeleteData, DeleteActionParams } from "@app/dashboard/types";
 import { dbClient } from "@root/dal/client";
 import { ActionState } from "@root/types";
 import { NotAuthenticatedError } from "@waelhabbaldev/next-jwt-auth";
@@ -8,187 +11,116 @@ import { z } from "zod";
 
 import { auth } from "./auth";
 
-export const defaultOrder = 100_000;
+export type ServerAction<TState> = (prevState: TState, formData: FormData) => Promise<ActionState<TState>>;
 
-export type ActionHandler<TInput, TState> = (data: TInput) => Promise<TState>;
+export type ActionHandler<TInput> = (data: TInput) => Promise<ActionState<TInput>>;
 
-interface ParserConfig {
-  booleanFields?: string[];
-  jsonFields?: string[];
-}
+export function createActionParser(
+  config: {
+    booleanFields?: string[];
+    jsonFields?: string[];
+  } = {},
+) {
+  const { booleanFields = [], jsonFields = [] } = config;
 
-/**
- * Creates a robust FormData parser function.
- * This HOF is designed to handle the complexities of FormData, including
- * nested objects (via dot notation) and boolean values from checkboxes/switches.
- *
- * @param config - Configuration object to specify boolean fields.
- * @returns A parser function that converts FormData to a structured object.
- */
-export function createFormDataParser({ booleanFields = [], jsonFields = [] }: ParserConfig = {}) {
-  return function parse(formData: FormData): Record<string, any> {
+  return (formData: FormData): Record<string, any> => {
     const object: Record<string, any> = {};
 
     formData.forEach((value, key) => {
+      // We don't need to parse CSRF token as a field.
+      if (key === "csrf_token") return;
+
       if (jsonFields.includes(key)) {
-        console.log(jsonFields);
-        console.log(value.toString());
-
-        console.log(jsonFields.includes(key));
-
         try {
-          object[key] = JSON.parse(value.toString());
-          console.log("+++++++++++++++++++++++++++++++++");
-
-          console.log(object[key]);
-        } catch (e) {
-          console.log(e);
-
-          object[key] = value;
+          object[key] = JSON.parse(value as string);
+        } catch {
+          object[key] = null;
         }
-      } else if (key.includes(".")) {
-        const keys = key.split(".");
-        keys.reduce((acc, currentKey, index) => {
-          if (index === keys.length - 1) {
-            acc[currentKey] = value;
-          } else {
-            acc[currentKey] = acc[currentKey] || {};
-          }
-          return acc[currentKey];
-        }, object);
-      } else if (booleanFields.includes(key)) {
-        if (key) {
-          const val = value.toString().toLowerCase();
-          object[key] = val === "on" || val === "true" || val === "1";
-        } else {
-          object[key] = false;
-        }
-      } else if (key === "translations") {
-        object[key] = JSON.parse(value.toString());
-      } else {
-        object[key] = value;
+        return;
       }
+
+      if (booleanFields.includes(key)) return; // Processed last.
+
+      const keys = key.match(/[^.[\]]+/g) || [];
+      keys.reduce((acc, currentKey, index) => {
+        if (index === keys.length - 1) {
+          acc[currentKey] = value;
+        } else {
+          const nextKey = keys[index + 1];
+          if (!acc[currentKey]) {
+            acc[currentKey] = /^\d+$/.test(nextKey) ? [] : {};
+          }
+        }
+        return acc[currentKey];
+      }, object);
     });
+
+    booleanFields.forEach((key) => {
+      object[key] = formData.get(key) === "on";
+    });
+
     return object;
   };
 }
 
-// Default parser for simple forms without booleans or nesting.
-const defaultParser = createFormDataParser();
-
-/**
- * A higher-order function to create a type-safe, protected server action.
- *
- * @param schema The Zod schema to validate the form data.
- * @param handler The core business logic of the action, which receives the validated data.
- * @param parser An optional function to parse FormData into a plain object before validation.
- * @returns A server action function that can be used in forms.
- */
-export function createProtectedAction<TInput, TState extends ActionState<any>>(schema: z.ZodSchema<TInput>, handler: ActionHandler<TInput, TState>, parser?: (formData: FormData) => Record<string, any>) {
-  return async function protectedAction(prevState: TState, formData: FormData): Promise<TState> {
+export function createProtectedAction<TInput, TState extends ActionState<TInput>>(schema: z.ZodSchema<TInput>, handler: ActionHandler<TInput>, parser: (formData: FormData) => Record<string, any>): ServerAction<TState> {
+  return async function protectedAction(prevState: TState, formData: FormData): Promise<ActionState<TState>> {
     try {
       await auth.protectAction(undefined, formData);
+      const newCsrfToken = await getCsrfTokenAction();
 
-      const dataToParse = parser ? parser(formData) : Object.fromEntries(formData);
-
+      const dataToParse = parser(formData);
       const parsed = schema.safeParse(dataToParse);
 
       if (!parsed.success) {
-        const errors = z.treeifyError(parsed.error);
         return {
+          newCsrfToken: newCsrfToken,
           success: false,
           message: "Validation failed. Please check the fields for errors.",
-          errors,
-        } as TState;
+          errors: z.treeifyError(parsed.error),
+        } as ActionState<TState>;
       }
 
-      return await handler(parsed.data);
+      const result = await handler(parsed.data);
+      result.newCsrfToken = newCsrfToken;
+      return result;
     } catch (e) {
-      if (e instanceof NotAuthenticatedError) {
-        redirect("/signin");
-      }
-      if (isRedirectError(e)) {
-        throw e;
-      }
+      if (e instanceof NotAuthenticatedError) redirect("/signin");
+      if (isRedirectError(e)) throw e;
 
       console.error("Server Action Error:", e);
-
       return {
         success: false,
         message: (e as Error).message || "An unexpected server error occurred.",
         errors: {},
-      } as TState;
+      } as ActionState<TState>;
     }
   };
 }
 
-/**
- * Configuration for the generic reordering action.
- */
-interface ReorderActionConfig {
-  tableName: "categories" | "products";
-  pkColumn: "categoryId" | "productId";
-  orderColumn?: string;
-  revalidatePaths?: string[];
-}
-
-const ReorderSchema = z.array(
-  z.object({
-    id: z.number().positive(),
-    order: z.number().nonnegative(),
-  }),
-);
-type ReorderData = z.infer<typeof ReorderSchema>;
-
-/**
- * Creates a generic, protected server action for reordering items in any table.
- */
-export function createReorderAction<T>({ tableName, pkColumn, orderColumn = "displayOrder", revalidatePaths = [] }: ReorderActionConfig) {
-  const handler = async (data: ReorderData): Promise<ActionState<ReorderData>> => {
-    await dbClient.executeTransaction(async (trx) => {
-      for (const item of data) {
-        await trx.update(tableName, { [orderColumn]: item.order }, { [pkColumn]: item.id });
-      }
-    });
-    revalidatePaths.forEach((path) => revalidatePath(path, "layout"));
-    return { success: true, message: "Order updated successfully." };
-  };
-
-  return createProtectedAction(ReorderSchema, handler, (formData) => JSON.parse(formData.get("orderedData") as string));
-}
-
-/**
- * Configuration for the generic delete action creator.
- */
-interface DeleteActionConfig {
-  tableName: "termCategories" | "tags" | "terms";
-  pkColumn: "categoryId" | "productId" | "tagId" | "termId";
-  revalidatePaths: string[];
-}
-
-/**
- * Creates a generic, type-safe, and protected server action for deleting an entity.
- * This HOF encapsulates authentication, validation, deletion logic, and error handling.
- *
- * @param config - The configuration object specifying the table, primary key, and revalidation paths.
- * @returns A complete server action function ready to be used in a form.
- */
-export function createDeleteAction({ tableName, pkColumn, revalidatePaths }: DeleteActionConfig) {
-  const DeleteSchema = z.object({
-    [pkColumn]: z.coerce.number().int().min(1, `Invalid ${pkColumn}`),
+export function createDeleteAction({ tableName, pkColumn, revalidatePaths }: DeleteActionParams) {
+  const schema = z.object({
+    [`${pkColumn}`]: z.coerce.number().int().min(1),
   });
 
-  const handler = async (data: z.infer<typeof DeleteSchema>): Promise<ActionState<z.infer<typeof DeleteSchema>>> => {
-    const id = data[pkColumn as keyof typeof data];
-
-    await dbClient.delete(tableName, { [pkColumn]: id });
-
+  const handler: ActionHandler<z.infer<typeof schema>> = async (data) => {
+    await dbClient.delete(tableName, { [pkColumn]: data[pkColumn as keyof typeof data] });
     revalidatePaths.forEach((path) => revalidatePath(path, "layout"));
-
     return { success: true, message: "Item deleted successfully." };
   };
 
-  return createProtectedAction(DeleteSchema, handler);
+  return createProtectedAction(schema, handler, createActionParser());
+}
+
+export function createBulkDeleteAction({ tableName, pkColumn, revalidatePaths }: DeleteActionParams) {
+  const handler: ActionHandler<BulkDeleteData> = async (data) => {
+    if (data.ids.length === 0) return { success: true, message: "No items to delete." };
+    await dbClient.delete(tableName, { [pkColumn]: { in: data.ids } });
+    revalidatePaths.forEach((path) => revalidatePath(path, "layout"));
+    return { success: true, message: "Selected items deleted successfully." };
+  };
+
+  return createProtectedAction(BulkDeleteSchema, handler, createActionParser({ jsonFields: ["ids"] }));
 }
 
 async function getId<T extends Record<string, any>, K extends keyof T>(params: Promise<T>, key: K): Promise<number> {

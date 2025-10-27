@@ -5,12 +5,14 @@ import { saveCategoryAction } from "@app/dashboard/term-categories/actions";
 import { Button } from "@components/ui/button";
 import { Input } from "@components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { setServerErrors } from "@lib/form-helpers";
 import { cn } from "@lib/utils";
 import i18nAppConfig from "@root/i18n/config";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@ui/form";
 import { Switch } from "@ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/tabs";
 import { CsrfInput } from "@waelhabbaldev/next-jwt-auth/client";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -29,8 +31,13 @@ export function CategoryForm({ initialData }: { initialData: Partial<CategoryFor
   const isEditMode = !!initialData?.categoryId;
   const router = useRouter();
   const [state, formAction] = useActionState(saveCategoryAction, initialFormState);
+  const locale = useLocale();
+  const tLabels = useTranslations("Dashboard.forms.labels");
+  const tCommonActions = useTranslations("Common.actions");
+  const tCommon = useTranslations("Common");
 
   const form = useForm<CategoryForm>({
+    mode: "onBlur",
     resolver: zodResolver(CategoryFormSchema),
     defaultValues: {
       isActive: true,
@@ -38,15 +45,17 @@ export function CategoryForm({ initialData }: { initialData: Partial<CategoryFor
     },
   });
 
-  const { formState } = form;
+  const { formState, setError } = form;
 
   useEffect(() => {
     if (state.success) {
       toast.success(state.message);
-    } else if (state.message) {
+      // Redirect is handled by the server action
+    } else if (state.message && state.errors) {
+      setServerErrors(state.errors, setError);
       toast.error(state.message);
     }
-  }, [state]);
+  }, [state, setError]);
 
   return (
     <Form {...form}>
@@ -54,7 +63,7 @@ export function CategoryForm({ initialData }: { initialData: Partial<CategoryFor
         <CsrfInput />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <Tabs defaultValue={i18nAppConfig.defaultLocale}>
+            <Tabs defaultValue={i18nAppConfig.defaultLocale} dir={locale === "ar" ? "rtl" : "ltr"}>
               <TabsList>
                 {i18nAppConfig.locales.map((locale) => {
                   const hasError = !!formState.errors.translations?.[locale];
@@ -72,7 +81,9 @@ export function CategoryForm({ initialData }: { initialData: Partial<CategoryFor
                     name={`translations.${locale}.name`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel>
+                          {tLabels("name")} - ({locale.toUpperCase()})
+                        </FormLabel>
                         <FormControl>
                           <Input {...field} value={field.value ?? ""} />
                         </FormControl>
@@ -87,19 +98,17 @@ export function CategoryForm({ initialData }: { initialData: Partial<CategoryFor
 
           <div className="space-y-6">
             <div className="p-6 bg-white rounded-lg border space-y-4">
-              <h3 className="font-semibold text-lg">Visibility</h3>
+              <h3 className="font-semibold text-lg">{tLabels("visibility")}</h3> {/* FIX: Hardcoded text removed */}
               <FormField
                 control={form.control}
                 name="isActive"
                 render={({ field }) => (
                   <FormItem className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
                     <FormLabel htmlFor="isActive" className="cursor-pointer mb-0">
-                      Active
+                      {field.value ? tLabels("active") : tLabels("inactive")}
                     </FormLabel>
                     <FormControl>
-                      <span className="wael habbal">
-                        <Switch id="isActive" name={field.name} checked={field.value} onCheckedChange={field.onChange} />
-                      </span>
+                      <Switch id="isActive" name={field.name} checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -110,10 +119,14 @@ export function CategoryForm({ initialData }: { initialData: Partial<CategoryFor
 
         <div className="flex justify-between items-center mt-8 pt-6 border-t">
           <Button variant="outline" size="lg" onClick={() => router.back()} type="button">
-            Cancel
+            {tCommonActions("cancel")} {/* FIX: Correct key and namespace */}
           </Button>
-          {/* isPending={isPending} */}
-          <SubmitButton isEditMode={isEditMode} />
+          <SubmitButton
+            isEditMode={isEditMode}
+            createText={tCommonActions("create")} // FIX: Correct key and namespace
+            updateText={tCommonActions("save")} // FIX: Correct key and namespace
+            pendingText={tCommon("saving")} // FIX: Correct key and namespace
+          />
         </div>
       </form>
     </Form>

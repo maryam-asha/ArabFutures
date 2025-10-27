@@ -6,9 +6,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { setServerErrors } from "@lib/form-helpers";
 import { cn } from "@lib/utils";
 import i18nAppConfig from "@root/i18n/config";
 import { CsrfInput } from "@waelhabbaldev/next-jwt-auth/client";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -26,29 +28,34 @@ const initialFormState: TagFormState = {
 
 export function TagForm({ initialData }: { initialData: Partial<TagForm> }) {
   const isEditMode = !!initialData?.tagId;
+  const locale = useLocale();
   const router = useRouter();
   const [state, formAction] = useActionState(saveTagAction, initialFormState);
+  const tLabels = useTranslations("Dashboard.forms.labels");
+  const tCommon = useTranslations("Common");
 
   const form = useForm<TagForm>({
     resolver: zodResolver(TagFormSchema),
     defaultValues: initialData,
   });
 
-  const { formState } = form;
+  const { formState, setError } = form;
 
   useEffect(() => {
     if (state.success) {
       toast.success(state.message);
-    } else if (state.message) {
+      // Redirect is handled by the server action
+    } else if (state.message && state.errors) {
+      setServerErrors(state.errors, setError);
       toast.error(state.message);
     }
-  }, [state]);
+  }, [state, setError]);
 
   return (
     <Form {...form}>
       <form action={formAction} className="space-y-8">
         <CsrfInput />
-        <Tabs defaultValue={i18nAppConfig.defaultLocale}>
+        <Tabs defaultValue={i18nAppConfig.defaultLocale} dir={locale === "ar" ? "rtl" : "ltr"}>
           <TabsList>
             {i18nAppConfig.locales.map((locale) => {
               const hasError = !!formState.errors.translations?.[locale];
@@ -66,7 +73,9 @@ export function TagForm({ initialData }: { initialData: Partial<TagForm> }) {
                 name={`translations.${locale}.name`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>
+                      {tLabels("name")} - ({locale.toUpperCase()})
+                    </FormLabel>
                     <FormControl>
                       <Input {...field} value={field.value ?? ""} />
                     </FormControl>
@@ -80,9 +89,9 @@ export function TagForm({ initialData }: { initialData: Partial<TagForm> }) {
 
         <div className="flex justify-between items-center mt-8 pt-6 border-t">
           <Button variant="outline" size="lg" onClick={() => router.back()} type="button">
-            Cancel
+            {tCommon("actions.cancel")}
           </Button>
-          <SubmitButton isEditMode={isEditMode} createText="Create Tag" />
+          <SubmitButton isEditMode={isEditMode} createText={tCommon("actions.create")} updateText={tCommon("actions.save")} pendingText={tCommon("saving")} />
         </div>
       </form>
     </Form>

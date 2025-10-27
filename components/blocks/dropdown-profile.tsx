@@ -1,6 +1,9 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@ui/dropdown-menu";
 import { CirclePlusIcon, CreditCardIcon, LogOutIcon, SettingsIcon, SquarePenIcon, UserIcon, UsersIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -10,6 +13,8 @@ type Props = {
 };
 
 const ProfileDropdown = ({ trigger, defaultOpen, align = "end" }: Props) => {
+  const t = useTranslations("Dashboard.profile");
+
   return (
     <DropdownMenu defaultOpen={defaultOpen}>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
@@ -33,15 +38,15 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "end" }: Props) => {
         <DropdownMenuGroup>
           <DropdownMenuItem className="px-4 py-2.5 text-base">
             <UserIcon className="text-foreground size-5" />
-            <span>My account</span>
+            <span>{t("myAccount")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem className="px-4 py-2.5 text-base">
             <SettingsIcon className="text-foreground size-5" />
-            <span>Settings</span>
+            <span>{t("settings")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem className="px-4 py-2.5 text-base">
             <CreditCardIcon className="text-foreground size-5" />
-            <span>Billing</span>
+            <span>{t("billing")}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
@@ -50,15 +55,15 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "end" }: Props) => {
         <DropdownMenuGroup>
           <DropdownMenuItem className="px-4 py-2.5 text-base">
             <UsersIcon className="text-foreground size-5" />
-            <span>Manage team</span>
+            <span>{t("manageTeam")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem className="px-4 py-2.5 text-base">
             <SquarePenIcon className="text-foreground size-5" />
-            <span>Customization</span>
+            <span>{t("customization")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem className="px-4 py-2.5 text-base">
             <CirclePlusIcon className="text-foreground size-5" />
-            <span>Add team account</span>
+            <span>{t("addTeam")}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
@@ -66,7 +71,7 @@ const ProfileDropdown = ({ trigger, defaultOpen, align = "end" }: Props) => {
 
         <DropdownMenuItem variant="destructive" className="px-4 py-2.5 text-base">
           <LogOutIcon className="size-5" />
-          <span>Logout</span>
+          <span>{t("logout")}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

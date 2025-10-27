@@ -5,16 +5,16 @@ import { DropdownMenuItem } from "@components/ui/dropdown-menu";
 import { type ActionState } from "@root/types";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@ui/alert-dialog";
 import { useCsrf } from "@waelhabbaldev/next-jwt-auth/client";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useState, useTransition } from "react";
 import { toast } from "sonner";
 
-// This action type is generic enough to work with any delete action we create
 type DeleteAction = (prevState: any, formData: FormData) => Promise<ActionState<any>>;
 
 interface DeleteEntityButtonProps {
   entityId: number;
-  entityName: string; // e.g., "category", "term"
+  entityName: string;
   deleteAction: DeleteAction;
   onSuccess?: () => void;
   children: ReactNode;
@@ -26,32 +26,34 @@ export function DeleteEntityButton({ entityId, entityName, deleteAction, onSucce
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const csrfToken = useCsrf() || "";
+  // const t = useTranslations("Dashboard");
+  const tCommon = useTranslations("Common");
+  const tDailog = useTranslations("Dashboard.dialogs");
+  const tToast = useTranslations("Dashboard.toasts");
 
   const handleDelete = () => {
     const formData = new FormData();
-    // The primary key column is derived from the entityName
     formData.append(`${entityName}Id`, entityId.toString());
     formData.append("csrf_token", csrfToken);
 
     startTransition(() => {
       toast.promise(deleteAction({} as any, formData), {
-        loading: `Deleting ${entityName}...`,
+        loading: tCommon("deleting"),
         success: (result) => {
           if (result.success) {
             setIsOpen(false);
             if (onSuccess) {
               onSuccess();
             } else {
-              router.refresh(); // Default behavior is to refresh the current view
+              router.refresh();
             }
-            return result.message || `Successfully deleted ${entityName}.`;
+            return result.message || tToast("deleteSuccess", { entityName });
           } else {
-            // If the server action returns success: false, it's treated as an error
             throw new Error(result.message);
           }
         },
         error: (error: Error) => {
-          return error.message || `Failed to delete ${entityName}.`;
+          return error.message || tToast("deleteError", { entityName });
         },
       });
     });
@@ -61,18 +63,31 @@ export function DeleteEntityButton({ entityId, entityName, deleteAction, onSucce
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <Trigger variant={asChild ? undefined : "destructive"} onClick={() => setIsOpen(true)} disabled={isPending} className={asChild ? "text-destructive focus:bg-destructive/10" : "w-full justify-start"}>
+      <Trigger
+        onSelect={(e) => {
+          if (asChild) {
+            e.preventDefault();
+          }
+          setIsOpen(true);
+        }}
+        onClick={asChild ? undefined : () => setIsOpen(true)}
+        disabled={isPending}
+        className={asChild ? "text-destructive focus:bg-destructive/10" : "w-full justify-start"}
+        variant={asChild ? undefined : "destructive"}
+      >
         {children}
       </Trigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>This action cannot be undone. This will permanently delete the {entityName}.</AlertDialogDescription>
+          <AlertDialogTitle>{tDailog("areYouSure")}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {tDailog("noUndo")} {tDailog("confirmDelete", { entityName })}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{tCommon("actions.cancel")}</AlertDialogCancel>
           <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90" disabled={isPending}>
-            {isPending ? "Deleting..." : "Delete Permanently"}
+            {isPending ? tCommon("actions.deleting") : tDailog("deletePermanently")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

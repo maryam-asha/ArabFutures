@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@comp
 import { getIdFromParams } from "@lib/action-handler";
 import { findTagById } from "@root/dal/tags-dx";
 import i18nAppConfig from "@root/i18n/config";
+import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { TagForm } from "../___blocks/tag-form";
@@ -9,6 +10,9 @@ import { TagForm } from "../___blocks/tag-form";
 export default async function EditTagPage({ params }: { params: Promise<{ tagId: string }> }) {
   const tagId = await getIdFromParams(params, "tagId");
   const tag = await findTagById(tagId);
+  // const t = await getTranslations("Dashboard");
+
+  const tTags = await getTranslations("Dashboard.pages.tags");
 
   if (!tag) {
     notFound();
@@ -19,8 +23,8 @@ export default async function EditTagPage({ params }: { params: Promise<{ tagId:
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Edit Tag</CardTitle>
-        <CardDescription>Modify the details for the tag: "{tagName}".</CardDescription>
+        <CardTitle>{tTags("editTitle")}</CardTitle>
+        <CardDescription>{tTags("editDescription", { entityName: tagName })}</CardDescription>
       </CardHeader>
       <CardContent>
         <TagForm initialData={tag} />

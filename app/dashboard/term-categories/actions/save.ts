@@ -1,15 +1,15 @@
 "use server";
 
-import { createDeleteAction, createFormDataParser, createProtectedAction, defaultOrder } from "@lib/action-handler";
+import i18nAppConfig from "@i18n/config";
+import { createActionParser, createProtectedAction } from "@lib/action-handler";
 import { dbClient } from "@root/dal/client";
-import i18nAppConfig from "@root/i18n/config";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { CategoryFormSchema } from "./category.schema";
-import { CategoryForm, CategoryFormState } from "./category.types";
+import { CategoryFormSchema } from "../category.schema";
+import { CategoryForm, CategoryFormState } from "../category.types";
 
-const parseCategoryFormData = createFormDataParser({
+const parseCategoryFormData = createActionParser({
   booleanFields: ["isActive"],
 });
 
@@ -23,7 +23,6 @@ const saveCategoryHandler = async (data: CategoryForm): Promise<CategoryFormStat
     } else {
       const result = await trx.insert("termCategories", {
         isActive,
-        displayOrder: defaultOrder,
       });
       currentCategoryId = result.insertId;
     }
@@ -44,9 +43,7 @@ const saveCategoryHandler = async (data: CategoryForm): Promise<CategoryFormStat
 
   revalidatePath("/dashboard/term-categories", "layout");
 
-  if (!categoryId) {
-    redirect(`/dashboard/term-categories`);
-  }
+  redirect(`/dashboard/term-categories`);
 
   return {
     success: true,
@@ -55,9 +52,3 @@ const saveCategoryHandler = async (data: CategoryForm): Promise<CategoryFormStat
 };
 
 export const saveCategoryAction = createProtectedAction(CategoryFormSchema, saveCategoryHandler, parseCategoryFormData);
-
-export const deleteTermCategoryAction = createDeleteAction({
-  tableName: "termCategories",
-  pkColumn: "categoryId",
-  revalidatePaths: ["/dashboard/term-categories"],
-});

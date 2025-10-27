@@ -1,11 +1,14 @@
-import i18nAppConfig, { AppLocale } from "@root/i18n/config";
+import i18nAppConfig from "@root/i18n/config";
 import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { Inter } from "next/font/google";
+import { getMessages, getTranslations } from "next-intl/server";
+import { Inter, Tajawal } from "next/font/google";
 import { notFound } from "next/navigation";
 import type React from "react";
 
 import "../globals.css";
+import PublicFooter from "./___blocks/footer";
+import PublicHeader from "./___blocks/header";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,43 +16,31 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-  const { locale } = await params;
-  const appLocale = locale as AppLocale;
+const tajawal = Tajawal({
+  subsets: ["arabic"],
+  display: "swap",
+  variable: "--font-tajawal",
+  weight: ["400", "500", "700"],
+});
 
-  const title = "Terms";
-  const description = "all terms";
-  const keywords = "";
-  const ogTitle = title;
-  const ogDescription = description;
-  const ogImage = "/default-og-image.jpg";
-  const twitterImage = "/default-twitter-image.jpg";
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: "Public.metadata" });
+  const title = t("title");
+  const description = t("description");
 
   return {
     title,
     description,
-    keywords: keywords.split(",").map((k) => k.trim()),
-    alternates: {
-      canonical: process.env.BASE_URL,
-    },
     openGraph: {
-      siteName: "HOMAM Jewelry",
-      title: ogTitle,
-      description: ogDescription,
+      siteName: title,
+      title,
+      description,
       type: "website",
       url: process.env.BASE_URL,
-      images: [{ url: ogImage }],
       locale,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: ogTitle,
-      description: ogDescription,
-      images: [twitterImage],
     },
   };
 }
-
 export function generateStaticParams() {
   return i18nAppConfig.locales.map((locale) => ({ locale }));
 }
@@ -66,10 +57,18 @@ export default async function LocaleLayout({
     notFound();
   }
 
+  const messages = await getMessages();
+
   return (
-    <html lang={locale} className={`${inter.variable} antialiased`}>
-      <body className="font-sans bg-neutral-50 text-neutral-900 overflow-x-hidden">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} className={locale === "ar" ? `${tajawal.variable} font-sans-arabic` : `${inter.variable} font-sans antialiased`}>
+      <body className="bg-background text-foreground overflow-x-hidden">
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <div className="flex flex-col min-h-screen">
+            <PublicHeader />
+            <main className="grow">{children}</main>
+            <PublicFooter />
+          </div>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

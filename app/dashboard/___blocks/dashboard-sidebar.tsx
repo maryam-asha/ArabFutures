@@ -1,56 +1,44 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@ui/sidebar";
-import { BookText, LayoutGrid, Tag } from "lucide-react";
+import { BookText, CheckSquare, LayoutGrid, Tag } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// Define our app's navigation structure
-const navLinks = [
-  {
-    href: "/dashboard",
-    icon: LayoutGrid,
-    label: "Overview",
-  },
-  {
-    label: "Content Management",
-    subLinks: [
-      {
-        href: "/dashboard/terms",
-        icon: BookText,
-        label: "Lexicon Terms",
-      },
-      {
-        href: "/dashboard/term-categories",
-        icon: LayoutGrid,
-        label: "Term Categories",
-      },
-      {
-        href: "/dashboard/tags",
-        icon: Tag,
-        label: "Tags",
-      },
-    ],
-  },
-  // Add other groups like "Community & Governance" here later
-];
-
 export default function DashboardSidebar() {
   const pathname = usePathname();
+  const locale = useLocale();
+  const t = useTranslations("Dashboard.sidebar");
+
+  const navLinks = [
+    {
+      href: "/dashboard",
+      icon: LayoutGrid,
+      label: t("overview"),
+    },
+    {
+      label: t("contentManagement"),
+      subLinks: [
+        { href: "/dashboard/terms", icon: BookText, label: t("terms") },
+        { href: "/dashboard/term-categories", icon: LayoutGrid, label: t("termCategories") },
+        { href: "/dashboard/tags", icon: Tag, label: t("tags") },
+        { href: "/dashboard/approvals", icon: CheckSquare, label: t("approvals") },
+      ],
+    },
+  ];
 
   return (
-    <Sidebar>
+    <Sidebar side={locale === "ar" ? "right" : "left"}>
       <SidebarContent>
         {navLinks.map((item, index) => (
           <SidebarGroup key={index}>
-            {/* If the item has subLinks, it's a group with a label */}
             {item.subLinks ? (
               <>
                 <SidebarGroupLabel>{item.label}</SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {item.subLinks.map((link) => {
-                      // An item is active if the current URL path starts with its href
                       const isActive = pathname.startsWith(link.href);
                       return (
                         <SidebarMenuItem key={link.href}>
@@ -67,16 +55,10 @@ export default function DashboardSidebar() {
                 </SidebarGroupContent>
               </>
             ) : (
-              // Otherwise, it's a single, top-level link
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      // A top-level link is active only on an exact match
-                      isActive={pathname === item.href}
-                      tooltip={item.label}
-                    >
+                    <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
                       <Link href={item.href!}>
                         <item.icon />
                         <span>{item.label}</span>

@@ -1,18 +1,20 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@components/ui/card";
-import i18nAppConfig from "@i18n/config";
+import i18nAppConfig, { AppLocale } from "@i18n/config";
 import { getIdFromParams } from "@lib/action-handler";
 import { findTagOptions } from "@root/dal/tags-dx";
 import { findActiveCategoryOptions } from "@root/dal/termCategories-dx";
 import { findTermById } from "@root/dal/terms-dx";
+import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { TermForm } from "../___blocks/term-form";
 
 export default async function EditTermPage({ params }: { params: Promise<{ termId: string }> }) {
   const termId = await getIdFromParams(params, "termId");
+  const locale = await getLocale();
+  const [term, categories, tags] = await Promise.all([findTermById(termId, locale as AppLocale), findActiveCategoryOptions(i18nAppConfig.defaultLocale), findTagOptions(i18nAppConfig.defaultLocale)]);
 
-  // Fetch the term data and the form options in parallel
-  const [term, categories, tags] = await Promise.all([findTermById(termId), findActiveCategoryOptions(i18nAppConfig.defaultLocale), findTagOptions(i18nAppConfig.defaultLocale)]);
+  const tTerms = await getTranslations("Dashboard.pages.terms");
 
   if (!term) {
     notFound();
@@ -23,8 +25,8 @@ export default async function EditTermPage({ params }: { params: Promise<{ termI
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Edit Lexicon Term</CardTitle>
-        <CardDescription>Modify the details for "{termTitle}".</CardDescription>
+        <CardTitle>{tTerms("editTitle")}</CardTitle>
+        <CardDescription>{tTerms("editDescription", { entityName: termTitle })}</CardDescription>
       </CardHeader>
       <CardContent>
         <TermForm initialData={term as any} categories={categories} tags={tags} />

@@ -9,3 +9,7 @@ export const TagFormSchema = z.object({
   tagId: z.coerce.number<number>().optional(),
   translations: createTranslationsSchema(TagTranslationFormSchema),
 });
+
+export const DeleteManyTagsSchema = z.object({
+  ids: z.array(z.coerce.number<number>()),
+});

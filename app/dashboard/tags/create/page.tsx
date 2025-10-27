@@ -1,13 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@components/ui/card";
+import { getTranslations } from "next-intl/server";
 
 import { TagForm } from "../___blocks/tag-form";
 
-export default function CreateTagPage() {
+export default async function CreateTagPage() {
+  const t = await getTranslations("Dashboard.pages.tags");
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add New Tag</CardTitle>
-        <CardDescription>Create a new tag to organize your lexicon terms.</CardDescription>
+        <CardTitle>{t("addTitle")}</CardTitle>
+        <CardDescription>{t("addDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <TagForm initialData={{}} />

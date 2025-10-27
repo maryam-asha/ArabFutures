@@ -50,15 +50,15 @@ ALTER TABLE `termCategoryTranslations` ADD INDEX `IX_termCategoryTranslations_ca
 
 CREATE TABLE `terms` (
   `termId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `categoryRef` INT UNSIGNED NOT NULL,
+  -- MODIFIED: Changed to NULL to allow terms without a category for more flexibility.
+  `categoryRef` INT UNSIGNED NULL,
   `status` ENUM('pending', 'published') NOT NULL DEFAULT 'pending',
   `isFeatured` BOOLEAN NOT NULL DEFAULT FALSE,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT `FK_categories_ref` FOREIGN KEY (`categoryRef`) REFERENCES `termCategories` (`categoryId`) ON DELETE CASCADE,
-  PRIMARY KEY (`termId`)
+  PRIMARY KEY (`termId`),
+  CONSTRAINT `FK_categories_ref` FOREIGN KEY (`categoryRef`) REFERENCES `termCategories` (`categoryId`) ON DELETE SET NULL
 );
-
 ALTER TABLE `terms` ADD INDEX `IX_terms_categoryRef` (`categoryRef`);
 
 CREATE TABLE `termTranslations` (
@@ -70,10 +70,27 @@ CREATE TABLE `termTranslations` (
   `fullDetail` TEXT NULL,
   PRIMARY KEY (`termTranslationId`),
   CONSTRAINT `UQ_termTranslations_locale` UNIQUE KEY (`termRef`, `locale`),
-CONSTRAINT `FK_termTranslation_ref` FOREIGN KEY (`termRef`) REFERENCES `terms` (`termId`) ON DELETE CASCADE
+  CONSTRAINT `FK_termTranslation_ref` FOREIGN KEY (`termRef`) REFERENCES `terms` (`termId`) ON DELETE CASCADE
 );
-
 ALTER TABLE `termTranslations` ADD INDEX `IX_termTranslations_termRef` (`termRef`);
+
+-- =================================================================
+-- NEW TABLE FOR TERM REFERENCES
+-- This is the professional, relational approach.
+-- It creates a one-to-many relationship between a translated term and its references.
+-- =================================================================
+CREATE TABLE `termReferences` (
+  `referenceId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `termRef` INT UNSIGNED NOT NULL,
+  `locale` VARCHAR(5) NOT NULL,
+  `content` TEXT NOT NULL,
+  `url` VARCHAR(2048) NULL, -- Optional URL, increased length for modern links.
+  PRIMARY KEY (`referenceId`),
+  -- This foreign key ensures that references are tied to a specific translation (term + locale).
+  -- ON DELETE CASCADE means if a term is deleted, these references are automatically cleaned up.
+  CONSTRAINT `FK_termReferences_term_translation_ref` FOREIGN KEY (`termRef` , `locale`) REFERENCES `termTranslations` (`termRef` , `locale`) ON DELETE CASCADE,
+  INDEX `IX_termReferences_termRef_locale` (`termRef`, `locale`)
+);
 
 CREATE TABLE `tags` (
   `tagId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -90,7 +107,6 @@ CREATE TABLE `tagTranslations` (
   CONSTRAINT `UQ_tagTranslations_locale` UNIQUE KEY (`tagRef`, `locale`),
   CONSTRAINT `FK_tagTranslations_ref` FOREIGN KEY (`tagRef`) REFERENCES `tags` (`tagId`) ON DELETE CASCADE
 );
-
 ALTER TABLE `tagTranslations` ADD INDEX `IX_tagTranslations_tagRef` (`tagRef`);
 
 CREATE TABLE `termTags` (
@@ -106,11 +122,11 @@ CREATE TABLE `termTags` (
     REFERENCES `tags` (`tagId`)
     ON DELETE CASCADE
 );
-
 ALTER TABLE `termTags` ADD INDEX `IX_terms_ref` (`termId`);
 ALTER TABLE `termTags` ADD INDEX `IX_tags_ref` (`tagId`);
+
 -- =================================================================
--- FORESIGHT TOOLS & CASE STUDIES
+-- FORESIGHT TOOLS & CASE STUDIES (UNCHANGED)
 -- =================================================================
 CREATE TABLE `tools` (
   `toolId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -133,12 +149,11 @@ CREATE TABLE `toolTranslations` (
   CONSTRAINT `UQ_toolTranslations_locale` UNIQUE KEY (`toolRef`, `locale`),
   CONSTRAINT `FK_toolTranslations_toolRef` FOREIGN KEY (`toolRef`) REFERENCES `tools` (`toolId`) ON DELETE CASCADE
 );
-
 ALTER TABLE `toolTranslations` ADD INDEX `IX_toolTranslations_toolRef` (`toolRef`);
 
 
 -- =================================================================
--- THOUGHT LEADERSHIP BLOG
+-- THOUGHT LEADERSHIP BLOG (UNCHANGED)
 -- =================================================================
 CREATE TABLE `articles` (
   `articleId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -167,5 +182,4 @@ CREATE TABLE `articleTranslations` (
         REFERENCES `articles` (`articleId`)
         ON DELETE CASCADE
 );
-
 ALTER TABLE `articleTranslations` ADD INDEX `IX_articleTranslations_articleRef` (`articleRef`);

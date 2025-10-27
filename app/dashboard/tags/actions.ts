@@ -6,8 +6,8 @@ import i18nAppConfig from "@root/i18n/config";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { TagFormSchema } from "./tag.schema";
-import { TagForm, TagFormState } from "./tag.types";
+import { DeleteManyTagsSchema, TagFormSchema } from "./tag.schema";
+import { DeleteManyTagsData, DeleteManyTagsState, TagForm, TagFormState } from "./tag.types";
 
 const saveTagHandler = async (data: TagForm): Promise<TagFormState> => {
   const { tagId, translations } = data;
@@ -37,9 +37,7 @@ const saveTagHandler = async (data: TagForm): Promise<TagFormState> => {
 
   revalidatePath("/dashboard/tags", "layout");
 
-  if (!tagId) {
-    redirect(`/dashboard/tags`);
-  }
+  redirect(`/dashboard/tags`);
 
   return {
     success: true,
@@ -57,4 +55,16 @@ export const deleteTagAction = createDeleteAction({
   tableName: "tags",
   pkColumn: "tagId",
   revalidatePaths: ["/dashboard/tags"],
+});
+
+const deleteManyTagsHandler = async (data: DeleteManyTagsData): Promise<DeleteManyTagsState> => {
+  await dbClient.delete("tags", { tagId: { in: data.ids } });
+  revalidatePath("/dashboard/tags", "layout");
+  return { success: true, message: "Selected tags deleted successfully." };
+};
+
+export const deleteManyTagsAction = createProtectedAction(DeleteManyTagsSchema, deleteManyTagsHandler, async (formData) => {
+  return {
+    ids: JSON.parse(formData.get("ids") as string),
+  };
 });

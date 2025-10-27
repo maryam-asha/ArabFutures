@@ -1,119 +1,161 @@
-import { createSqlTranslationsSubquery } from "@i18n/Translatable";
 import { AppLocale } from "@root/i18n/config";
 import { cache } from "react";
 
 import { dbClient } from "./client";
-import { TermDbSchema, TermForEditDbSchema, TermTranslationDbSchema } from "./dal.schema";
+import { TermDbSchema, TermForEditDbSchema } from "./dal.schema";
 import { TermDb, TermForEditDb } from "./dal.types";
 
-const findTermsFn = async (props: { status?: "pending" | "published"; locale: AppLocale }): Promise<TermDb[]> => {
-  const { status, locale } = props;
-  const translationsSubquery = createSqlTranslationsSubquery("t", "termId", "termTranslations", "termRef", TermTranslationDbSchema);
+/**
+ * Creates a robust SQL LEFT JOIN clause using a LATERAL derived table to safely fetch and aggregate translations.
+ * This pattern bypasses a suspected query planner bug in some MySQL/MariaDB versions by isolating the aggregation logic.
+ * It uses the highly compatible GROUP_CONCAT method internally to build the JSON.
+ * @param outerTableAlias The alias of the main 'terms' table (e.g., "outer_t").
+ * @returns A SQL string for a LEFT JOIN clause.
+ */
+const createSafeLateralTranslationsJoin = (outerTableAlias: string): string => {
+  return `
+    LEFT JOIN LATERAL (
+      SELECT
+        JSON_MERGE_PATCH(
+          IFNULL((
+            SELECT CONCAT('{', GROUP_CONCAT(json_kvp), '}')
+            FROM (
+              SELECT
+                CONCAT('"', locale, '":', JSON_OBJECT('title', title, 'briefDescription', briefDescription, 'fullDetail', fullDetail)) AS json_kvp
+              FROM termTranslations
+              WHERE termRef = ${outerTableAlias}.termId
+            ) AS translations_sub
+          ), '{}'
+          ),
+          IFNULL((
+            SELECT CONCAT('{', GROUP_CONCAT(json_kvp), '}')
+            FROM (
+              SELECT
+                CONCAT('"', locale, '":', JSON_ARRAYAGG(JSON_OBJECT('referenceId', referenceId, 'content', content, 'url', url))) as json_kvp
+              FROM termReferences
+              WHERE termRef = ${outerTableAlias}.termId
+              GROUP BY locale
+            ) AS refs_sub
+          ), '{}')
+        ) AS translations
+    ) AS translations_data ON TRUE
+  `;
+};
 
-  let whereClause = "WHERE 1=1";
-  const params: (string | number | boolean)[] = [locale, locale];
+/**
+ * Finds a list of terms with filtering, searching, and pagination.
+ */
+const findTermsFn = async (props: { locale: AppLocale; status?: "pending" | "published"; categoryIds?: number[]; query?: string; limit?: number; offset?: number }): Promise<TermDb[]> => {
+  const { status, locale, categoryIds, query, limit, offset } = props;
+  const translationsJoinSql = createSafeLateralTranslationsJoin("outer_t");
 
-  if (status) {
-    whereClause += " AND t.status = ?";
-    params.push(status);
-  }
-
-  // This complex query uses LEFT JOIN for the one-to-one category relationship
-  // and a JSON_ARRAYAGG subquery for the many-to-many tag relationship.
-  // This is highly efficient and prevents N+1 query problems.
-  const sql = `
+  let sql = `
     SELECT
-      t.*,
-      tct.name as categoryName,
-      (
-        SELECT JSON_ARRAYAGG(
-          JSON_OBJECT('tagId', tg.tagId, 'name', tt.name)
-        )
-        FROM termTags tt_j
-        JOIN tags tg ON tt_j.tagId = tg.tagId
-        LEFT JOIN tagTranslations tt ON tg.tagId = tt.tagRef AND tt.locale = ?
-        WHERE tt_j.termId = t.termId
-      ) as tags,
-      ${translationsSubquery} as translations
-    FROM terms t
-    LEFT JOIN termCategories tc ON t.categoryRef = tc.categoryId
-    LEFT JOIN termCategoryTranslations tct ON tc.categoryId = tct.categoryRef AND tct.locale = ?
-    ${whereClause}
-    ORDER BY t.termId DESC;
+      outer_t.termId,
+      outer_t.status,
+      outer_t.isFeatured,
+      outer_t.categoryRef,
+      tct.name AS categoryName,
+      tags_data.tags,
+      translations_data.translations
+    FROM terms AS outer_t
+    LEFT JOIN termCategories AS tc ON outer_t.categoryRef = tc.categoryId
+    LEFT JOIN termCategoryTranslations AS tct ON tc.categoryId = tct.categoryRef AND tct.locale = ?
+    ${query ? `LEFT JOIN termTranslations AS tt_search ON outer_t.termId = tt_search.termRef AND tt_search.locale = ?` : ""}
+    LEFT JOIN LATERAL (
+      SELECT JSON_ARRAYAGG(JSON_OBJECT('tagId', tg.tagId, 'name', tt_tags.name)) as tags
+      FROM termTags AS tt_j JOIN tags AS tg ON tt_j.tagId = tg.tagId
+      LEFT JOIN tagTranslations AS tt_tags ON tg.tagId = tt_tags.tagRef AND tt_tags.locale = ?
+      WHERE tt_j.termId = outer_t.termId
+    ) AS tags_data ON TRUE
+    ${translationsJoinSql}
   `;
 
-  const v = await dbClient.selectMany(sql, params, TermDbSchema);
-  console.log(JSON.stringify(v));
+  const params: (string | number | number[])[] = [locale, locale, locale];
+  if (query) params.push(locale);
 
-  return v;
+  const whereConditions: string[] = [];
+  if (status) {
+    whereConditions.push("outer_t.status = ?");
+    params.push(status);
+  }
+  if (categoryIds && categoryIds.length > 0) {
+    whereConditions.push("outer_t.categoryRef IN (?)");
+    params.push(categoryIds);
+  }
+  if (query) {
+    whereConditions.push("tt_search.title LIKE ?");
+    params.push(`%${query}%`);
+  }
+  if (whereConditions.length > 0) {
+    sql += ` WHERE ${whereConditions.join(" AND ")}`;
+  }
+
+  sql += `
+    ORDER BY outer_t.termId DESC
+    ${limit ? `LIMIT ${limit}` : ""}
+    ${offset ? `OFFSET ${offset}` : ""}
+  `;
+
+  return dbClient.selectMany(sql, params, TermDbSchema);
 };
 export const findTerms = cache(findTermsFn);
 
 /**
- * Finds a single term by its ID for editing.
- * Fetches associated category and tag IDs.
+ * Finds a single, specific term by its ID for editing.
  */
-const findTermByIdFn = async (termId: number): Promise<TermForEditDb | null> => {
-  const translationsSubquery = createSqlTranslationsSubquery("t", "termId", "termTranslations", "termRef", TermTranslationDbSchema);
+const findTermByIdFn = async (termId: number, locale: AppLocale): Promise<TermForEditDb | null> => {
+  const translationsJoinSql = createSafeLateralTranslationsJoin("outer_t");
 
   const sql = `
     SELECT
-      t.*,
-      (
-        SELECT GROUP_CONCAT(tt_j.tagId)
-        FROM termTags tt_j
-        WHERE tt_j.termId = t.termId
-      ) as tagIds,
-      ${translationsSubquery} as translations
-    FROM terms t
-    WHERE t.termId = ?
+      outer_t.*,
+      tct.name AS categoryName,
+      tags_data.tagIds,
+      translations_data.translations
+    FROM terms AS outer_t
+   LEFT JOIN termCategoryTranslations AS tct ON tct.categoryRef = outer_t.categoryRef AND tct.locale = ?
+    LEFT JOIN LATERAL (
+        SELECT JSON_ARRAYAGG(tt_j.tagId) as tagIds
+        FROM termTags AS tt_j
+        WHERE tt_j.termId = outer_t.termId
+    ) AS tags_data ON TRUE
+    ${translationsJoinSql}
+    WHERE outer_t.termId = ?
     LIMIT 1;
   `;
 
-  // We don't need categoryName or tags array here, just the raw data for the form
-  const rawTerm = await dbClient.selectSingleOrDefault(sql, [termId], TermForEditDbSchema.omit({ categoryName: true, tags: true }));
-
-  if (!rawTerm) return null;
-
-  // Manually construct the final object to satisfy the full schema
-  return {
-    ...rawTerm,
-    categoryName: null, // Not needed for the form
-    tags: [], // Not needed for the form
-  };
+  return await dbClient.selectSingleOrDefault(sql, [locale, termId], TermForEditDbSchema);
 };
 export const findTermById = cache(findTermByIdFn);
 
 /**
- * Fetches only the terms marked as "featured" for the public-facing site.
+ * Finds featured and published terms for public display.
  */
 const findFeaturedTermsFn = async (locale: AppLocale): Promise<TermDb[]> => {
-  const translationsSubquery = createSqlTranslationsSubquery("t", "termId", "termTranslations", "termRef", TermTranslationDbSchema);
+  const translationsJoinSql = createSafeLateralTranslationsJoin("outer_t");
 
-  // This query is similar to findTerms, but simpler.
-  // It filters for `isFeatured = TRUE` and `status = 'published'`.
   const sql = `
     SELECT
-      t.termId,
-      t.isFeatured,
-      t.status,
-      tc.categoryId as categoryRef,
-      tct.name as categoryName,
-      (
-        SELECT JSON_ARRAYAGG(
-          JSON_OBJECT('tagId', tg.tagId, 'name', tt.name)
-        )
-        FROM termTags tt_j
-        JOIN tags tg ON tt_j.tagId = tg.tagId
-        LEFT JOIN tagTranslations tt ON tg.tagId = tt.tagRef AND tt.locale = ?
-        WHERE tt_j.termId = t.termId
-      ) as tags,
-      ${translationsSubquery} as translations
-    FROM terms t
-    LEFT JOIN termCategories tc ON t.categoryRef = tc.categoryId
-    LEFT JOIN termCategoryTranslations tct ON tc.categoryId = tct.categoryRef AND tct.locale = ?
-    WHERE t.isFeatured = TRUE AND t.status = 'published'
-    ORDER BY t.termId DESC;
+      outer_t.termId,
+      outer_t.isFeatured,
+      outer_t.status,
+      outer_t.categoryRef,
+      tct.name AS categoryName,
+      tags_data.tags,
+      translations_data.translations
+    FROM terms AS outer_t
+    LEFT JOIN termCategories AS tc ON outer_t.categoryRef = tc.categoryId
+    LEFT JOIN termCategoryTranslations AS tct ON tc.categoryId = tct.categoryRef AND tct.locale = ?
+    LEFT JOIN LATERAL (
+      SELECT JSON_ARRAYAGG(JSON_OBJECT('tagId', tg.tagId, 'name', tt.name)) as tags
+      FROM termTags AS tt_j JOIN tags AS tg ON tt_j.tagId = tg.tagId
+      LEFT JOIN tagTranslations AS tt ON tg.tagId = tt.tagRef AND tt.locale = ?
+      WHERE tt_j.termId = outer_t.termId
+    ) AS tags_data ON TRUE
+    ${translationsJoinSql}
+    WHERE outer_t.isFeatured = TRUE AND outer_t.status = 'published'
+    ORDER BY outer_t.termId DESC;
   `;
 
   return dbClient.selectMany(sql, [locale, locale], TermDbSchema);

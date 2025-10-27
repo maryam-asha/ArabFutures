@@ -50,10 +50,18 @@ export const TagOptionSchema = z.object({
 // =================================================================
 // TERMS
 // =================================================================
+
+export const TermReferenceDbSchema = z.object({
+  referenceId: z.number(),
+  content: z.string().nullable(),
+  url: z.string().nullable(),
+});
+
 export const TermTranslationDbSchema = z.object({
   title: z.string(),
   briefDescription: z.string().nullable(),
   fullDetail: z.string().nullable(),
+  references: z.preprocess((val) => (val ? JSON.parse(val as string) : []), z.array(TermReferenceDbSchema)),
 });
 
 // This schema is now more complex to fetch related data efficiently
@@ -65,11 +73,15 @@ export const TermDbSchema = z.object({
   translations: createTranslationsSchema(TermTranslationDbSchema),
   // We'll fetch the category name and tags directly in our query
   categoryName: z.string().nullable(),
-  // tags: z
-  //   .string()
-  //   .transform((str) => (str ? JSON.parse(str) : []))
-  //   .pipe(z.array(z.object({ tagId: z.number(), name: z.string() }))),
-  tags: z.any(),
+  tags: z.preprocess(
+    (val) => (typeof val === "string" && val ? JSON.parse(val) : []),
+    z.array(
+      z.object({
+        tagId: z.number(),
+        name: z.string(),
+      }),
+    ),
+  ),
 });
 
 export const TermForEditDbSchema = TermDbSchema.extend({
