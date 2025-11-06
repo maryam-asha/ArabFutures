@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { CategoryForm } from "../___blocks/category-form";
+import { CategoryForm as CategoryFormType } from "../category.types";
 
 export default async function EditCategoryPage({ params }: { params: Promise<{ categoryId: string }> }) {
   const categoryId = await getIdFromParams(params, "categoryId");
@@ -17,7 +18,17 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ c
     notFound();
   }
 
-  const categoryName = category.translations?.[i18nAppConfig.defaultLocale]?.name || `Category #${categoryId}`;
+  const initialDataForForm: Partial<CategoryFormType> = {
+    ...category,
+    translations: {},
+  };
+  for (const loc of i18nAppConfig.locales) {
+    initialDataForForm.translations![loc] = {
+      name: category.name?.[loc] || "",
+    };
+  }
+
+  const categoryName = category.name?.[i18nAppConfig.defaultLocale] || `Category #${categoryId}`;
 
   return (
     <Card>
@@ -26,7 +37,7 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ c
         <CardDescription>{tCategories("editDescription", { entityName: categoryName })}</CardDescription>
       </CardHeader>
       <CardContent>
-        <CategoryForm initialData={category} />
+        <CategoryForm initialData={initialDataForForm} />
       </CardContent>
     </Card>
   );

@@ -1,7 +1,10 @@
 "use server";
 
-import { createActionParser } from "@lib/action-handler";
+import { TermFormSchema } from "@app/dashboard/terms/term.schema";
+import { TermForm, TermFormState } from "@app/dashboard/terms/term.types";
+import { ActionHandler, createActionParser, createPublicAction } from "@lib/action-handler";
 import { dbClient } from "@root/dal/client";
+import { TranslatableTermTitleSchema } from "@root/dal/dal.schema";
 import { TermDb } from "@root/dal/dal.types";
 import { findTerms } from "@root/dal/terms-dx";
 import i18nAppConfig, { AppLocale } from "@root/i18n/config";
@@ -9,89 +12,49 @@ import { ActionState } from "@root/types";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-const TermSuggestionSchema = z
-  .object({
-    categoryRef: z.coerce.number().min(1, "Please select a category."),
-    tags: z.array(z.coerce.number()).optional(),
-    translations: z.any(),
-  })
-  .refine(
-    (data) => {
-      const translations = data.translations || {};
-      return i18nAppConfig.locales.some((locale) => translations[locale]?.title && translations[locale].title.length >= 3);
-    },
-    {
-      message: "At least one language must have a title with at least 3 characters.",
-      path: [`translations.${i18nAppConfig.defaultLocale}.title`],
-    },
-  );
+const termActionParser = createActionParser();
 
-const parseSuggestionFormData = createActionParser();
+const termSuggestionSaveHandler: ActionHandler<TermForm> = async (data): Promise<TermFormState> => {
+  const { categoryRef, translations } = data;
 
-export async function suggestTermAction(prevState: ActionState<any>, formData: FormData): Promise<ActionState<any>> {
-  try {
-    const dataToParse = parseSuggestionFormData(formData);
-    const parsed = TermSuggestionSchema.safeParse(dataToParse);
+  const titleJson: z.infer<typeof TranslatableTermTitleSchema> = { en: undefined, ar: undefined };
+  const briefDescriptionJson: Record<string, string> = {};
+  const fullDetailJson: Record<string, string> = {};
 
-    if (!parsed.success) {
-      return {
-        success: false,
-        message: "Validation failed.",
-        errors: z.treeifyError(parsed.error),
-      };
+  for (const locale of i18nAppConfig.locales) {
+    const trans = translations?.[locale as AppLocale];
+    if (trans) {
+      if (trans.title) {
+        titleJson[locale as AppLocale] = [{ value: trans.title, references: [] }];
+      }
+      if (trans.briefDescription) {
+        briefDescriptionJson[locale as AppLocale] = trans.briefDescription;
+      }
     }
-
-    const { categoryRef, tags, translations } = parsed.data;
-    let newTermId: number | undefined;
-
-    await dbClient.executeTransaction(async (trx) => {
-      const result = await trx.insert("terms", {
-        categoryRef,
-        status: "pending",
-        isFeatured: false,
-      });
-      newTermId = result.insertId;
-
-      if (!newTermId) throw new Error("Failed to create term.");
-
-      for (const locale of i18nAppConfig.locales) {
-        const trans = translations?.[locale];
-        if (trans?.title) {
-          await trx.insert("termTranslations", {
-            termRef: newTermId,
-            locale,
-            title: trans.title,
-            briefDescription: trans.briefDescription || null,
-            fullDetail: trans.fullDetail || null,
-          });
-        }
-      }
-
-      // CORRECTED: Save tags for the new suggestion
-      if (tags && tags.length > 0 && newTermId) {
-        const tagValues = tags.map((tagId) => ({ _isRawSql: true, value: `{${newTermId}, ${tagId}}` }));
-
-        await trx.insertMany("termTags", tagValues);
-      }
-    });
-
-    revalidatePath("/dashboard/approvals", "layout");
-
-    return {
-      success: true,
-      message: "Suggestion submitted successfully!",
-    };
-  } catch (error) {
-    console.error("Suggestion Action Error:", error);
-    return {
-      success: false,
-      message: "An unexpected server error occurred.",
-      errors: {} as any,
-    };
   }
-}
 
-// Action for the contact form
+  await dbClient.executeTransaction(async (trx) => {
+    const result = await trx.insert("terms", {
+      categoryRef,
+      status: "pending",
+      isFeatured: false,
+      title: JSON.stringify(titleJson),
+      briefDescription: JSON.stringify(briefDescriptionJson),
+      fullDetail: JSON.stringify(fullDetailJson),
+    });
+    if (!result.insertId) throw new Error("Failed to create term suggestion.");
+  });
+
+  revalidatePath("/dashboard/approvals", "layout");
+
+  return {
+    success: true,
+    message: "Suggestion submitted successfully! Thank you for your contribution.",
+  };
+};
+
+export const suggestTermAction = createPublicAction(TermFormSchema, termSuggestionSaveHandler, termActionParser);
+
 const ContactSchema = z.object({
   name: z.string().min(2, "Name is required."),
   email: z.string().email("Please enter a valid email."),
@@ -110,7 +73,7 @@ export async function contactAction(prevState: ActionState<any>, formData: FormD
   }
 
   console.log("=== CONTACT FORM SUBMISSION ===");
-  console.log("To Email:", "your-email@example.com"); // Replace with your email
+  console.log("To Email:", "your-email@example.com");
   console.log("Name:", parsed.data.name);
   console.log("Email:", parsed.data.email);
   console.log("Message:", parsed.data.message);
@@ -127,7 +90,7 @@ const TERMS_PER_PAGE = 8;
 export async function loadMoreTermsAction(locale: AppLocale, page: number, query?: string, categoryIds?: number[]): Promise<TermDb[]> {
   const offset = page * TERMS_PER_PAGE;
 
-  const terms = await findTerms({
+  const { data: terms } = await findTerms({
     locale,
     status: "published",
     query,

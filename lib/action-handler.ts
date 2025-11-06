@@ -11,9 +11,6 @@ import { z } from "zod";
 
 import { auth } from "./auth";
 
-// export type ServerAction<TState> = (prevState: TState, formData: FormData) => Promise<ActionState<TState>>;
-// export type ActionHandler<TInput> = (data: TInput) => Promise<ActionState<TInput>>;
-
 export type ServerAction<TInput> = (prevState: ActionState<TInput>, formData: FormData) => Promise<ActionState<TInput>>;
 
 export type ActionHandler<TInput> = (data: TInput) => Promise<ActionState<TInput>>;
@@ -30,7 +27,6 @@ export function createActionParser(
     const object: Record<string, any> = {};
 
     formData.forEach((value, key) => {
-      // We don't need to parse CSRF token as a field.
       if (key === "csrf_token") return;
 
       if (jsonFields.includes(key)) {
@@ -42,7 +38,7 @@ export function createActionParser(
         return;
       }
 
-      if (booleanFields.includes(key)) return; // Processed last.
+      if (booleanFields.includes(key)) return;
 
       const keys = key.match(/[^.[\]]+/g) || [];
       keys.reduce((acc, currentKey, index) => {
@@ -63,6 +59,35 @@ export function createActionParser(
     });
 
     return object;
+  };
+}
+
+export function createPublicAction<TInput>(schema: z.ZodSchema<TInput>, handler: ActionHandler<TInput>, parser: (formData: FormData) => Record<string, any>): ServerAction<TInput> {
+  return async function publicAction(prevState: ActionState<TInput>, formData: FormData): Promise<ActionState<TInput>> {
+    try {
+      const dataToParse = parser(formData);
+      const parsed = schema.safeParse(dataToParse);
+
+      if (!parsed.success) {
+        return {
+          success: false,
+          message: "Validation failed. Please check the fields for errors.",
+          errors: z.treeifyError(parsed.error),
+        };
+      }
+
+      const result = await handler(parsed.data);
+      return result;
+    } catch (e) {
+      if (isRedirectError(e)) throw e;
+
+      console.error("Server Action Error:", e);
+      return {
+        success: false,
+        message: (e as Error).message || "An unexpected server error occurred.",
+        errors: {} as any,
+      };
+    }
   };
 }
 

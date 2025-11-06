@@ -15,30 +15,31 @@ const tagSaveHandler = async (data: TagForm): Promise<TagFormState> => {
   const { tagId, translations } = data;
   let currentTagId = tagId;
 
+  // Create a JSON object for the 'name' field
+  const nameJson: Record<string, string> = {};
+  for (const locale of i18nAppConfig.locales) {
+    const name = translations?.[locale]?.name;
+    if (name) {
+      nameJson[locale] = name;
+    }
+  }
+
   await dbClient.executeTransaction(async (trx) => {
+    const tagData = {
+      name: JSON.stringify(nameJson), // Stringify the object for the database
+    };
+
     if (currentTagId) {
-      // Tags table has no other columns to update, so we just ensure the record exists.
+      await trx.update("tags", tagData, { tagId: currentTagId });
     } else {
-      const result = await trx.modify("INSERT INTO tags () VALUES ();", []);
+      const result = await trx.insert("tags", tagData);
       currentTagId = result.insertId;
     }
 
     if (!currentTagId) throw new Error("Failed to get tag ID.");
-
-    for (const locale of i18nAppConfig.locales) {
-      const name = translations?.[locale]?.name;
-      if (name) {
-        await trx.modify(
-          `INSERT INTO tagTranslations (tagRef, locale, name) VALUES (?, ?, ?)
-           ON DUPLICATE KEY UPDATE name = VALUES(name);`,
-          [currentTagId, locale, name],
-        );
-      }
-    }
   });
 
   revalidatePath("/dashboard/tags", "layout");
-
   redirect(`/dashboard/tags`);
 
   return {

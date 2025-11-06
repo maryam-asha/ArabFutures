@@ -30,7 +30,7 @@ export default function CsrfManager({ children }: { children: React.ReactNode })
 
   return (
     <CsrfContext.Provider value={{ csrfToken, setCsrfToken }}>
-      p<CsrfProvider token={csrfToken}>{children}</CsrfProvider>
+      <CsrfProvider token={csrfToken}>{children}</CsrfProvider>
     </CsrfContext.Provider>
   );
 }

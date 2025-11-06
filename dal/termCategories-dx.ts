@@ -1,69 +1,91 @@
-import { createSqlTranslationsSubquery } from "@i18n/Translatable";
-import { AppLocale } from "@i18n/config";
+// File: dal/termCategories-dx.ts
+import i18nAppConfig, { AppLocale } from "@i18n/config";
+import { unstable_noStore as noStore } from "next/cache";
 import { cache } from "react";
 import { z } from "zod";
 
 import { dbClient } from "./client";
-import { TermCategoryDbSchema, TermCategoryOptionSchema, TermCategoryTranslationDbSchema } from "./dal.schema";
+import { TermCategoryDbSchema, TermCategoryOptionSchema } from "./dal.schema";
 import { TermCategoryDb, TermCategoryOption } from "./dal.types";
 
-// Schema for the main list, which includes a count of associated terms
 const TermCategoryWithCountDbSchema = TermCategoryDbSchema.extend({
   termCount: z.number(),
 });
-
 export type TermCategoryWithCount = z.infer<typeof TermCategoryWithCountDbSchema>;
+
+// NEW: Define a paginated return type
+export interface PaginatedTermCategories {
+  data: TermCategoryWithCount[];
+  totalCount: number;
+}
 
 /**
  * Fetches all term categories along with a count of how many terms are in each.
  */
-const findTermCategoriesFn = async (): Promise<TermCategoryWithCount[]> => {
-  const translationsSubquery = createSqlTranslationsSubquery("tc", "categoryId", "termCategoryTranslations", "categoryRef", TermCategoryTranslationDbSchema);
+export const findTermCategories = async (props: { locale: AppLocale; query?: string; limit?: number; offset?: number }): Promise<PaginatedTermCategories> => {
+  noStore();
+  const { locale, query, limit, offset } = props;
 
-  const sql = `
+  const params: string[] = [];
+  const whereConditions: string[] = [];
+
+  if (query) {
+    const searchQuery = `%${query}%`;
+    const searchClauses = i18nAppConfig.locales.map((loc) => `(tc.name ->> '$.${loc}' LIKE ?)`).join(" OR ");
+    whereConditions.push(`(${searchClauses})`);
+    i18nAppConfig.locales.forEach(() => params.push(searchQuery));
+  }
+
+  const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
+
+  // QUERY 1: Get the total count
+  const countSql = `SELECT COUNT(*) as count FROM termCategories tc ${whereClause}`;
+  const countResult = await dbClient.selectSingle(countSql, params, z.object({ count: z.number() }));
+  const totalCount = countResult.count;
+
+  // QUERY 2: Get the paginated data
+  const dataSql = `
     SELECT
       tc.*,
-      (SELECT COUNT(*) FROM terms t WHERE t.categoryRef = tc.categoryId) as termCount,
-      ${translationsSubquery} as translations
+      (SELECT COUNT(*) FROM terms t WHERE t.categoryRef = tc.categoryId) as termCount
     FROM termCategories tc
-    ORDER BY tc.displayOrder ASC;
+    ${whereClause}
+    ORDER BY tc.displayOrder ASC
+    ${limit ? `LIMIT ${limit}` : ""}
+    ${offset ? `OFFSET ${offset}` : ""}
   `;
 
-  return dbClient.selectMany(sql, [], TermCategoryWithCountDbSchema);
+  const data = await dbClient.selectMany(dataSql, params, TermCategoryWithCountDbSchema);
+
+  return { data, totalCount };
 };
-export const findTermCategories = cache(findTermCategoriesFn);
 
 /**
- * Finds a single term category by its ID.
- * Returns the category object or null if not found.
+ * Finds a single term category by its ID. (No changes needed)
  */
 const findCategoryByIdFn = async (categoryId: number): Promise<TermCategoryDb | null> => {
-  const translationsSubquery = createSqlTranslationsSubquery("tc", "categoryId", "termCategoryTranslations", "categoryRef", TermCategoryTranslationDbSchema);
-
   const sql = `
-    SELECT
-      tc.*,
-      ${translationsSubquery} as translations
+    SELECT *
     FROM termCategories tc
     WHERE tc.categoryId = ?
     LIMIT 1;
   `;
-
   return dbClient.selectSingleOrDefault(sql, [categoryId], TermCategoryDbSchema);
 };
 export const findCategoryById = cache(findCategoryByIdFn);
 
+/**
+ * Fetches active categories for use in form select components. (No changes needed)
+ */
 const findActiveCategoryOptionsFn = async (locale: AppLocale): Promise<TermCategoryOption[]> => {
   const sql = `
     SELECT
       tc.categoryId,
-      tct.name
+      tc.name ->> '$.${locale}' AS name
     FROM termCategories tc
-    JOIN termCategoryTranslations tct ON tc.categoryId = tct.categoryRef
-    WHERE tc.isActive = TRUE AND tct.locale = ?
+    WHERE tc.isActive = TRUE
     ORDER BY tc.displayOrder ASC;
   `;
-
-  return dbClient.selectMany(sql, [locale], TermCategoryOptionSchema);
+  return dbClient.selectMany(sql, [], TermCategoryOptionSchema);
 };
 export const findActiveCategoryOptions = cache(findActiveCategoryOptionsFn);

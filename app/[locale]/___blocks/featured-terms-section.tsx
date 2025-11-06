@@ -15,8 +15,8 @@ export function FeaturedTermsSection({ terms, categories }: { terms: TermDb[]; c
   const [selectedTerm, setSelectedTerm] = useState<TermDb | null>(null);
 
   return (
-    <section className="container mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-12">
+    <section id="featured-terms" className="container mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="text-center md:text-start">
           <h2 className="text-3xl md:text-4xl font-bold">{t("title")}</h2>
         </div>

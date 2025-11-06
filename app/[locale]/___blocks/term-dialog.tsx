@@ -13,7 +13,6 @@ interface TermDialogProps {
   onClose: () => void;
 }
 
-// Reusable Section Component for consistent styling
 const DetailSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div>
     <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">{title}</h3>
@@ -32,12 +31,13 @@ export function TermDialog({ term, onClose }: TermDialogProps) {
   }
 
   const otherLocale = i18nAppConfig.locales.find((l) => l !== currentLocale) || currentLocale;
-  const primaryTranslation = term.translations?.[currentLocale];
-  const secondaryTranslation = term.translations?.[otherLocale];
 
-  const title = primaryTranslation?.title || commonT("notAvailable");
-  const briefDescription = primaryTranslation?.briefDescription;
-  const dir = currentLocale === "ar" ? "rtl" : "ltr";
+  const primaryTitle = term.title?.[currentLocale]?.[0]?.value || commonT("notAvailable");
+  const primaryReferences = term.title?.[currentLocale]?.[0]?.references || [];
+  const secondaryTitle = term.title?.[otherLocale]?.[0]?.value;
+  const briefDescription = term.briefDescription?.[currentLocale];
+  const fullDetail = term.fullDetail?.[currentLocale];
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-3xl p-0">
@@ -46,8 +46,8 @@ export function TermDialog({ term, onClose }: TermDialogProps) {
             <div className="pl-6">
               <DialogHeader>
                 {term.categoryName && <span className="font-semibold text-primary mb-2">{term.categoryName}</span>}
-                <DialogTitle className="text-3xl font-bold leading-tight md:text-4xl">{title}</DialogTitle>
-                {secondaryTranslation?.title && <DialogDescription className="text-lg pt-1 text-muted-foreground/80">{secondaryTranslation.title}</DialogDescription>}
+                <DialogTitle className="text-3xl font-bold leading-tight md:text-4xl">{primaryTitle}</DialogTitle>
+                {secondaryTitle && <DialogDescription className="text-lg pt-1 text-muted-foreground/80">{secondaryTitle}</DialogDescription>}
               </DialogHeader>
 
               {briefDescription && <p className="mt-6 text-lg text-foreground/80 leading-relaxed">{briefDescription}</p>}
@@ -55,17 +55,16 @@ export function TermDialog({ term, onClose }: TermDialogProps) {
               <Separator className="my-8" />
 
               <div className="space-y-10">
-                {primaryTranslation?.fullDetail && (
+                {fullDetail && (
                   <DetailSection title={t("fullDescription")}>
-                    <div className="prose prose-sm max-w-none text-muted-foreground whitespace-pre-wrap leading-relaxed">{primaryTranslation.fullDetail}</div>
+                    <div className="prose prose-sm max-w-none text-muted-foreground whitespace-pre-wrap leading-relaxed">{fullDetail}</div>
                   </DetailSection>
                 )}
 
-                {/* Tags Section */}
                 {term.tags && term.tags.length > 0 && (
                   <DetailSection title={t("tags")}>
                     <div className="flex flex-wrap gap-2">
-                      {term.tags.map((tag: any) => (
+                      {term.tags.map((tag) => (
                         <Badge key={tag.tagId} variant="secondary" className="text-sm px-3 py-1">
                           {tag.name}
                         </Badge>
@@ -74,12 +73,11 @@ export function TermDialog({ term, onClose }: TermDialogProps) {
                   </DetailSection>
                 )}
 
-                {/* References Section */}
-                {primaryTranslation?.references && primaryTranslation.references.length > 0 && (
+                {primaryReferences.length > 0 && (
                   <DetailSection title={t("references")}>
                     <ul className="space-y-4">
-                      {primaryTranslation.references.map((ref) => (
-                        <li key={ref.referenceId} className="flex items-start gap-3 text-base">
+                      {primaryReferences.map((ref, index) => (
+                        <li key={index} className="flex items-start gap-3 text-base">
                           {ref.url ? (
                             <>
                               <LinkIcon className="h-4 w-4 shrink-0 mt-1 text-primary" />

@@ -24,34 +24,23 @@ CREATE TABLE `revokedTokens` (
     PRIMARY KEY (`jti`),
     INDEX `IX_revokedTokens_expiresAt` (`expiresAt`)
 );
-
--- =================================================================
--- BILINGUAL KNOWLEDGE LEXICON (GLOSSARY)
 -- =================================================================
 CREATE TABLE `termCategories` (
   `categoryId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `displayOrder` INT NOT NULL DEFAULT 100000,
+  `name` JSON NOT NULL,
   `isActive` BOOLEAN NOT NULL DEFAULT TRUE,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`categoryId`)
 );
 
-CREATE TABLE `termCategoryTranslations` (
-  `categoryTranslationId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `categoryRef` INT UNSIGNED NOT NULL,
-  `locale` VARCHAR(5) NOT NULL,
-  `name` VARCHAR(100) NOT NULL,
-  PRIMARY KEY (`categoryTranslationId`),
-  CONSTRAINT `UQ_termCategoryTranslations_locale` UNIQUE KEY (`categoryRef`, `locale`),
-  CONSTRAINT `FK_termCategoryTranslations_ref` FOREIGN KEY (`categoryRef`) REFERENCES `termCategories` (`categoryId`) ON DELETE CASCADE
-);
-ALTER TABLE `termCategoryTranslations` ADD INDEX `IX_termCategoryTranslations_categoryRef` (`categoryRef`);
-
 CREATE TABLE `terms` (
   `termId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  -- MODIFIED: Changed to NULL to allow terms without a category for more flexibility.
   `categoryRef` INT UNSIGNED NULL,
+  `title`JSON NOT NULL,
+  `briefDescription` TEXT NULL,
+  `fullDetail` TEXT NULL,
   `status` ENUM('pending', 'published') NOT NULL DEFAULT 'pending',
   `isFeatured` BOOLEAN NOT NULL DEFAULT FALSE,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -61,53 +50,12 @@ CREATE TABLE `terms` (
 );
 ALTER TABLE `terms` ADD INDEX `IX_terms_categoryRef` (`categoryRef`);
 
-CREATE TABLE `termTranslations` (
-  `termTranslationId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `termRef` INT UNSIGNED NOT NULL,
-  `locale` VARCHAR(5) NOT NULL,
-  `title` VARCHAR(255) NOT NULL,
-  `briefDescription` TEXT NULL,
-  `fullDetail` TEXT NULL,
-  PRIMARY KEY (`termTranslationId`),
-  CONSTRAINT `UQ_termTranslations_locale` UNIQUE KEY (`termRef`, `locale`),
-  CONSTRAINT `FK_termTranslation_ref` FOREIGN KEY (`termRef`) REFERENCES `terms` (`termId`) ON DELETE CASCADE
-);
-ALTER TABLE `termTranslations` ADD INDEX `IX_termTranslations_termRef` (`termRef`);
-
--- =================================================================
--- NEW TABLE FOR TERM REFERENCES
--- This is the professional, relational approach.
--- It creates a one-to-many relationship between a translated term and its references.
--- =================================================================
-CREATE TABLE `termReferences` (
-  `referenceId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `termRef` INT UNSIGNED NOT NULL,
-  `locale` VARCHAR(5) NOT NULL,
-  `content` TEXT NOT NULL,
-  `url` VARCHAR(2048) NULL, -- Optional URL, increased length for modern links.
-  PRIMARY KEY (`referenceId`),
-  -- This foreign key ensures that references are tied to a specific translation (term + locale).
-  -- ON DELETE CASCADE means if a term is deleted, these references are automatically cleaned up.
-  CONSTRAINT `FK_termReferences_term_translation_ref` FOREIGN KEY (`termRef` , `locale`) REFERENCES `termTranslations` (`termRef` , `locale`) ON DELETE CASCADE,
-  INDEX `IX_termReferences_termRef_locale` (`termRef`, `locale`)
-);
-
 CREATE TABLE `tags` (
   `tagId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` JSON NOT NULL,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`tagId`)
 );
-
-CREATE TABLE `tagTranslations` (
-  `tagTranslationId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `tagRef` INT UNSIGNED NOT NULL,
-  `locale` VARCHAR(5) NOT NULL,
-  `name` VARCHAR(100) NOT NULL,
-  PRIMARY KEY (`tagTranslationId`),
-  CONSTRAINT `UQ_tagTranslations_locale` UNIQUE KEY (`tagRef`, `locale`),
-  CONSTRAINT `FK_tagTranslations_ref` FOREIGN KEY (`tagRef`) REFERENCES `tags` (`tagId`) ON DELETE CASCADE
-);
-ALTER TABLE `tagTranslations` ADD INDEX `IX_tagTranslations_tagRef` (`tagRef`);
 
 CREATE TABLE `termTags` (
   `termId` INT UNSIGNED NOT NULL,
@@ -153,7 +101,7 @@ ALTER TABLE `toolTranslations` ADD INDEX `IX_toolTranslations_toolRef` (`toolRef
 
 
 -- =================================================================
--- THOUGHT LEADERSHIP BLOG (UNCHANGED)
+-- THOUGHT LEADERSHIP BLOG ARTICLES
 -- =================================================================
 CREATE TABLE `articles` (
   `articleId` INT UNSIGNED NOT NULL AUTO_INCREMENT,

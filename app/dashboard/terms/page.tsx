@@ -18,10 +18,21 @@ const termBulkActions: BulkAction[] = [
   { label: "delete", action: termBulkDeleteAction, isDestructive: true },
 ];
 
-export default async function TermsPage() {
-  const terms = await findTerms({
+export default async function TermsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  const { page: _page, limit: _limit, query: _query } = await searchParams;
+
+  const page = Number(_page ?? "1");
+  const limit = Number(_limit ?? "10");
+  const query = (_query as string) ?? undefined;
+  const offset = (page - 1) * limit;
+
+  const { data: terms, totalCount } = await findTerms({
     locale: i18nAppConfig.defaultLocale,
+    limit,
+    offset,
+    query,
   });
+
   const t = await getTranslations("Dashboard");
   const tActions = await getTranslations("Common.actions");
 
@@ -37,7 +48,7 @@ export default async function TermsPage() {
         </Button>
       </div>
       <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <DataTable columns={termColumns} data={terms} filterColumnId="title" filterColumnPlaceholder={t("forms.labels.title")} bulkActions={termBulkActions} pkColumn="termId" />
+        <DataTable columns={termColumns} data={terms} totalCount={totalCount} filterColumnId="title" filterColumnPlaceholder={t("forms.labels.title")} bulkActions={termBulkActions} pkColumn="termId" />
       </div>
     </div>
   );

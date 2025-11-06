@@ -26,7 +26,7 @@ export default async function HeroSection({ categories }: HeroSectionProps) {
   };
 
   return (
-    <section className="container flex flex-col items-center justify-center h-dvh mx-auto pb-20 md:pb-3">
+    <section id="hero" className="container flex flex-col items-center justify-center h-dvh mx-auto">
       <div className="flex items-center justify-center pt-8">
         <Image src="/logo-dark.png" alt="Arab Futures Society Logo" className="w-full max-w-md lg:max-w-full rounded-md object-cover" width={512} height={512} priority />
       </div>

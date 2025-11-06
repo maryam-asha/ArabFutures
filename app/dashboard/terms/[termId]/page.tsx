@@ -8,11 +8,13 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { TermForm } from "../___blocks/term-form";
+import { termSaveAction } from "../actions";
+import { TermForm as TermFormType } from "../term.types";
 
 export default async function EditTermPage({ params }: { params: Promise<{ termId: string }> }) {
   const termId = await getIdFromParams(params, "termId");
-  const locale = await getLocale();
-  const [term, categories, tags] = await Promise.all([findTermById(termId, locale as AppLocale), findActiveCategoryOptions(i18nAppConfig.defaultLocale), findTagOptions(i18nAppConfig.defaultLocale)]);
+  const locale = (await getLocale()) as AppLocale;
+  const [term, categories, tags] = await Promise.all([findTermById(termId, locale), findActiveCategoryOptions(i18nAppConfig.defaultLocale), findTagOptions(i18nAppConfig.defaultLocale)]);
 
   const tTerms = await getTranslations("Dashboard.pages.terms");
 
@@ -20,7 +22,27 @@ export default async function EditTermPage({ params }: { params: Promise<{ termI
     notFound();
   }
 
-  const termTitle = term.translations?.[i18nAppConfig.defaultLocale]?.title || `Term #${termId}`;
+  const initialDataForForm: Partial<TermFormType> = {
+    termId: term.termId,
+    status: term.status,
+    isFeatured: term.isFeatured,
+    categoryRef: term.categoryRef ?? 0,
+    tags: term.tagIds,
+    translations: {},
+  };
+
+  for (const loc of i18nAppConfig.locales) {
+    const titleEntry = term.title?.[loc]?.[0];
+    initialDataForForm.translations![loc] = {
+      title: titleEntry?.value || "",
+      references: titleEntry?.references || [],
+      briefDescription: term.briefDescription?.[loc] || "",
+      fullDetail: term.fullDetail?.[loc] || "",
+    };
+  }
+
+  const defaultLocaleTitle = term.title?.[i18nAppConfig.defaultLocale]?.[0]?.value;
+  const termTitle = defaultLocaleTitle || `Term #${termId}`;
 
   return (
     <Card>
@@ -29,7 +51,7 @@ export default async function EditTermPage({ params }: { params: Promise<{ termI
         <CardDescription>{tTerms("editDescription", { entityName: termTitle })}</CardDescription>
       </CardHeader>
       <CardContent>
-        <TermForm initialData={term as any} categories={categories} tags={tags} />
+        <TermForm initialData={initialDataForForm} categories={categories} tags={tags} mode="dashboard" action={termSaveAction} />
       </CardContent>
     </Card>
   );

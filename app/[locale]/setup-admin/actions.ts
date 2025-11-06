@@ -18,7 +18,6 @@ export async function createAdminUserAction(): Promise<ActionResult> {
   const password = "admin123";
 
   try {
-    // 1. Check if the user already exists to prevent duplicates
     const existingUser = await dbClient.selectSingleOrDefault(
       "SELECT userId FROM users WHERE username = ?",
       [username],
@@ -34,12 +33,9 @@ export async function createAdminUserAction(): Promise<ActionResult> {
       };
     }
 
-    // 2. Hash the password securely
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // 3. Insert the new user into the database
-    // version starts at 1, isForbidden is false (0)
     await dbClient.insert("users", {
       username,
       passwordHash,

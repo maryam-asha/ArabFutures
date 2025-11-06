@@ -1,4 +1,3 @@
-// File: app/[locale]/contact/contact-form.tsx
 "use client";
 
 import { contactAction } from "@app/public-actions";
@@ -13,10 +12,6 @@ import { useActionState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-
-// File: app/[locale]/contact/contact-form.tsx
-
-// File: app/[locale]/contact/contact-form.tsx
 
 const ContactSchema = z.object({
   name: z.string().min(2, "Name is required."),
@@ -39,7 +34,6 @@ export function ContactForm() {
   });
 
   useEffect(() => {
-    // Use specific success/error messages from translations
     if (state.success) {
       toast.success(t("successMessage"));
       form.reset();

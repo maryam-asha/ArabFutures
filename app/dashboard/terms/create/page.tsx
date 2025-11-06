@@ -5,6 +5,7 @@ import { findActiveCategoryOptions } from "@root/dal/termCategories-dx";
 import { getTranslations } from "next-intl/server";
 
 import { TermForm } from "../___blocks/term-form";
+import { termSaveAction } from "../actions";
 
 export default async function CreateTermPage() {
   const [categories, tags] = await Promise.all([findActiveCategoryOptions(i18nAppConfig.defaultLocale), findTagOptions(i18nAppConfig.defaultLocale)]);
@@ -17,7 +18,7 @@ export default async function CreateTermPage() {
         <CardDescription>{tTerm("addDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
-        <TermForm initialData={{}} categories={categories} tags={tags} />
+        <TermForm initialData={{}} categories={categories} tags={tags} mode="dashboard" action={termSaveAction} />
       </CardContent>
     </Card>
   );

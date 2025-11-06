@@ -20,16 +20,13 @@ import { type FieldPath, type FieldValues, type UseFormSetError } from "react-ho
  * @param path - The base path for nested fields (used internally for recursion).
  */
 export function setServerErrors<T extends FieldValues>(errors: any, setError: UseFormSetError<T>, path: string = "") {
-  // Set the error for the current field if it has any messages
   if (errors?.errors && errors.errors.length > 0) {
-    // We must ensure 'path' is a valid key of the form values
     setError(path as FieldPath<T>, {
       type: "server",
-      message: errors.errors[0], // Display the first error message
+      message: errors.errors[0],
     });
   }
 
-  // Recurse into the nested properties
   if (errors?.properties) {
     for (const key in errors.properties) {
       const newPath = path ? `${path}.${key}` : key;

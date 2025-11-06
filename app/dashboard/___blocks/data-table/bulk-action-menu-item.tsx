@@ -37,7 +37,7 @@ export function BulkActionMenuItem<TData>({ table, pkColumn, label, action, acti
               setCsrfToken(result.newCsrfToken);
             }
             table.resetRowSelection();
-            router.refresh(); // Re-fetches Server Components
+            router.refresh();
             return result.message || tCommon("actionSuccess");
           }
           throw new Error(result.message || tCommon("actionError"));

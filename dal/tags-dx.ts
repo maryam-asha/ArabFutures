@@ -1,72 +1,91 @@
-import { createSqlTranslationsSubquery } from "@i18n/Translatable";
-import { AppLocale } from "@i18n/config";
+// File: dal/tags-dx.ts
+import i18nAppConfig, { AppLocale } from "@i18n/config";
+import { unstable_noStore as noStore } from "next/cache";
 import { cache } from "react";
 import { z } from "zod";
 
 import { dbClient } from "./client";
-import { TagDbSchema, TagOptionSchema, TagTranslationDbSchema } from "./dal.schema";
+import { TagDbSchema, TagOptionSchema } from "./dal.schema";
 import { TagDb, TagOption } from "./dal.types";
 
-// Schema for the main list, which includes a count of associated terms
 const TagWithCountDbSchema = TagDbSchema.extend({
   termCount: z.number(),
 });
 
 export type TagWithCount = z.infer<typeof TagWithCountDbSchema>;
 
+export interface PaginatedTags {
+  data: TagWithCount[];
+  totalCount: number;
+}
+
 /**
  * Fetches all tags along with a count of how many terms use each tag.
+ * UPDATED: Now supports pagination and filtering.
  */
-const findTagsFn = async (): Promise<TagWithCount[]> => {
-  const translationsSubquery = createSqlTranslationsSubquery("tg", "tagId", "tagTranslations", "tagRef", TagTranslationDbSchema);
+export const findTags = async (props: { locale: AppLocale; query?: string; limit?: number; offset?: number }): Promise<PaginatedTags> => {
+  noStore();
+  const { locale, query, limit, offset } = props;
 
-  const sql = `
+  const params: (string | number)[] = [];
+  const whereConditions: string[] = [];
+
+  if (query) {
+    const searchQuery = `%${query}%`;
+    const searchClauses = i18nAppConfig.locales.map((loc) => `(tg.name ->> '$.${loc}' LIKE ?)`).join(" OR ");
+    whereConditions.push(`(${searchClauses})`);
+    i18nAppConfig.locales.forEach(() => params.push(searchQuery));
+  }
+
+  const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
+
+  // QUERY 1: Get the total count
+  const countSql = `SELECT COUNT(*) as count FROM tags tg ${whereClause}`;
+  const countResult = await dbClient.selectSingle(countSql, params, z.object({ count: z.number() }));
+  const totalCount = countResult.count;
+
+  // QUERY 2: Get the paginated data
+  const dataSql = `
     SELECT
       tg.*,
-      (SELECT COUNT(*) FROM termTags tt WHERE tt.tagId = tg.tagId) as termCount,
-      ${translationsSubquery} as translations
+      (SELECT COUNT(*) FROM termTags tt WHERE tt.tagId = tg.tagId) as termCount
     FROM tags tg
-    ORDER BY tg.tagId DESC;
+    ${whereClause}
+    ORDER BY tg.tagId DESC
+    ${limit ? `LIMIT ${limit}` : ""}
+    ${offset ? `OFFSET ${offset}` : ""}
   `;
 
-  return dbClient.selectMany(sql, [], TagWithCountDbSchema);
+  const data = await dbClient.selectMany(dataSql, params, TagWithCountDbSchema);
+
+  return { data, totalCount };
 };
-export const findTags = cache(findTagsFn);
 
 /**
- * Finds a single tag by its ID.
- * Returns the tag object or null if not found.
+ * Finds a single tag by its ID. (No changes needed here)
  */
 const findTagByIdFn = async (tagId: number): Promise<TagDb | null> => {
-  const translationsSubquery = createSqlTranslationsSubquery("tg", "tagId", "tagTranslations", "tagRef", TagTranslationDbSchema);
-
   const sql = `
-    SELECT
-      tg.*,
-      ${translationsSubquery} as translations
+    SELECT *
     FROM tags tg
     WHERE tg.tagId = ?
     LIMIT 1;
   `;
-
   return dbClient.selectSingleOrDefault(sql, [tagId], TagDbSchema);
 };
 export const findTagById = cache(findTagByIdFn);
 
 /**
- * Fetches all tags for use in form multi-select components.
+ * Fetches all tags for use in form multi-select components. (No changes needed here)
  */
 const findTagOptionsFn = async (locale: AppLocale): Promise<TagOption[]> => {
   const sql = `
     SELECT
       tg.tagId,
-      tt.name
+      tg.name ->> "$.${locale}" AS name
     FROM tags tg
-    JOIN tagTranslations tt ON tg.tagId = tt.tagRef
-    WHERE tt.locale = ?
-    ORDER BY tt.name ASC;
+    ORDER BY name ASC;
   `;
-
-  return dbClient.selectMany(sql, [locale], TagOptionSchema);
+  return dbClient.selectMany(sql, [], TagOptionSchema);
 };
 export const findTagOptions = cache(findTagOptionsFn);

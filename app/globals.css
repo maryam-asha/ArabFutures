@@ -160,10 +160,6 @@
   display: none;
 }
 
-.scroll-mt-header {
-  scroll-margin-top: 6rem; /* Adjust this value if your header height changes */
-}
-
 @layer utilities {
   @keyframes scroll {
     to {

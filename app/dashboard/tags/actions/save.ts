@@ -15,7 +15,6 @@ const saveTagHandler = async (data: TagForm): Promise<TagFormState> => {
 
   await dbClient.executeTransaction(async (trx) => {
     if (currentTagId) {
-      // Tags table has no other columns to update, so we just ensure the record exists.
     } else {
       const result = await trx.modify("INSERT INTO tags () VALUES ();", []);
       currentTagId = result.insertId;
@@ -45,8 +44,4 @@ const saveTagHandler = async (data: TagForm): Promise<TagFormState> => {
   };
 };
 
-export const saveTagAction = createProtectedAction(
-  TagFormSchema,
-  saveTagHandler,
-  createActionParser(), // No boolean fields needed
-);
+export const saveTagAction = createProtectedAction(TagFormSchema, saveTagHandler, createActionParser());

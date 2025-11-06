@@ -44,7 +44,6 @@ export function TagForm({ initialData }: { initialData: Partial<TagForm> }) {
   useEffect(() => {
     if (state.success) {
       toast.success(state.message);
-      // Redirect is handled by the server action
     } else if (state.message && state.errors) {
       setServerErrors(state.errors, setError);
       toast.error(state.message);

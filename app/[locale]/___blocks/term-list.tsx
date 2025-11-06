@@ -38,18 +38,13 @@ export function TermList({ initialTerms, initialQuery }: TermListProps) {
   const commonT = useTranslations("Common");
   const tableT = useTranslations("Dashboard.tables");
 
-  // This effect handles ALL search logic, including clearing the input.
   useEffect(() => {
-    // --- 2. FIX FOR CLEARING SEARCH ---
-    // We compare the current debounced query with what's in the URL params.
-    // This reliably detects changes, including clearing the input.
     const currentUrlQuery = new URLSearchParams(window.location.search).get("query") || "";
     if (debouncedQuery === currentUrlQuery) {
-      return; // Do nothing if the query hasn't actually changed.
+      return;
     }
 
     startSearchTransition(async () => {
-      // Update the URL without a full page reload
       const params = new URLSearchParams(window.location.search);
       if (debouncedQuery) {
         params.set("query", debouncedQuery);
@@ -58,15 +53,13 @@ export function TermList({ initialTerms, initialQuery }: TermListProps) {
       }
       window.history.pushState(null, "", `?${params.toString()}`);
 
-      // Fetch the new set of terms for page 0
       const newTerms = await loadMoreTermsAction(locale, 0, debouncedQuery);
       setTerms(newTerms);
-      setPage(1); // Reset pagination
+      setPage(1);
       setHasMore(newTerms.length > 0);
     });
   }, [debouncedQuery, locale]);
 
-  // Sync state if user navigates (e.g., back/forward buttons)
   useEffect(() => {
     setTerms(initialTerms);
     setSearchQuery(initialQuery);

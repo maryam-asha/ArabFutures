@@ -50,7 +50,6 @@ export function CategoryForm({ initialData }: { initialData: Partial<CategoryFor
   useEffect(() => {
     if (state.success) {
       toast.success(state.message);
-      // Redirect is handled by the server action
     } else if (state.message && state.errors) {
       setServerErrors(state.errors, setError);
       toast.error(state.message);
@@ -121,12 +120,7 @@ export function CategoryForm({ initialData }: { initialData: Partial<CategoryFor
           <Button variant="outline" size="lg" onClick={() => router.back()} type="button">
             {tCommonActions("cancel")} {/* FIX: Correct key and namespace */}
           </Button>
-          <SubmitButton
-            isEditMode={isEditMode}
-            createText={tCommonActions("create")} // FIX: Correct key and namespace
-            updateText={tCommonActions("save")} // FIX: Correct key and namespace
-            pendingText={tCommon("saving")} // FIX: Correct key and namespace
-          />
+          <SubmitButton isEditMode={isEditMode} createText={tCommonActions("create")} updateText={tCommonActions("save")} pendingText={tCommon("saving")} />
         </div>
       </form>
     </Form>

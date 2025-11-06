@@ -24,7 +24,8 @@
       "deleteSelected": "Delete Selected",
       "close": "Close",
       "openMenu": "Open menu",
-      "search": "Search..."
+      "search": "Search...",
+      "submit": "Submit"
     }
   },
   "Public": {

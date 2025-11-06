@@ -1,10 +1,8 @@
-// File: app/[locale]/contact/page.tsx
 import { LinkedinIcon, MailIcon, TwitterIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { ContactForm } from "./contact-form";
 
-// A small, reusable component for the "Why Connect" section items
 const ReasonItem = ({ title, description }: { title: string; description: string }) => (
   <div className="relative ps-8">
     <div className="absolute start-0 top-1 h-2 w-2 rounded-full bg-primary"></div>

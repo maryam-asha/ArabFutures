@@ -1,3 +1,4 @@
+import CsrfManager from "@app/dashboard/___blocks/csrf-provider-client";
 import { findActiveCategoryOptions } from "@root/dal/termCategories-dx";
 import { findFeaturedTerms } from "@root/dal/terms-dx";
 import { AppLocale } from "@root/i18n/config";
@@ -21,10 +22,12 @@ export default async function LandingPage() {
     <div className="flex flex-col space-y-8 md:space-y-16 lg:space-y-24">
       <HeroSection categories={categories} />
       <VisionMissionSection />
-      <OurWorkSection />
       <AboutSection />
+      <OurWorkSection />
       <ProjectsSection />
-      <FeaturedTermsSection terms={featuredTerms} categories={categories} />
+      <CsrfManager>
+        <FeaturedTermsSection terms={featuredTerms} categories={categories} />
+      </CsrfManager>
       <FriendsSection />
     </div>
   );

@@ -9,8 +9,8 @@ const navLinks = [
   { label: "work", href: "/#work", color: "hsl(45, 90%, 60%)" },
   { label: "about", href: "/#about", color: "hsl(260, 90%, 70%)" },
   { label: "home", href: "/", color: "hsl(var(--primary))" },
-  { label: "blogs", href: "", color: "hsl(340, 90%, 70%)" }, // Points to the /terms page
-  { label: "projects", href: "/terms", color: "hsl(340, 90%, 70%)" }, // Points to the /terms page
+  { label: "blogs", href: "", color: "hsl(340, 90%, 70%)" },
+  { label: "projects", href: "/terms", color: "hsl(340, 90%, 70%)" },
   { label: "contact", href: "/contact", color: "hsl(145, 70%, 55%)" },
 ];
 
@@ -27,18 +27,9 @@ const HomeIcon = ({ className }: { className?: string }) => (
 const Navbar = () => {
   const tNav = useTranslations("Public.nav");
 
-  // const HomeIcon = ({ className }: { className?: string }) => (
-  //   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-  //     <circle cx="12" cy="12" r="10" />
-  //     <path d="M8 14V9.5" />
-  //     <path d="M12 14V9.5" />
-  //     <path d="M16 14V9.5" />
-  //     <path d="M7 14h10" />
-  //   </svg>
-  // );
   return (
-    <header className="bg-background fixed w-full top-0 z-50">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-8 px-4 py-7 sm:px-6">
+    <header className="sticky top-0 bg-background w-full p-2 md:p-4 z-50">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-8">
         <div className="text-muted-foreground  flex-1 items-center gap-8 font-medium hidden md:flex md:justify-center lg:gap-16">
           {navLinks.map((item) =>
             item.label === "home" ? (

@@ -5,11 +5,11 @@ import { Badge } from "@components/ui/badge";
 import { Button } from "@components/ui/button";
 import { Checkbox } from "@components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@components/ui/dropdown-menu";
-import i18nAppConfig from "@i18n/config";
+import { AppLocale } from "@i18n/config";
 import { TermDb } from "@root/dal/dal.types";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 
 import { termDeleteAction } from "../actions";
@@ -19,9 +19,9 @@ export const termColumns: ColumnDef<TermDb>[] = [
     id: "select",
     header: ({ table }) => {
       const t = useTranslations("Dashboard.tables");
-      return <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label={t("selectAll")} />;
+      return <Checkbox className="ms-3" checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label={t("selectAll")} />;
     },
-    cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
+    cell: ({ row }) => <Checkbox className="ms-3" checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
     enableSorting: false,
     enableHiding: false,
   },
@@ -37,11 +37,13 @@ export const termColumns: ColumnDef<TermDb>[] = [
       );
     },
     cell: ({ row }) => {
-      const title = row.original.translations?.[i18nAppConfig.defaultLocale]?.title || "N/A";
+      const locale = useLocale() as AppLocale;
+      const title = row.original.title?.[locale]?.[0]?.value || "N/A";
       return <div className="font-medium">{title}</div>;
     },
     filterFn: (row, id, value) => {
-      const title = row.original.translations?.[i18nAppConfig.defaultLocale]?.title?.toLowerCase();
+      const locale = useLocale() as AppLocale;
+      const title = row.original.title?.[locale]?.[0]?.value?.toLowerCase();
       return title ? title.includes((value as string).toLowerCase()) : false;
     },
   },
@@ -97,7 +99,8 @@ export const termColumns: ColumnDef<TermDb>[] = [
       return <div>{t("featured")}</div>;
     },
     cell: ({ row }) => {
-      return row.original.isFeatured ? "Yes" : "No";
+      const t = useTranslations("Common");
+      return row.original.isFeatured ? t("yes") : t("no");
     },
   },
   {
@@ -120,7 +123,7 @@ export const termColumns: ColumnDef<TermDb>[] = [
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DeleteEntityButton entityId={term.termId} entityName="term" deleteAction={termDeleteAction} asChild>
-                <span className="text-destructive focus:bg-destructive/10">{t_common("delete")}</span>
+                <span className="text-destructive focus:bg-destructive/10 w-full cursor-pointer">{t_common("delete")}</span>
               </DeleteEntityButton>
             </DropdownMenuContent>
           </DropdownMenu>

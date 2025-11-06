@@ -5,9 +5,9 @@ export default async function OurWorkSection() {
   const features = t.raw("features");
 
   return (
-    <section id="work" className="container mx-auto py-8 scroll-mt-header">
+    <section id="work" className="container mx-auto py-8">
       <div className="mx-auto max-w-3xl text-center">
-        <h2 className="text-pretty text-4xl font-bold lg:text-5xl">{t("title")}</h2>
+        <h2 className="text-pretty text-4xl font-bold lg:text-5xl mb-12">{t("title")}</h2>
       </div>
       <div className="grid gap-8 lg:grid-cols-2">
         {features.map((feature: any, index: number) => (

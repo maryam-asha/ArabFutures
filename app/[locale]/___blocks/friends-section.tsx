@@ -33,7 +33,6 @@ const PlaceholderPath = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// --- Type Definitions ---
 type ImageLogo = { type: "image"; src: string; alt: string };
 type SvgLogo = { type: "svg"; Component: React.FC<{ className?: string }>; alt: string };
 type Logo = ImageLogo | SvgLogo;
@@ -50,7 +49,7 @@ export default function FriendsSection() {
   ];
 
   return (
-    <section className="mx-auto py-24 bg-muted/20">
+    <section id="freinds-section" className="mx-auto bg-muted/20 mb-8 md:mb-16 lg:mb-24">
       <div className="container text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-16">{t("title")}</h2>
 
@@ -61,15 +60,7 @@ export default function FriendsSection() {
         <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-12">
           {logos.map((logo, index) => (
             <div key={index} className="shrink-0">
-              {logo.type === "image" ? (
-                <Image src={logo.src} alt={logo.alt} width={150} height={48} className="max-h-12 w-auto" />
-              ) : (
-                <logo.Component
-                  className="h-12 w-auto text-muted-foreground/60"
-                  aria-label={logo.alt}
-                  // role="img"
-                />
-              )}
+              {logo.type === "image" ? <Image src={logo.src} alt={logo.alt} width={150} height={48} className="max-h-12 w-auto" /> : <logo.Component className="h-12 w-auto text-muted-foreground/60" aria-label={logo.alt} />}
             </div>
           ))}
         </div>

@@ -6,19 +6,28 @@ import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { TagForm } from "../___blocks/tag-form";
+import { TagForm as TagFormType } from "../tag.types";
 
 export default async function EditTagPage({ params }: { params: Promise<{ tagId: string }> }) {
   const tagId = await getIdFromParams(params, "tagId");
   const tag = await findTagById(tagId);
-  // const t = await getTranslations("Dashboard");
-
   const tTags = await getTranslations("Dashboard.pages.tags");
 
   if (!tag) {
     notFound();
   }
 
-  const tagName = tag.translations?.[i18nAppConfig.defaultLocale]?.name || `Tag #${tagId}`;
+  const initialDataForForm: Partial<TagFormType> = {
+    tagId: tag.tagId,
+    translations: {},
+  };
+  for (const loc of i18nAppConfig.locales) {
+    initialDataForForm.translations![loc] = {
+      name: tag.name?.[loc] || "",
+    };
+  }
+
+  const tagName = tag.name?.[i18nAppConfig.defaultLocale] || `Tag #${tagId}`;
 
   return (
     <Card>
@@ -27,7 +36,7 @@ export default async function EditTagPage({ params }: { params: Promise<{ tagId:
         <CardDescription>{tTags("editDescription", { entityName: tagName })}</CardDescription>
       </CardHeader>
       <CardContent>
-        <TagForm initialData={tag} />
+        <TagForm initialData={initialDataForForm} />
       </CardContent>
     </Card>
   );

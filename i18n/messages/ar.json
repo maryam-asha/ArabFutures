@@ -23,7 +23,8 @@
       "reset": "إعادة تعيين",
       "deleteSelected": "حذف المحدد",
       "close": "إغلاق",
-      "openMenu": "فتح القائمة"
+      "openMenu": "فتح القائمة",
+      "submit": "إرسال"
     }
   },
   "Public": {

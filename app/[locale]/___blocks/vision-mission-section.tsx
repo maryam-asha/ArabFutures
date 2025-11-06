@@ -4,7 +4,7 @@ export default async function VisionMissionSection() {
   const t = await getTranslations("Public");
 
   return (
-    <section id="vision" className="bg-primary p-8 scroll-mt-header">
+    <section id="vision" className="bg-primary p-8">
       <div className="container mx-auto max-w-5xl p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 ">
           <div className="flex flex-col gap-4 text-center md:text-start">

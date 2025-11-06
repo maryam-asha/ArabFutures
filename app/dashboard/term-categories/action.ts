@@ -17,32 +17,31 @@ const termCategorySaveHandler = async (data: CategoryForm): Promise<CategoryForm
   const { categoryId, isActive, translations } = data;
   let currentCategoryId = categoryId;
 
+  const nameJson: Record<string, string> = {};
+  for (const locale of i18nAppConfig.locales) {
+    const name = translations?.[locale]?.name;
+    if (name) {
+      nameJson[locale] = name;
+    }
+  }
+
   await dbClient.executeTransaction(async (trx) => {
+    const categoryData = {
+      isActive,
+      name: JSON.stringify(nameJson),
+    };
+
     if (currentCategoryId) {
-      await trx.update("termCategories", { isActive }, { categoryId: currentCategoryId });
+      await trx.update("termCategories", categoryData, { categoryId: currentCategoryId });
     } else {
-      const result = await trx.insert("termCategories", {
-        isActive,
-      });
+      const result = await trx.insert("termCategories", categoryData);
       currentCategoryId = result.insertId;
     }
 
     if (!currentCategoryId) throw new Error("Failed to get category ID.");
-
-    for (const locale of i18nAppConfig.locales) {
-      const name = translations?.[locale]?.name;
-      if (name) {
-        await trx.modify(
-          `INSERT INTO termCategoryTranslations (categoryRef, locale, name) VALUES (?, ?, ?)
-           ON DUPLICATE KEY UPDATE name = VALUES(name);`,
-          [currentCategoryId, locale, name],
-        );
-      }
-    }
   });
 
   revalidatePath("/dashboard/term-categories", "layout");
-
   redirect(`/dashboard/term-categories`);
 
   return {

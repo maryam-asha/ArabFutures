@@ -4,11 +4,11 @@ import { DeleteEntityButton } from "@app/dashboard/___blocks/data-table/delete-e
 import { Button } from "@components/ui/button";
 import { Checkbox } from "@components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@components/ui/dropdown-menu";
+import { AppLocale } from "@i18n/config";
 import { TagWithCount } from "@root/dal/tags-dx";
-import i18nAppConfig from "@root/i18n/config";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 
 import { tagDeleteAction } from "../actions";
@@ -16,8 +16,8 @@ import { tagDeleteAction } from "../actions";
 export const columns: ColumnDef<TagWithCount>[] = [
   {
     id: "select",
-    header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Select all" />,
-    cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
+    header: ({ table }) => <Checkbox className="ms-3" checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Select all" />,
+    cell: ({ row }) => <Checkbox className="ms-3" checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
     enableSorting: false,
     enableHiding: false,
   },
@@ -33,12 +33,14 @@ export const columns: ColumnDef<TagWithCount>[] = [
       );
     },
     cell: ({ row }) => {
-      const name = row.original.translations?.[i18nAppConfig.defaultLocale]?.name || "N/A";
+      const locale = useLocale() as AppLocale;
+      const name = row.original.name?.[locale] || "N/A";
       return <div className="font-medium">{name}</div>;
     },
     filterFn: (row, id, value) => {
-      const name = row.original.translations?.[i18nAppConfig.defaultLocale]?.name?.toLowerCase();
-      return name ? name.includes(value.toLowerCase()) : false;
+      const locale = useLocale() as AppLocale;
+      const name = row.original.name?.[locale]?.toLowerCase();
+      return name ? name.includes((value as string).toLowerCase()) : false;
     },
   },
   {
@@ -72,7 +74,7 @@ export const columns: ColumnDef<TagWithCount>[] = [
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DeleteEntityButton entityId={tag.tagId} entityName="tag" deleteAction={tagDeleteAction} asChild>
-                <span className="text-destructive focus:bg-destructive/10">{tActions("delete")}</span>
+                <span className="text-destructive focus:bg-destructive/10 w-full cursor-pointer">{tActions("delete")}</span>
               </DeleteEntityButton>
             </DropdownMenuContent>
           </DropdownMenu>

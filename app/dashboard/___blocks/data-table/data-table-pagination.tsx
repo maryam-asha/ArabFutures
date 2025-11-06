@@ -5,60 +5,86 @@ import { Table } from "@tanstack/react-table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui/select";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import * as React from "react";
 
-interface DataTablePaginationProps<TData> {
-  table: Table<TData>;
-}
-
-export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({ table }: { table: Table<TData> }) {
   const t = useTranslations("Dashboard.tables");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
+  // 🔁 Always reactive — updated when URL changes
+  const currentPage = Number(searchParams.get("page") || 1);
+  const pageSize = Number(searchParams.get("limit") || 10);
+
+  // 🧮 Derived values
+  const totalCount = table.options.rowCount ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const canPrev = currentPage > 1;
+  const canNext = currentPage < totalPages;
+
+  // 🧭 URL update helper
+  const updateParams = React.useCallback(
+    (params: Record<string, string | number | null>) => {
+      const next = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(params)) {
+        if (value === null || value === "") next.delete(key);
+        else next.set(key, String(value));
+      }
+      const qs = next.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [router, pathname, searchParams],
+  );
+
+  // 🧩 Render
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
         {t("selectedRows", {
           count: table.getFilteredSelectedRowModel().rows.length,
-          total: table.getFilteredRowModel().rows.length,
+          total: totalCount,
         })}
       </div>
-      <div className="flex items-center space-x-6 lg:space-x-8">
+
+      <div className="flex items-center space-x-2 md:space-x-6 lg:space-x-8">
+        {/* Rows per page */}
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">{t("rowsPerPage")}</p>
-          <Select
-            value={`${table.getState().pagination.pageSize}`}
-            onValueChange={(value) => {
-              table.setPageSize(Number(value));
-            }}
-          >
+          <Select value={`${pageSize}`} onValueChange={(val) => updateParams({ limit: val, page: 1 })}>
             <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
+              <SelectValue placeholder={pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
+              {[10, 20, 30, 40, 50].map((s) => (
+                <SelectItem key={s} value={`${s}`}>
+                  {s}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-        <div className="flex w-[100px] items-center justify-center text-sm font-medium">{t("pageIndicator", { page: table.getState().pagination.pageIndex + 1, totalPages: table.getPageCount() })}</div>
+
+        {/* Page indicator */}
+        <div className="flex w-[120px] items-center justify-center text-sm font-medium">{t("pageIndicator", { page: currentPage, totalPages })}</div>
+
+        {/* Pagination buttons */}
         <div className="flex items-center space-x-2">
-          <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex" onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>
-            <span className="sr-only">{t("goToFirstPage")}</span>
-            <ChevronsLeft className="h-4 w-4" />
+          <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex" onClick={() => updateParams({ page: 1 })} disabled={!canPrev}>
+            <ChevronsLeft className="h-4 w-4 rtl:rotate-180" />
           </Button>
-          <Button variant="outline" className="h-8 w-8 p-0" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-            <span className="sr-only">{t("goToPreviousPage")}</span>
-            <ChevronLeft className="h-4 w-4" />
+
+          <Button variant="outline" className="h-8 w-8 p-0" onClick={() => updateParams({ page: currentPage - 1 })} disabled={!canPrev}>
+            <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
           </Button>
-          <Button variant="outline" className="h-8 w-8 p-0" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            <span className="sr-only">{t("goToNextPage")}</span>
-            <ChevronRight className="h-4 w-4" />
+
+          <Button variant="outline" className="h-8 w-8 p-0" onClick={() => updateParams({ page: currentPage + 1 })} disabled={!canNext}>
+            <ChevronRight className="h-4 w-4 rtl:rotate-180" />
           </Button>
-          <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex" onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}>
-            <span className="sr-only">{t("goToLastPage")}</span>
-            <ChevronsRight className="h-4 w-4" />
+
+          <Button variant="outline" className="hidden h-8 w-8 p-0 lg:flex" onClick={() => updateParams({ page: totalPages })} disabled={!canNext}>
+            <ChevronsRight className="h-4 w-4 rtl:rotate-180" />
           </Button>
         </div>
       </div>

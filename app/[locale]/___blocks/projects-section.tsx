@@ -21,18 +21,18 @@ const ProjectSection = async () => {
   const features: Feature[] = t.raw("features");
 
   return (
-    <section id="projects" className="py-16 sm:py-8 scroll-mt-header">
+    <section id="projects">
       <div className="container mx-auto">
-        <div className="mx-auto mb-16 max-w-3xl text-center">
+        <div className="mx-auto mb-16  text-center">
           <h2 className="text-4xl font-bold tracking-tight lg:text-5xl">{title}</h2>
         </div>
 
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto ">
           {features.map((feature) => (
             <div key={feature.id} className="grid items-center gap-8 overflow-hidden rounded-2xl bg-background shadow-lg md:grid-cols-2 md:gap-0">
               {/* Image Column */}
               <div className="relative h-64 md:h-full w-full">
-                <Image src={feature.image} alt={feature.heading} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                <Image src={feature.image} alt={feature.heading} fill className="object-cover object-[25%_75%] " sizes="(max-width: 768px) 100vw, 50vw" />
                 <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent"></div>
               </div>
 
