@@ -4,19 +4,16 @@ import { useReactiveCsrf } from "@app/dashboard/___blocks/csrf-provider-client";
 import { MultiSelectCombobox } from "@app/dashboard/___blocks/multi-select-combobox";
 import { SubmitButton } from "@app/dashboard/___blocks/submit-button";
 import { Button } from "@components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@components/ui/form";
 import { Input } from "@components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
-import { Separator } from "@components/ui/separator";
 import { Switch } from "@components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
+import { Textarea } from "@components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import i18nAppConfig from "@i18n/config";
-import { ServerAction } from "@lib/action-handler";
 import { setServerErrors } from "@lib/form-helpers";
-import { cn } from "@lib/utils";
 import { TagOption, TermCategoryOption } from "@root/dal/dal.types";
-import { Textarea } from "@ui/textarea";
 import { CsrfInput } from "@waelhabbaldev/next-jwt-auth/client";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -25,217 +22,204 @@ import { useActionState, useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { termSaveAction } from "../actions";
 import { TermFormSchema } from "../term.schema";
-import { type TermForm, type TermFormState } from "../term.types";
+import { TermFormState, TermForm as TermFormType } from "../term.types";
 
 const initialFormState: TermFormState = { success: false, errors: {} as any };
 
 interface TermFormProps {
-  initialData: Partial<TermForm>;
+  initialData: Partial<TermFormType>;
   categories: TermCategoryOption[];
   tags: TagOption[];
-  mode: "dashboard" | "public";
-  action: ServerAction<TermForm>;
-  onSuccess?: () => void;
 }
 
-export function TermForm({ initialData, categories, tags, mode, action, onSuccess }: TermFormProps) {
+export function TermForm({ initialData, categories, tags }: TermFormProps) {
   const isEditMode = !!initialData?.termId;
   const router = useRouter();
   const locale = useLocale();
-  const [state, formAction] = useActionState(action, initialFormState);
+  const [state, formAction] = useActionState(termSaveAction, initialFormState);
   const { setCsrfToken } = useReactiveCsrf();
 
-  const tLabels = useTranslations("Dashboard.forms.labels");
-  const tPlaceholders = useTranslations("Dashboard.forms.placeholders");
-  const tStatuses = useTranslations("Dashboard.forms.statuses");
+  const t = useTranslations("Dashboard");
   const tCommon = useTranslations("Common");
 
-  const form = useForm<TermForm>({
+  const form = useForm<TermFormType>({
     resolver: zodResolver(TermFormSchema),
     defaultValues: {
       status: "pending",
       isFeatured: false,
       tags: [],
+      content: {
+        default: {
+          en: { name: "", briefDescription: "", fullDescription: "", references: [] },
+          ar: { name: "", briefDescription: "", fullDescription: "", references: [] },
+        },
+        more: [],
+      },
       ...initialData,
     },
   });
 
-  const { formState, control, setError, setValue } = form;
+  const {
+    control,
+    formState: { errors },
+    setError,
+  } = form;
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "content.more",
+  });
 
   useEffect(() => {
     if (state.success) {
-      if (state.message) toast.success(state.message);
-      if (onSuccess) onSuccess();
+      toast.success(state.message);
     } else if (!state.success && state.message) {
-      if (mode === "dashboard" && state.newCsrfToken) {
-        setCsrfToken(state.newCsrfToken);
-      }
+      if (state.newCsrfToken) setCsrfToken(state.newCsrfToken);
       setServerErrors(state.errors, setError);
       toast.error(state.message);
     }
-  }, [state, setError, setCsrfToken, mode, onSuccess]);
-
-  useEffect(() => {
-    if (form.formState.isSubmitSuccessful && state.success) {
-      form.reset(mode === "public" ? { categoryRef: 0, translations: { en: { title: "" }, ar: { title: "" } } } : initialData);
-    }
-  }, [form, form.formState.isSubmitSuccessful, state.success, initialData, mode]);
+  }, [state, setError, setCsrfToken]);
 
   const tagOptions = tags.map((t) => ({ value: t.tagId, label: t.name }));
-  const isDashboard = mode === "dashboard";
-  console.log(form.formState.errors);
-  console.log(form.getValues());
 
   return (
     <Form {...form}>
       <form action={formAction} className="space-y-8">
         {isEditMode && <input type="hidden" {...form.register("termId")} />}
-        {/* {isDashboard && <CsrfInput />} */}
-        {!isDashboard && <input type="hidden" name="status" value="pending" />}
         <CsrfInput />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 space-y-6">
-            <Tabs defaultValue={i18nAppConfig.defaultLocale} dir={locale === "ar" ? "rtl" : "ltr"}>
-              <TabsList>
-                {i18nAppConfig.locales.map((locale) => {
-                  const hasError = !!formState.errors.translations?.[locale];
-                  return (
-                    <TabsTrigger key={locale} value={locale} className={cn(hasError && "text-destructive")}>
-                      {locale.toUpperCase()} {hasError && "*"}
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-              {i18nAppConfig.locales.map((locale) => (
-                <TabsContent key={locale} value={locale} className="pt-4 space-y-4" forceMount>
-                  <FormField
-                    control={control}
-                    name={`translations.${locale}.title`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          {tLabels("title")} ({locale.toUpperCase()})
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} value={field.value ?? ""} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name={`translations.${locale}.briefDescription`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          {tLabels("briefDescription")} ({locale.toUpperCase()})
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea {...field} value={field.value ?? ""} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <>
+            {/* --- DEFAULT TRANSLATIONS --- */}
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("forms.labels.defaultTranslations")}</CardTitle>
+                <CardDescription>{t("forms.helpers.defaultTranslations")}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="en">
+                  <TabsList>
+                    <TabsTrigger value="en">English</TabsTrigger>
+                    <TabsTrigger value="ar">Arabic</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="en" className="pt-4">
+                    <TranslationFields control={control} path="content.default.en" />
+                  </TabsContent>
+                  <TabsContent value="ar" className="pt-4">
+                    <TranslationFields control={control} path="content.default.ar" />
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* --- MORE TRANSLATIONS --- */}
+            <Card>
+              <CardHeader className="flex-row items-center justify-between">
+                <div>
+                  <CardTitle>{t("forms.labels.moreTranslations")}</CardTitle>
+                  <CardDescription>{t("forms.helpers.moreTranslations")}</CardDescription>
+                </div>
+                <Button type="button" size="sm" variant="outline" onClick={() => append({ locale: "", name: "" })}>
+                  <PlusCircle className="h-4 w-4 mr-2" />
+                  {t("forms.labels.addTranslation")}
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="p-4 border rounded-lg relative">
+                    <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 text-muted-foreground hover:text-destructive" onClick={() => remove(index)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                     <FormField
                       control={control}
-                      name={`translations.${locale}.fullDetail`}
+                      name={`content.more.${index}.locale`}
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            {tLabels("fullDetail")} ({locale.toUpperCase()})
-                          </FormLabel>
+                        <FormItem className="mb-4 w-1/2">
+                          <FormLabel>{t("forms.labels.localeIdentifier")}</FormLabel>
                           <FormControl>
-                            <Textarea {...field} value={field.value ?? ""} rows={8} />
+                            <Input placeholder="e.g., fr, ar-latn" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <Separator />
-                    <ReferencesField control={control} locale={locale as "en" | "ar"} />
-                  </>
-                </TabsContent>
-              ))}
-            </Tabs>
+                    <TranslationFields control={control} path={`content.more.${index}`} />
+                  </div>
+                ))}
+                {fields.length === 0 && <p className="text-sm text-center text-muted-foreground py-4">{t("forms.helpers.noExtraTranslations")}</p>}
+              </CardContent>
+            </Card>
           </div>
 
-          <div className="space-y-6">
-            <div className="p-6 bg-white rounded-lg border space-y-4">
-              <h3 className="font-semibold text-lg">{tLabels("organization")}</h3>
-              <FormField
-                control={control}
-                name="categoryRef"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{tLabels("category")}</FormLabel>
-                    <Select
-                      {...field}
-                      onValueChange={(value) => {
-                        setValue("categoryRef", Number(value));
-                        field.onChange(Number(value));
-                      }}
-                      value={field.value ? String(field.value) : ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={tPlaceholders("selectCategory")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
-                            {cat.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {isDashboard && (
+          <div className="space-y-6 lg:sticky lg:top-24">
+            {/* --- ORGANIZATION --- */}
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("forms.labels.organization")}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <FormField
+                  control={control}
+                  name="categoryRef"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("forms.labels.category")}</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value ? String(field.value) : ""}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t("forms.placeholders.selectCategory")} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categories.map((c) => (
+                            <SelectItem key={c.categoryId} value={String(c.categoryId)}>
+                              {c.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={control}
                   name="tags"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{tLabels("tags")}</FormLabel>
-                      <MultiSelectCombobox options={tagOptions} selected={field.value || []} onChange={field.onChange} placeholder={tPlaceholders("selectTags")} />
-                      <FormMessage />
+                      <FormLabel>{t("forms.labels.tags")}</FormLabel>
+                      <MultiSelectCombobox options={tagOptions} selected={field.value || []} onChange={field.onChange} placeholder={t("forms.placeholders.selectTags")} />
                     </FormItem>
                   )}
                 />
-              )}
-            </div>
-            {isDashboard && (
-              <div className="p-6 bg-white rounded-lg border space-y-4">
-                <h3 className="font-semibold text-lg">{tLabels("visibility")}</h3>
+              </CardContent>
+            </Card>
+
+            {/* --- VISIBILITY --- */}
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("forms.labels.visibility")}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <FormField
                   control={control}
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{tLabels("status")}</FormLabel>
-                      <Select
-                        {...field}
-                        onValueChange={(value: "pending" | "published") => {
-                          setValue("status", value);
-                          field.onChange(Number(value));
-                        }}
-                        value={field.value}
-                      >
+                      <FormLabel>{t("forms.labels.status")}</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder={tPlaceholders("selectStatus")} />
+                            <SelectValue />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="published">{tStatuses("published")}</SelectItem>
-                          <SelectItem value="pending">{tStatuses("pending")}</SelectItem>
+                          <SelectItem value="published">{t("forms.statuses.published")}</SelectItem>
+                          <SelectItem value="pending">{t("forms.statuses.pending")}</SelectItem>
+                          <SelectItem value="has-pending-review">{t("forms.statuses.has-pending-review")}</SelectItem>
+                          <SelectItem value="rejected">{t("forms.statuses.rejected")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormItem>
@@ -245,84 +229,74 @@ export function TermForm({ initialData, categories, tags, mode, action, onSucces
                   control={control}
                   name="isFeatured"
                   render={({ field }) => (
-                    <FormItem className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
-                      <FormLabel>{tLabels("featured")}</FormLabel>
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                      <FormLabel>{t("forms.labels.featured")}</FormLabel>
                       <FormControl>
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                     </FormItem>
                   )}
                 />
-              </div>
-            )}
+              </CardContent>
+            </Card>
           </div>
         </div>
 
         <div className="flex justify-between items-center mt-8 pt-6 border-t">
-          {isDashboard ? (
-            <Button variant="outline" size="lg" onClick={() => router.back()} type="button">
-              {tCommon("actions.cancel")}
-            </Button>
-          ) : (
-            <div />
-          )}
-          <SubmitButton isEditMode={isEditMode} createText={isDashboard ? tCommon("actions.create") : tCommon("actions.submit")} updateText={tCommon("actions.save")} pendingText={tCommon("saving")} />
+          <Button variant="outline" size="lg" onClick={() => router.back()} type="button">
+            {tCommon("actions.cancel")}
+          </Button>
+          <SubmitButton isEditMode={isEditMode} />
         </div>
       </form>
     </Form>
   );
 }
 
-function ReferencesField({ control, locale }: { control: any; locale: "en" | "ar" }) {
-  const tLabels = useTranslations("Dashboard.forms.labels");
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: `translations.${locale}.references`,
-  });
-
+// Reusable component for translation fields
+const TranslationFields = ({ control, path }: { control: any; path: string }) => {
+  const t = useTranslations("Dashboard.forms.labels");
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h4 className="font-medium">{tLabels("references")}</h4>
-        <Button type="button" variant="ghost" size="sm" onClick={() => append({ content: "", url: "" })}>
-          <PlusCircle className="h-4 w-4 me-2" />
-          {tLabels("addReference")}
-        </Button>
-      </div>
-
-      {fields.map((item, index) => (
-        <div key={item.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-2 p-3 border rounded-md">
-          <FormField
-            control={control}
-            name={`translations.${locale}.references.${index}.content`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs">{tLabels("referenceContent")}</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name={`translations.${locale}.references.${index}.url`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs">{tLabels("referenceUrl")}</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="self-end text-destructive hover:bg-destructive/10">
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ))}
+      <FormField
+        control={control}
+        name={`${path}.name`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t("name")}</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name={`${path}.briefDescription`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t("briefDescription")}</FormLabel>
+            <FormControl>
+              <Textarea rows={3} {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name={`${path}.fullDescription`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t("fullDescription")}</FormLabel>
+            <FormControl>
+              <Textarea rows={6} {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
-}
+};

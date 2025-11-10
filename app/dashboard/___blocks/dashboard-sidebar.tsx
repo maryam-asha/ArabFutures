@@ -1,12 +1,16 @@
 "use client";
 
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem } from "@ui/sidebar";
 import { BookText, CheckSquare, LayoutGrid, Tag } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function DashboardSidebar() {
+interface DashboardSidebarProps {
+  pendingReviewCount: number;
+}
+
+export default function DashboardSidebar({ pendingReviewCount }: DashboardSidebarProps) {
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations("Dashboard.sidebar");
@@ -23,6 +27,12 @@ export default function DashboardSidebar() {
         { href: "/dashboard/terms", icon: BookText, label: t("terms") },
         { href: "/dashboard/term-categories", icon: LayoutGrid, label: t("termCategories") },
         { href: "/dashboard/tags", icon: Tag, label: t("tags") },
+        {
+          href: "/dashboard/reviews",
+          icon: CheckSquare,
+          label: t("reviews"),
+          badge: pendingReviewCount > 0 ? pendingReviewCount : null,
+        },
         { href: "/dashboard/approvals", icon: CheckSquare, label: t("approvals") },
       ],
     },
@@ -46,6 +56,7 @@ export default function DashboardSidebar() {
                             <Link href={link.href}>
                               <link.icon />
                               <span>{link.label}</span>
+                              {link.badge && <SidebarMenuBadge>{link.badge}</SidebarMenuBadge>}
                             </Link>
                           </SidebarMenuButton>
                         </SidebarMenuItem>

@@ -2,132 +2,95 @@ DROP SCHEMA IF EXISTS `future-foresight-terms-v1`;
 CREATE SCHEMA `future-foresight-terms-v1` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `future-foresight-terms-v1`;
 
+-- Set default SQL modes
+SET NAMES utf8mb4;
+SET time_zone = '+00:00';
+SET foreign_key_checks = 0;
+SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+
 -- =================================================================
--- AUTHENTICATION TABLES
+-- Table Structures
 -- =================================================================
 
+-- Table: users
 CREATE TABLE `users` (
-  `userId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `username` VARCHAR(50) NOT NULL,
-  `passwordHash` VARCHAR(255) NOT NULL,
-  `version` INT UNSIGNED NOT NULL DEFAULT 1,
-  `isForbidden` BOOLEAN NOT NULL DEFAULT FALSE,
-  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `userId` INT NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `passwordHash` varchar(255) NOT NULL,
+  `version` INT NOT NULL DEFAULT 1,
+  `isForbidden` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`userId`),
-  CONSTRAINT `UQ_users_username` UNIQUE KEY (`username`)
-);
+  UNIQUE KEY `UQ_users_username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: revokedTokens
 
 CREATE TABLE `revokedTokens` (
-    `jti` VARCHAR(36) NOT NULL,
-    `expiresAt` TIMESTAMP NOT NULL,
-    PRIMARY KEY (`jti`),
-    INDEX `IX_revokedTokens_expiresAt` (`expiresAt`)
-);
--- =================================================================
-CREATE TABLE `termCategories` (
-  `categoryId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `displayOrder` INT NOT NULL DEFAULT 100000,
-  `name` JSON NOT NULL,
-  `isActive` BOOLEAN NOT NULL DEFAULT TRUE,
-  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`categoryId`)
-);
+  `jti` varchar(255) NOT NULL,
+  `expiresAt` datetime NOT NULL,
+  PRIMARY KEY (`jti`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `terms` (
-  `termId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `categoryRef` INT UNSIGNED NULL,
-  `title`JSON NOT NULL,
-  `briefDescription` TEXT NULL,
-  `fullDetail` TEXT NULL,
-  `status` ENUM('pending', 'published') NOT NULL DEFAULT 'pending',
-  `isFeatured` BOOLEAN NOT NULL DEFAULT FALSE,
-  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`termId`),
-  CONSTRAINT `FK_categories_ref` FOREIGN KEY (`categoryRef`) REFERENCES `termCategories` (`categoryId`) ON DELETE SET NULL
-);
-ALTER TABLE `terms` ADD INDEX `IX_terms_categoryRef` (`categoryRef`);
+
+-- Table: termCategories
+
+CREATE TABLE `termCategories` (
+  `categoryId` INT NOT NULL AUTO_INCREMENT,
+  `displayOrder` INT NOT NULL DEFAULT 0,
+  `isActive` tinyint(1) NOT NULL DEFAULT 1,
+  `name` json DEFAULT NULL,
+  PRIMARY KEY (`categoryId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: tags
 
 CREATE TABLE `tags` (
-  `tagId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` JSON NOT NULL,
-  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `tagId` INT NOT NULL AUTO_INCREMENT,
+  `name` json DEFAULT NULL,
   PRIMARY KEY (`tagId`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: terms (OVERHAULED SCHEMA)
+
+CREATE TABLE `terms` (
+  `termId` INT NOT NULL AUTO_INCREMENT,
+  `categoryRef` INT DEFAULT NULL,
+  `status` enum('pending','published','rejected','has-pending-review') NOT NULL DEFAULT 'pending',
+  `isFeatured` tinyint(1) NOT NULL DEFAULT 0,
+  `content` json DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`termId`),
+  KEY `IX_terms_categoryRef` (`categoryRef`),
+  CONSTRAINT `FK_terms_categoryRef` FOREIGN KEY (`categoryRef`) REFERENCES `termCategories` (`categoryId`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table: termTags (Junction)
 
 CREATE TABLE `termTags` (
-  `termId` INT UNSIGNED NOT NULL,
-  `tagId` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`termId`, `tagId`),
-  CONSTRAINT `FK_term_tags_termId`
-    FOREIGN KEY (`termId`)
-    REFERENCES `terms` (`termId`)
-    ON DELETE CASCADE,
-  CONSTRAINT `FK_term_tags_tagId`
-    FOREIGN KEY (`tagId`)
-    REFERENCES `tags` (`tagId`)
-    ON DELETE CASCADE
-);
-ALTER TABLE `termTags` ADD INDEX `IX_terms_ref` (`termId`);
-ALTER TABLE `termTags` ADD INDEX `IX_tags_ref` (`tagId`);
+  `termId` INT NOT NULL,
+  `tagId` INT NOT NULL,
+  PRIMARY KEY (`termId`,`tagId`),
+  KEY `IX_termTags_tagId` (`tagId`),
+  CONSTRAINT `FK_termTags_termId` FOREIGN KEY (`termId`) REFERENCES `terms` (`termId`) ON DELETE CASCADE,
+  CONSTRAINT `FK_termTags_tagId` FOREIGN KEY (`tagId`) REFERENCES `tags` (`tagId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =================================================================
--- FORESIGHT TOOLS & CASE STUDIES (UNCHANGED)
--- =================================================================
-CREATE TABLE `tools` (
-  `toolId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `displayOrder` INT NOT NULL DEFAULT 100000,
-  `isActive` BOOLEAN NOT NULL DEFAULT TRUE,
-  `isFeatured` BOOLEAN NOT NULL DEFAULT FALSE,
-  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`toolId`)
-);
+-- Table: termReviews (NEW TABLE)
 
-CREATE TABLE `toolTranslations` (
-  `toolTranslationId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `toolRef` INT UNSIGNED NOT NULL,
-  `locale` VARCHAR(5) NOT NULL,
-  `name` VARCHAR(255) NOT NULL,
-  `description` TEXT NULL,
-  `methodology` VARCHAR(255) NULL, -- e.g., Forecasting, Trend Analysis
-  PRIMARY KEY (`toolTranslationId`),
-  CONSTRAINT `UQ_toolTranslations_locale` UNIQUE KEY (`toolRef`, `locale`),
-  CONSTRAINT `FK_toolTranslations_toolRef` FOREIGN KEY (`toolRef`) REFERENCES `tools` (`toolId`) ON DELETE CASCADE
-);
-ALTER TABLE `toolTranslations` ADD INDEX `IX_toolTranslations_toolRef` (`toolRef`);
+CREATE TABLE `termReviews` (
+  `reviewId` INT NOT NULL AUTO_INCREMENT,
+  `termRef` INT NOT NULL,
+  `translationIdentifier` varchar(50) NOT NULL COMMENT 'e.g., ''default-en'', ''more-0''',
+  `fieldKey` varchar(50) NOT NULL COMMENT 'e.g., ''name'', ''briefDescription''',
+  `suggestedValue` text NOT NULL,
+  `explanation` text DEFAULT NULL,
+  `references` json DEFAULT NULL,
+  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `resolvedAt` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`reviewId`),
+  KEY `IX_termReviews_termRef` (`termRef`),
+  CONSTRAINT `FK_termReviews_termRef` FOREIGN KEY (`termRef`) REFERENCES `terms` (`termId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- =================================================================
--- THOUGHT LEADERSHIP BLOG ARTICLES
--- =================================================================
-CREATE TABLE `articles` (
-  `articleId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `authorName` VARCHAR(255) NOT NULL,
-  `readTimeMinutes` INT NOT NULL DEFAULT 5,
-  `views` INT UNSIGNED NOT NULL DEFAULT 0,
-  `isFeatured` BOOLEAN NOT NULL DEFAULT FALSE,
-  `isActive` BOOLEAN NOT NULL DEFAULT TRUE,
-  `publishedAt` TIMESTAMP NULL,
-  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`articleId`)
-);
-
-CREATE TABLE `articleTranslations` (
-    `articleTranslationId` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `articleRef` INT UNSIGNED NOT NULL,
-    `locale` VARCHAR(5) NOT NULL,
-    `title` VARCHAR(255) NOT NULL,
-    `excerpt` TEXT NULL,
-    `content` LONGTEXT NULL,
-    `category` VARCHAR(100) NULL,
-    PRIMARY KEY (`articleTranslationId`),
-    CONSTRAINT `UQ_articleTranslations_locale` UNIQUE KEY (`articleRef` , `locale`),
-    CONSTRAINT `FK_articleTranslations_ref` FOREIGN KEY (`articleRef`)
-        REFERENCES `articles` (`articleId`)
-        ON DELETE CASCADE
-);
-ALTER TABLE `articleTranslations` ADD INDEX `IX_articleTranslations_articleRef` (`articleRef`);

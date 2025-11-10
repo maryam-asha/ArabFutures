@@ -37,7 +37,7 @@ export function DataTableToolbar<TData>({ table, filterColumnId, filterColumnPla
   const tActions = useTranslations("Common.actions");
   const tDialogs = useTranslations("Dashboard.dialogs");
   const tCommon = useTranslations("Common");
-
+  console.log(filterColumnId);
   const filterColumn = filterColumnId ? table.getColumn(filterColumnId) : undefined;
   const [inputValue, setInputValue] = useState<string>((filterColumn?.getFilterValue() as string) ?? "");
   const debouncedValue = useDebouncedValue(inputValue, 400);
@@ -50,7 +50,6 @@ export function DataTableToolbar<TData>({ table, filterColumnId, filterColumnPla
 
   return (
     <div className="flex items-center justify-between">
-      {/* Filter input */}
       <div className="flex flex-1 items-center space-x-2">
         {filterColumn && <Input placeholder={filterColumnPlaceholder} value={inputValue} onChange={(e) => setInputValue(e.target.value)} className="h-8 w-[150px] lg:w-[250px]" />}
         {isFiltered && (

@@ -1,59 +1,98 @@
 "use server";
 
-import { TermFormSchema } from "@app/dashboard/terms/term.schema";
-import { TermForm, TermFormState } from "@app/dashboard/terms/term.types";
-import { ActionHandler, createActionParser, createPublicAction } from "@lib/action-handler";
+import { createActionParser, createPublicAction } from "@lib/action-handler";
 import { dbClient } from "@root/dal/client";
-import { TranslatableTermTitleSchema } from "@root/dal/dal.schema";
+import { TermReferenceSchema, TermTranslationSchema } from "@root/dal/dal.schema";
 import { TermDb } from "@root/dal/dal.types";
 import { findTerms } from "@root/dal/terms-dx";
-import i18nAppConfig, { AppLocale } from "@root/i18n/config";
+import { AppLocale } from "@root/i18n/config";
 import { ActionState } from "@root/types";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-const termActionParser = createActionParser();
+// =================================================================
+// Action: Suggest a completely new term (from the hero button)
+// =================================================================
 
-const termSuggestionSaveHandler: ActionHandler<TermForm> = async (data): Promise<TermFormState> => {
-  const { categoryRef, translations } = data;
+const NewTermSuggestionSchema = z.object({
+  categoryRef: z.coerce.number().min(1, "Please select a category."),
+  content: z.object({
+    default: z.object({
+      // We only validate name/briefDescription, as that's all the form shows.
+      en: TermTranslationSchema.pick({ name: true, briefDescription: true }),
+      ar: TermTranslationSchema.pick({ name: true, briefDescription: true }),
+    }),
+  }),
+});
 
-  const titleJson: z.infer<typeof TranslatableTermTitleSchema> = { en: undefined, ar: undefined };
-  const briefDescriptionJson: Record<string, string> = {};
-  const fullDetailJson: Record<string, string> = {};
+const suggestNewTermHandler = async (data: z.infer<typeof NewTermSuggestionSchema>): Promise<ActionState<any>> => {
+  const { categoryRef, content } = data;
 
-  for (const locale of i18nAppConfig.locales) {
-    const trans = translations?.[locale as AppLocale];
-    if (trans) {
-      if (trans.title) {
-        titleJson[locale as AppLocale] = [{ value: trans.title, references: [] }];
-      }
-      if (trans.briefDescription) {
-        briefDescriptionJson[locale as AppLocale] = trans.briefDescription;
-      }
-    }
-  }
+  // Build the full content object, ensuring 'more' is an empty array and other fields are present.
+  const fullContentPayload = {
+    default: {
+      en: { ...content.default.en, fullDescription: "", references: [] },
+      ar: { ...content.default.ar, fullDescription: "", references: [] },
+    },
+    more: [],
+  };
 
-  await dbClient.executeTransaction(async (trx) => {
-    const result = await trx.insert("terms", {
-      categoryRef,
-      status: "pending",
-      isFeatured: false,
-      title: JSON.stringify(titleJson),
-      briefDescription: JSON.stringify(briefDescriptionJson),
-      fullDetail: JSON.stringify(fullDetailJson),
-    });
-    if (!result.insertId) throw new Error("Failed to create term suggestion.");
+  await dbClient.insert("terms", {
+    categoryRef,
+    status: "pending", // ALWAYS pending for public submissions
+    isFeatured: false, // NEVER featured for public submissions
+    content: JSON.stringify(fullContentPayload),
   });
 
   revalidatePath("/dashboard/approvals", "layout");
 
-  return {
-    success: true,
-    message: "Suggestion submitted successfully! Thank you for your contribution.",
-  };
+  return { success: true, message: "Suggestion submitted successfully and is now pending review!" };
 };
 
-export const suggestTermAction = createPublicAction(TermFormSchema, termSuggestionSaveHandler, termActionParser);
+export const suggestNewTermAction = createPublicAction(NewTermSuggestionSchema, suggestNewTermHandler, createActionParser());
+
+// =================================================================
+// Action: Submit a review/change for an EXISTING term
+// =================================================================
+
+const SubmitReviewSchema = z.object({
+  termRef: z.coerce.number(),
+  translationIdentifier: z.string().min(1),
+  fieldKey: z.string().min(1),
+  suggestedValue: z.string().min(1, "Your suggestion cannot be empty."),
+  explanation: z.string().optional(),
+  // References are passed as a JSON string from a hidden input and then parsed
+  references: z
+    .string()
+    .transform((val) => JSON.parse(val || "[]"))
+    .pipe(z.array(TermReferenceSchema)),
+});
+
+const submitReviewHandler = async (data: z.infer<typeof SubmitReviewSchema>): Promise<ActionState<any>> => {
+  await dbClient.executeTransaction(async (trx) => {
+    // 1. Insert the new review record
+    await trx.insert("termReviews", {
+      ...data,
+      references: JSON.stringify(data.references), // Re-stringify for the DB
+    });
+
+    // 2. Update the term's status to indicate a review is pending
+    await trx.update("terms", { status: "has-pending-review" }, { termId: data.termRef });
+  });
+
+  // Revalidate pages where this change is visible
+  revalidatePath("/", "layout"); // Revalidates all public pages
+  revalidatePath("/dashboard/reviews", "layout");
+  revalidatePath("/dashboard/terms", "layout");
+
+  return { success: true, message: "Thank you! Your suggestion has been submitted for review." };
+};
+
+export const submitReviewAction = createPublicAction(SubmitReviewSchema, submitReviewHandler, createActionParser());
+
+// =================================================================
+// Action: Handle the contact form submission
+// =================================================================
 
 const ContactSchema = z.object({
   name: z.string().min(2, "Name is required."),
@@ -72,6 +111,8 @@ export async function contactAction(prevState: ActionState<any>, formData: FormD
     };
   }
 
+  // In a real application, you would send an email here.
+  // For now, we just log it to the console.
   console.log("=== CONTACT FORM SUBMISSION ===");
   console.log("To Email:", "your-email@example.com");
   console.log("Name:", parsed.data.name);
@@ -84,6 +125,10 @@ export async function contactAction(prevState: ActionState<any>, formData: FormD
     message: "Your message has been sent successfully!",
   };
 }
+
+// =================================================================
+// Action: Load more terms for the public listing (infinite scroll)
+// =================================================================
 
 const TERMS_PER_PAGE = 8;
 

@@ -48,7 +48,7 @@ export default async function TermsPage({ searchParams }: { searchParams: Promis
         </Button>
       </div>
       <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <DataTable columns={termColumns} data={terms} totalCount={totalCount} filterColumnId="title" filterColumnPlaceholder={t("forms.labels.title")} bulkActions={termBulkActions} pkColumn="termId" />
+        <DataTable columns={termColumns} data={terms} totalCount={totalCount} filterColumnId="content" filterColumnPlaceholder={t("forms.placeholders.search")} bulkActions={termBulkActions} pkColumn="termId" />
       </div>
     </div>
   );

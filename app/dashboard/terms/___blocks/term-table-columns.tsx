@@ -5,7 +5,7 @@ import { Badge } from "@components/ui/badge";
 import { Button } from "@components/ui/button";
 import { Checkbox } from "@components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@components/ui/dropdown-menu";
-import { AppLocale } from "@i18n/config";
+import i18nAppConfig, { AppLocale } from "@i18n/config";
 import { TermDb } from "@root/dal/dal.types";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
@@ -26,25 +26,31 @@ export const termColumns: ColumnDef<TermDb>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "title",
+    accessorKey: "content",
     header: ({ column }) => {
       const t = useTranslations("Dashboard.forms.labels");
       return (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          {t("title")}
+          {t("name")}
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => {
       const locale = useLocale() as AppLocale;
-      const title = row.original.title?.[locale]?.[0]?.value || "N/A";
-      return <div className="font-medium">{title}</div>;
+      const defaultLocale = i18nAppConfig.defaultLocale;
+
+      // Correctly access the name from the new nested structure
+      const name = row.original.content.default[locale]?.name || row.original.content.default[defaultLocale]?.name;
+
+      return <div className="font-medium">{name || "N/A"}</div>;
     },
+    // The filter function also needs to be updated
     filterFn: (row, id, value) => {
-      const locale = useLocale() as AppLocale;
-      const title = row.original.title?.[locale]?.[0]?.value?.toLowerCase();
-      return title ? title.includes((value as string).toLowerCase()) : false;
+      const enName = row.original.content.default.en?.name?.toLowerCase();
+      const arName = row.original.content.default.ar?.name?.toLowerCase();
+      const query = (value as string).toLowerCase();
+      return !!((enName && enName.includes(query)) || (arName && arName.includes(query)));
     },
   },
   {
@@ -85,9 +91,12 @@ export const termColumns: ColumnDef<TermDb>[] = [
     },
     cell: ({ row }) => {
       const status = row.original.status;
+
+      const variant: "secondary" | "outline" | "destructive" = status === "published" ? "secondary" : status === "rejected" ? "destructive" : "outline"; // for 'pending' and 'has-pending-review'
+
       return (
-        <Badge variant={status === "published" ? "secondary" : "outline"} className="capitalize">
-          {status}
+        <Badge variant={variant} className="capitalize">
+          {status.replace("-", " ")}
         </Badge>
       );
     },

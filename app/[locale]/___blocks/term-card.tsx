@@ -12,9 +12,9 @@ export default function TermCard({ term, onSelect }: { term: TermDb; onSelect: (
   const currentLocale = useLocale() as AppLocale;
   const otherLocale = i18nAppConfig.locales.find((locale) => locale !== currentLocale) || currentLocale;
 
-  const primaryTitle = term.title?.[currentLocale]?.[0]?.value || commonT("notAvailable");
-  const secondaryTitle = term.title?.[otherLocale]?.[0]?.value;
-  const briefDescription = term.briefDescription?.[currentLocale] || t("noDescription");
+  const primaryTitle = term.content.default[currentLocale]?.name || "N/A";
+  const secondaryTitle = term.content.default[otherLocale]?.name;
+  const briefDescription = term.content.default[currentLocale]?.briefDescription || t("noDescription");
 
   return (
     <Card className="group relative flex flex-col overflow-hidden term-card transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">

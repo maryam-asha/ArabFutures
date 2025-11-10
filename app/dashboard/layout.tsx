@@ -2,6 +2,7 @@ import LanguageDropdown from "@components/blocks/dropdown-language";
 import ProfileDropdown from "@components/blocks/dropdown-profile";
 import { SidebarProvider, SidebarTrigger } from "@components/ui/sidebar";
 import { auth } from "@lib/auth";
+import { getPendingReviewCount } from "@root/dal/reviews-dx";
 import { Avatar, AvatarFallback, AvatarImage } from "@ui/avatar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@ui/breadcrumb";
 import { Button } from "@ui/button";
@@ -39,13 +40,15 @@ export default async function DashboardShell({
   const t = await getTranslations("Dashboard");
   const publicT = await getTranslations("Public");
 
+  const pendingReviewCount = await getPendingReviewCount();
+
   return (
     <html lang={currentLocale} dir={currentLocale === "ar" ? "rtl" : "ltr"} className={currentLocale === "ar" ? `${tajawal.variable} font-sans-arabic` : `${inter.variable} font-sans antialiased`}>
       <body className="bg-neutral-50 text-neutral-900 overflow-x-hidden">
         <NextIntlClientProvider messages={messages} locale={currentLocale}>
           <div className="flex min-h-dvh w-full">
             <SidebarProvider>
-              <DashboardSidebar />
+              <DashboardSidebar pendingReviewCount={pendingReviewCount} />
               <div className="flex flex-1 flex-col">
                 <header className="bg-card sticky top-0 z-50 border-b">
                   <div className="flex  items-center justify-between gap-6 px-4 py-2 sm:px-6">
