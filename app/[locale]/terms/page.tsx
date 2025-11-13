@@ -1,15 +1,27 @@
 import { loadMoreTermsAction } from "@app/public-actions";
+import { findActiveCategoryOptions } from "@root/dal/termCategories-dx";
 import { AppLocale } from "@root/i18n/config";
+import { SearchParamsProps } from "@root/types";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { TermList } from "../___blocks/term-list";
 
-export default async function TermsPage({ searchParams }: { searchParams?: { query?: string } }) {
+export default async function TermsPage(params: { searchParams: SearchParamsProps }) {
+  const searchParamsObject = await params.searchParams;
+
   const locale = (await getLocale()) as AppLocale;
   const t = await getTranslations("Public.featuredTerms");
-  const query = searchParams?.query || "";
+  const query = searchParamsObject?.query?.toString() || "";
+  const sort = searchParamsObject?.sort?.toString() || "newest";
+  const categoryIds =
+    searchParamsObject?.category && typeof searchParamsObject.category === "string"
+      ? searchParamsObject.category
+          .split(",")
+          .map(Number)
+          .filter((id) => !isNaN(id))
+      : [];
 
-  const initialTerms = await loadMoreTermsAction(locale, 0, query);
+  const [categories, initialTerms] = await Promise.all([findActiveCategoryOptions(locale), loadMoreTermsAction(locale, 0, query, categoryIds, sort as any)]);
 
   return (
     <div className="container mx-auto py-24">
@@ -19,7 +31,7 @@ export default async function TermsPage({ searchParams }: { searchParams?: { que
       </div>
 
       {/* The client component handles all interactivity from here. */}
-      <TermList initialTerms={initialTerms} initialQuery={query} />
+      <TermList initialTerms={initialTerms} categories={categories} initialQuery={query} initialCategoryIds={categoryIds} initialSort={sort as any} />
     </div>
   );
 }

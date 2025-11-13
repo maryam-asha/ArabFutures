@@ -114,7 +114,7 @@ export async function contactAction(prevState: ActionState<ContactActionInput>, 
 
 const TERMS_PER_PAGE = 8;
 
-export async function loadMoreTermsAction(locale: AppLocale, page: number, query?: string, categoryIds?: number[]): Promise<TermDb[]> {
+export async function loadMoreTermsAction(locale: AppLocale, page: number, query?: string, categoryIds?: number[], orderBy?: "newest" | "oldest"): Promise<TermDb[]> {
   const offset = page * TERMS_PER_PAGE;
 
   const { data: terms } = await findTerms({
@@ -122,6 +122,7 @@ export async function loadMoreTermsAction(locale: AppLocale, page: number, query
     status: "published",
     query,
     categoryIds,
+    orderBy,
     limit: TERMS_PER_PAGE,
     offset,
   });

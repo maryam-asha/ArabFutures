@@ -9,6 +9,7 @@
     "notAvailable": "N/A",
     "yes": "Yes",
     "no": "No",
+
     "actions": {
       "title": "Actions",
       "add": "Add New",
@@ -326,6 +327,7 @@
       "showPassword": "Show password",
       "hidePassword": "Hide password"
     },
+
     "contact": {
       "title": "Get in Touch",
       "description": "We'd love to hear from you. Whether you have a question, a proposal, or just want to say hello, feel free to reach out.",
@@ -346,6 +348,16 @@
       "sendMessage": "Send Message",
       "successMessage": "Your message has been sent!",
       "errorMessage": "Failed to send message. Please try again."
+    },
+    "termsPage": {
+      "allCategories": "All",
+      "loadMore": "Load More",
+      "sort": {
+        "newest": "newest",
+        "oldest": "oldest",
+        "placeholder": "sort"
+      },
+      "searchPlaceholder": "search ..."
     }
   }
 }

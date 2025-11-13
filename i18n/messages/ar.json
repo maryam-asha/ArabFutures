@@ -277,6 +277,7 @@
       "suggestTerm": "اقترح مصطلحًا",
       "viewAll": "عرض كل المصطلحات",
       "searchPlaceholder": "ابحث عن مصطلح...",
+
       "loadMore": "تحميل المزيد"
     },
     "termCard": {
@@ -346,6 +347,16 @@
       "sendMessage": "إرسال الرسالة",
       "successMessage": "تم إرسال رسالتك بنجاح!",
       "errorMessage": "فشل إرسال الرسالة. يرجى المحاولة مرة أخرى."
+    },
+    "termsPage": {
+      "allCategories": "الكل",
+      "loadMore": "تحميل المزيد",
+      "sort": {
+        "newest": "الأحدث",
+        "oldest": "الأقدم",
+        "placeholder": "فرز حسب"
+      },
+      "searchPlaceholder": "بحث ..."
     }
   }
 }

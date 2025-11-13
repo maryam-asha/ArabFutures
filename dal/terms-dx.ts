@@ -33,6 +33,7 @@ export const findTerms = async (props: {
   status?: "pending" | "published" | "rejected" | "has-pending-review";
   categoryIds?: number[];
   query?: string;
+  orderBy?: "newest" | "oldest"; // <-- ADDED: New sorting parameter
   limit?: number;
   offset?: number;
 }): Promise<{
@@ -40,7 +41,7 @@ export const findTerms = async (props: {
   totalCount: number;
 }> => {
   noStore();
-  const { status, locale, categoryIds, query, limit, offset } = props;
+  const { status, locale, categoryIds, query, orderBy = "newest", limit, offset } = props;
 
   const params: (string | number | number[])[] = [];
   let whereConditions: string[] = [];
@@ -69,13 +70,14 @@ export const findTerms = async (props: {
   }
 
   const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
+  const orderByClause = orderBy === "oldest" ? "ORDER BY t.termId ASC" : "ORDER BY t.termId DESC";
 
   const countSql = `SELECT COUNT(t.termId) as count ${SQL_STANDARD_JOINS} ${whereClause}`;
   const dataSql = `
     SELECT ${SQL_SELECT_COLUMNS(locale)}
     ${SQL_STANDARD_JOINS}
     ${whereClause}
-    ORDER BY t.termId DESC
+    ${orderByClause}
     ${limit ? `LIMIT ${limit}` : ""}
     ${offset ? `OFFSET ${offset}` : ""}
   `;
