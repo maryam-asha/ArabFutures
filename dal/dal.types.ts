@@ -2,24 +2,21 @@ import { z } from "zod";
 
 import * as schema from "./dal.schema";
 
-// Types for Term Categories
 export type TermCategoryDb = z.infer<typeof schema.TermCategoryDbSchema>;
-export type TermCategoryOption = z.infer<typeof schema.TermCategoryOptionSchema>;
+export type TermCategoryOption = z.infer<typeof schema.TermCategoryOptionDbSchema>;
 export type TermCategoryWithCount = z.infer<typeof schema.TermCategoryWithCountDbSchema>;
 
-// Types for Tags
 export type TagDb = z.infer<typeof schema.TagDbSchema>;
-export type TagOption = z.infer<typeof schema.TagOptionSchema>;
+export type TagOption = z.infer<typeof schema.TagOptionDbSchema>;
+export type TagWithCount = z.infer<typeof schema.TagWithCountDbSchema>;
 
-// Types for the new Term Content structure
-export type TermReference = z.infer<typeof schema.TermReferenceSchema>;
-export type TermTranslation = z.infer<typeof schema.TermTranslationSchema>;
-export type TermMoreTranslation = z.infer<typeof schema.TermMoreTranslationSchema>;
-export type TermContent = z.infer<typeof schema.TermContentSchema>;
+export type TermReferenceDb = z.infer<typeof schema.TermReferenceDbSchema>;
+export type TermTranslationDb = z.infer<typeof schema.TermTranslationDbSchema>;
+export type TermMoreTranslationDb = z.infer<typeof schema.TermMoreTranslationDbSchema>;
+export type TermContentDb = z.infer<typeof schema.TermContentDbSchema>;
 
-// Types for Terms
 export type TermDb = z.infer<typeof schema.TermDbSchema>;
 export type TermForEditDb = z.infer<typeof schema.TermForEditDbSchema>;
 
-// Types for Term Reviews
 export type TermReviewDb = z.infer<typeof schema.TermReviewDbSchema>;
+export type TermReviewWithTermName = z.infer<typeof schema.TermReviewWithTermNameDbSchema>;

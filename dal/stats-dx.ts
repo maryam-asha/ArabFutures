@@ -3,9 +3,9 @@ import { z } from "zod";
 import { dbClient } from "./client";
 
 const DashboardStatsSchema = z.object({
-  totalTerms: z.number(),
-  publishedTerms: z.number(),
-  pendingTerms: z.number(),
+  totalTerms: z.coerce.number<number>(),
+  publishedTerms: z.coerce.number<number>(),
+  pendingTerms: z.coerce.number<number>(),
 });
 
 export type DashboardStats = z.infer<typeof DashboardStatsSchema>;
@@ -22,7 +22,6 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     FROM terms;
   `;
 
-  // Use selectSingle because we know it will always return exactly one row.
   const stats = await dbClient.selectSingle(sql, [], DashboardStatsSchema);
 
   return {

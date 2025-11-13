@@ -20,7 +20,10 @@
       "submit": "Submit",
       "reset": "Reset",
       "approve": "Approve",
+      "pending": "Pending",
       "reject": "Reject",
+      "review": "Review",
+      "view": "View",
       "pend": "Set to Pending",
       "feature": "Feature",
       "unfeature": "Unfeature",
@@ -75,7 +78,9 @@
         "addTitle": "Add New Term",
         "addDescription": "Create a new lexicographical term with all its translations and details.",
         "editTitle": "Edit Term",
-        "editDescription": "You are editing the term: {entityName}"
+        "editDescription": "You are editing the term: {entityName}",
+        "reviewAlertTitle": "Reviewing Submission",
+        "reviewAlertDescription": "You are viewing a community suggestion for the field:{fieldKey}. The suggested value has been pre-filled. You can edit it further or save to approve the change."
       },
       "categories": {
         "title": "Term Categories",
@@ -111,7 +116,6 @@
         "organization": "Organization",
         "briefDescription": "Brief Description",
         "fullDescription": "Full Description",
-        "fullDetail": "Full Detail",
         "references": "References",
         "addReference": "Add Reference",
         "referenceContent": "Content / Title",
@@ -119,7 +123,9 @@
         "defaultTranslations": "Default Translations",
         "moreTranslations": "More Translations (Optional)",
         "addTranslation": "Add Translation",
-        "localeIdentifier": "Locale Identifier"
+        "localeIdentifier": "Locale Identifier",
+        "SuggestedChange": "Suggested Change",
+        "explanation": "explanation"
       },
       "placeholders": {
         "search": "Search...",
@@ -141,6 +147,16 @@
       }
     },
     "tables": {
+      "headers": {
+        "termName": "Term Name",
+        "field": "Field",
+        "suggestedChange": "Suggested Change",
+        "explanation": "Explanation",
+        "category": "Category",
+        "tags": "Tags",
+        "status": "Status",
+        "featured": "Featured"
+      },
       "noResults": "No results found.",
       "selectedRows": "{count, plural, =0 {No rows selected.} =1 {1 row selected.} other {# rows selected.}} of {total}",
       "rowsPerPage": "Rows per page",
@@ -159,7 +175,16 @@
       "deleteError": "Failed to delete {entityName}.",
       "approveSuccess": "{entityName} approved successfully.",
       "approveError": "Failed to approve {entityName}.",
-      "suggestionSuccess": "Suggestion submitted successfully."
+      "rejectSuccess": "{entityName} rejected successfully.",
+      "rejectError": "Failed to reject {entityName}.",
+      "processing": "Processing...",
+      "approving": "Approving...",
+      "bulkUpdateSuccess": "Items updated successfully.",
+      "noItemsSelected": "No items were selected.",
+      "reviewApproved": "Review approved and changes applied.",
+      "reviewRejected": "Review rejected.",
+      "reviewNotFound": "Review not found or already resolved.",
+      "termNotFound": "Associated term not found."
     }
   },
   "Public": {
@@ -182,52 +207,44 @@
       "ctaPrimary": "Suggest a Term",
       "ctaSecondary": "Explore the Lexicon"
     },
-    "vision": {
-      "title": "Our Vision",
-      "text": "To be the leading platform for future studies and foresight in the Arab world, fostering a community of thinkers and doers."
-    },
-    "mission": {
-      "title": "Our Mission",
-      "text": "To build a shared, open-source lexicon of future-oriented concepts, enabling richer dialogue and collaborative action."
-    },
     "ourWork": {
       "title": "What We Do",
       "features": [
-        {
-          "label": "Research & Analysis",
-          "heading": "Deep Dives into Future Trends",
-          "description": "We systematically identify, analyze, and synthesize emerging trends relevant to the Arab world, from technological shifts to social dynamics."
-        },
-        {
-          "label": "Community & Collaboration",
-          "heading": "Building a Network of Futurists",
-          "description": "We facilitate workshops, discussions, and collaborative projects to build a vibrant community dedicated to foresight."
-        }
+        { "label": "Research & Analysis", "heading": "Deep Dives into Future Trends", "description": "We systematically identify, analyze, and synthesize emerging trends relevant to the Arab world, from technological shifts to social dynamics." },
+        { "label": "Community & Collaboration", "heading": "Building a Network of Futurists", "description": "We facilitate workshops, discussions, and collaborative projects to build a vibrant community dedicated to foresight." }
       ]
     },
     "about": {
-      "title": "About the Society",
-      "p1": "We are a collective of researchers, designers, and futurists dedicated to fostering a proactive and imaginative approach to the future within the Arab world.",
-      "breakoutTitle": "Why a Lexicon?",
-      "breakoutDescription": "Language shapes thought. By building a shared, nuanced vocabulary for future concepts, we empower clearer communication, deeper understanding, and more effective collaboration on the challenges and opportunities ahead.",
-      "valuesTitle": "Our Core Values",
+      "title": "About Arab Futures Society",
+      "p1": "We are a collective of thinkers, creators, and innovators dedicated to exploring and shaping the future of the Arab world through foresight, research, and collaborative projects.",
+      "breakoutTitle": "Our Driving Force",
+      "breakoutDescription": "We aspire to make foresight equitable and connected, accessible to all and reflective of our shared humanity. are guided by an Arab ethos of trust, humility, and courage before the unknown, acting with clarity even amid uncertainty.",
+      "valuesTitle": "Our Values",
       "values": {
-        "collaboration": {
-          "label": "Collaboration",
-          "value": "We believe in the power of collective intelligence to build richer knowledge."
+        "ParticipatoryAndInclusive": {
+          "label": "Inclusion & Collective Ownership",
+          "value": "We are participatory, fostering inclusion and collective ownership of the future."
         },
-        "openness": {
-          "label": "Openness",
-          "value": "Our work is open-source and accessible to all, encouraging broad participation."
+        "UpholdingAgency": {
+          "label": "Empowerment & Agency",
+          "value": "We uphold agency, empowering individuals and institutions to shape their own trajectories."
         },
-        "rigor": {
-          "label": "Intellectual Rigor",
-          "value": "We are committed to high-quality, well-researched, and contextually relevant content."
+        "ChampioningRepresentation": {
+          "label": "Authentic Arab Representation",
+          "value": "We champion representation, so Arab futures are told by Arab voices."
         },
-        "foresight": {
-          "label": "Proactive Foresight",
-          "value": "We aim to move beyond reaction and actively shape a desirable future."
+        "impaPioneeringAndAdaptivect": {
+          "label": "Pioneering & Future-Focused",
+          "value": "We are pioneering, driven to challenge, adapt, and create what our region needs."
         }
+      },
+      "vision": {
+        "title": "Our Vision",
+        "text": "A future where the Arab world is a global leader in innovation, culture, and sustainable development, driven by the foresight and creativity of its people."
+      },
+      "mission": {
+        "title": "Our Mission",
+        "text": "To cultivate a foresight culture across the Arab region by providing accessible knowledge, fostering collaborative networks, and initiating impactful future-oriented projects."
       }
     },
     "projects": {
@@ -250,8 +267,11 @@
       "yourLogoAlt": "Your Logo",
       "partnerLogoAlt": "Partner Logo {number}"
     },
+    "toasts": {
+      "loadError": "Failed to load more terms."
+    },
     "featuredTerms": {
-      "title": "Featured Terms",
+      "title": "All Terms",
       "description": "Explore our curated collection of key concepts and ideas.",
       "suggestTerm": "Suggest a Term",
       "viewAll": "View All Terms",
@@ -266,19 +286,15 @@
       "fullDescription": "Full Description",
       "tags": "Tags",
       "references": "References",
-      "otherTranslations": "Other Translations"
-    },
-    "suggestDialog": {
-      "title": "Suggest a New Term",
-      "description": "Contribute to the knowledge base by suggesting a new term. Your submission will be reviewed by our team.",
-      "categoryLabel": "Category",
-      "categoryPlaceholder": "Select the most relevant category",
-      "nameLabel": "Term Name",
-      "briefDescriptionLabel": "Brief Description",
-      "submitButton": "Submit for Review"
+      "otherTranslations": "Other Translations",
+      "suggestEdit": "Suggest an Edit"
     },
     "reviewDialog": {
       "title": "Suggest a Change for \"{fieldName}\"",
+      "field-name": "Name",
+      "field-briefDescription": "Brief Description",
+      "field-fullDescription": "Full Description",
+
       "description": "Your suggestion will be reviewed by our team before being published.",
       "currentValue": "Current Value",
       "suggestionLabel": "Your Suggestion",
@@ -287,6 +303,16 @@
       "submitButton": "Submit Suggestion",
       "submitting": "Submitting..."
     },
+    "suggestDialog": {
+      "title": "Suggest a New Term",
+      "description": "Contribute to the knowledge base by suggesting a new term. Your submission will be reviewed by our team.",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "Select the most relevant category",
+      "nameLabel": "Term Name",
+      "fullDescritpionLabel": "Full Description",
+      "submitButton": "Submit for Review"
+    },
+
     "signin": {
       "title": "Sign In",
       "description": "Welcome back! Please enter your credentials to access the dashboard.",
@@ -305,22 +331,10 @@
       "description": "We'd love to hear from you. Whether you have a question, a proposal, or just want to say hello, feel free to reach out.",
       "whyConnectTitle": "Why Connect With Us?",
       "reasons": {
-        "collaborate": {
-          "title": "Collaborate on Research",
-          "description": "Partner with us on exploring a specific future-focused topic."
-        },
-        "learn": {
-          "title": "Learn More",
-          "description": "Inquire about our methodologies and upcoming publications."
-        },
-        "speak": {
-          "title": "Speaking Engagements",
-          "description": "Invite us to speak at your event or organization."
-        },
-        "join": {
-          "title": "Join the Community",
-          "description": "Find out how you can become a contributing member."
-        }
+        "collaborate": { "title": "Collaborate on Research", "description": "Partner with us on exploring a specific future-focused topic." },
+        "learn": { "title": "Learn More", "description": "Inquire about our methodologies and upcoming publications." },
+        "speak": { "title": "Speaking Engagements", "description": "Invite us to speak at your event or organization." },
+        "join": { "title": "Join the Community", "description": "Find out how you can become a contributing member." }
       },
       "contactInfoTitle": "Contact Information",
       "emailAddress": "contact@arabfutures.org",

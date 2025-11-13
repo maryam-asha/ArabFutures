@@ -7,9 +7,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { TagFormSchema } from "../tag.schema";
-import { TagForm, TagFormState } from "../tag.types";
+import { TagFormState, TagFormValues } from "../tag.types";
 
-const saveTagHandler = async (data: TagForm): Promise<TagFormState> => {
+const saveTagHandler = async (data: TagFormValues): Promise<TagFormState> => {
   const { tagId, translations } = data;
   let currentTagId = tagId;
 

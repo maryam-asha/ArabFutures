@@ -1,8 +1,7 @@
 "use client";
 
-import { getCsrfTokenAction } from "@app/auth-actions";
 import { CsrfProvider } from "@waelhabbaldev/next-jwt-auth/client";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 interface CsrfContextType {
   csrfToken: string;
@@ -19,15 +18,8 @@ export const useReactiveCsrf = () => {
   return context;
 };
 
-export default function CsrfManager({ children }: { children: React.ReactNode }) {
-  const [csrfToken, setCsrfToken] = useState<string>("");
-
-  useEffect(() => {
-    getCsrfTokenAction().then((token) => {
-      setCsrfToken(token);
-    });
-  }, []);
-
+export default function CsrfManager({ initialToken, children }: { initialToken: string; children: React.ReactNode }) {
+  const [csrfToken, setCsrfToken] = useState<string>(initialToken);
   return (
     <CsrfContext.Provider value={{ csrfToken, setCsrfToken }}>
       <CsrfProvider token={csrfToken}>{children}</CsrfProvider>

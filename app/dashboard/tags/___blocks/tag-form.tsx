@@ -1,7 +1,5 @@
 "use client";
 
-import { SubmitButton } from "@app/dashboard/___blocks/submit-button";
-import { Button } from "@components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@components/ui/form";
 import { Input } from "@components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
@@ -11,30 +9,27 @@ import { cn } from "@lib/utils";
 import i18nAppConfig from "@root/i18n/config";
 import { CsrfInput } from "@waelhabbaldev/next-jwt-auth/client";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { tagSaveAction } from "../actions";
 import { TagFormSchema } from "../tag.schema";
-import { type TagForm, type TagFormState } from "../tag.types";
+import { type TagFormState, TagFormValues } from "../tag.types";
 
-const initialFormState: TagFormState = {
-  success: false,
-  message: "",
-  errors: {} as any,
-};
+const initialFormState: TagFormState = { success: false, errors: {} as any };
 
-export function TagForm({ initialData }: { initialData: Partial<TagForm> }) {
-  const isEditMode = !!initialData?.tagId;
+interface TagFormProps {
+  initialData: Partial<TagFormValues>;
+  children: React.ReactNode;
+}
+
+export function TagForm({ initialData, children }: TagFormProps) {
   const locale = useLocale();
-  const router = useRouter();
   const [state, formAction] = useActionState(tagSaveAction, initialFormState);
   const tLabels = useTranslations("Dashboard.forms.labels");
-  const tCommon = useTranslations("Common");
 
-  const form = useForm<TagForm>({
+  const form = useForm<TagFormValues>({
     resolver: zodResolver(TagFormSchema),
     defaultValues: initialData,
   });
@@ -52,45 +47,44 @@ export function TagForm({ initialData }: { initialData: Partial<TagForm> }) {
 
   return (
     <Form {...form}>
-      <form action={formAction} className="space-y-8">
+      <form action={formAction}>
         <CsrfInput />
-        <Tabs defaultValue={i18nAppConfig.defaultLocale} dir={locale === "ar" ? "rtl" : "ltr"}>
-          <TabsList>
-            {i18nAppConfig.locales.map((locale) => {
-              const hasError = !!formState.errors.translations?.[locale];
-              return (
-                <TabsTrigger key={locale} value={locale} className={cn(hasError && "text-destructive")}>
-                  {locale.toUpperCase()} {hasError && "*"}
-                </TabsTrigger>
-              );
-            })}
-          </TabsList>
-          {i18nAppConfig.locales.map((locale) => (
-            <TabsContent key={locale} value={locale} className="pt-4" forceMount>
-              <FormField
-                control={form.control}
-                name={`translations.${locale}.name`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {tLabels("name")} - ({locale.toUpperCase()})
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} value={field.value ?? ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </TabsContent>
-          ))}
-        </Tabs>
+        {initialData.tagId && <input type="hidden" name="tagId" value={initialData.tagId} />}
 
-        <div className="flex justify-between items-center mt-8 pt-6 border-t">
-          <Button variant="outline" size="lg" onClick={() => router.back()} type="button">
-            {tCommon("actions.cancel")}
-          </Button>
-          <SubmitButton isEditMode={isEditMode} createText={tCommon("actions.create")} updateText={tCommon("actions.save")} pendingText={tCommon("saving")} />
+        <div className="space-y-8">
+          <Tabs defaultValue={i18nAppConfig.defaultLocale} dir={locale === "ar" ? "rtl" : "ltr"}>
+            <TabsList>
+              {i18nAppConfig.locales.map((locale) => {
+                const hasError = !!formState.errors.translations?.[locale];
+                return (
+                  <TabsTrigger key={locale} value={locale} className={cn(hasError && "text-destructive")}>
+                    {locale.toUpperCase()} {hasError && "*"}
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
+            {i18nAppConfig.locales.map((locale) => (
+              <TabsContent key={locale} value={locale} className="pt-4" forceMount>
+                <FormField
+                  control={form.control}
+                  name={`translations.${locale}.name`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {tLabels("name")} - ({locale.toUpperCase()})
+                      </FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value ?? ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
+            ))}
+          </Tabs>
+
+          {children}
         </div>
       </form>
     </Form>

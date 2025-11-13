@@ -7,13 +7,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { CategoryFormSchema } from "./category.schema";
-import { CategoryForm, CategoryFormState } from "./category.types";
+import { CategoryFormState, CategoryFormValues } from "./category.types";
 
 const termCategoryParser = createActionParser({
   booleanFields: ["isActive"],
 });
 
-const termCategorySaveHandler = async (data: CategoryForm): Promise<CategoryFormState> => {
+const termCategorySaveHandler = async (data: CategoryFormValues): Promise<CategoryFormState> => {
   const { categoryId, isActive, translations } = data;
   let currentCategoryId = categoryId;
 

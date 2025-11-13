@@ -12,3 +12,5 @@ export type ActionState<T> =
       message?: string;
       newCsrfToken?: string;
     };
+
+export type SearchParamsProps = Promise<{ [key: string]: string | string[] | undefined }>;

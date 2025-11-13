@@ -54,3 +54,10 @@ export const TermCreateSchema = z.object({
 });
 
 export type TermCreate = z.infer<typeof TermCreateSchema>;
+
+export const TagSchema = z.object({
+  tagId: z.number(),
+  name: z.string(),
+});
+
+export type TermTag = z.infer<typeof TagSchema>;

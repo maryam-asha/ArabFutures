@@ -7,15 +7,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { TagFormSchema } from "./tag.schema";
-import { TagForm, TagFormState } from "./tag.types";
+import { TagFormState, TagFormValues } from "./tag.types";
 
 const tagActionParser = createActionParser();
 
-const tagSaveHandler = async (data: TagForm): Promise<TagFormState> => {
+const tagSaveHandler = async (data: TagFormValues): Promise<TagFormState> => {
   const { tagId, translations } = data;
   let currentTagId = tagId;
 
-  // Create a JSON object for the 'name' field
   const nameJson: Record<string, string> = {};
   for (const locale of i18nAppConfig.locales) {
     const name = translations?.[locale]?.name;
@@ -26,7 +25,7 @@ const tagSaveHandler = async (data: TagForm): Promise<TagFormState> => {
 
   await dbClient.executeTransaction(async (trx) => {
     const tagData = {
-      name: JSON.stringify(nameJson), // Stringify the object for the database
+      name: JSON.stringify(nameJson),
     };
 
     if (currentTagId) {

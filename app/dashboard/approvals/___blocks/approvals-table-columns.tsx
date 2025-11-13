@@ -1,5 +1,6 @@
 "use client";
 
+import { useReactiveCsrf } from "@app/dashboard/___blocks/csrf-provider-client";
 import { DeleteEntityButton } from "@app/dashboard/___blocks/data-table/delete-entity-button";
 import { termDeleteAction, termsBulkUpdateAction } from "@app/dashboard/terms/actions";
 import { Badge } from "@components/ui/badge";
@@ -13,27 +14,31 @@ import { Check, MoreHorizontal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
-function ApproveTermButton({ termId }: { termId: number }) {
+function ApproveTermButton({ termId, setMenuOpen }: { termId: number; setMenuOpen: (open: boolean) => void }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const tToast = useTranslations("Dashboard.toasts");
+  const t = useTranslations();
+  const { csrfToken } = useReactiveCsrf();
 
   const handleApprove = () => {
+    setMenuOpen(false);
+
     const formData = new FormData();
     formData.append("ids", JSON.stringify([termId]));
     formData.append("actionType", "approve");
+    formData.append("csrf_token", csrfToken);
 
     startTransition(() => {
       toast.promise(termsBulkUpdateAction({} as any, formData), {
-        loading: "Approving...",
+        loading: t("Common.processing"),
         success: (result) => {
           router.refresh();
-          return "Term approved successfully.";
+          return t("Dashboard.toasts.approveSuccess", { entityName: "Term" });
         },
-        error: "Failed to approve term.",
+        error: t("Dashboard.toasts.approveError", { entityName: "Term" }),
       });
     });
   };
@@ -41,7 +46,7 @@ function ApproveTermButton({ termId }: { termId: number }) {
   return (
     <DropdownMenuItem onSelect={(e) => e.preventDefault()} onClick={handleApprove} disabled={isPending}>
       <Check className="mr-2 h-4 w-4" />
-      <span>Approve</span>
+      <span>{t("Common.actions.approve")}</span>
     </DropdownMenuItem>
   );
 }
@@ -49,8 +54,11 @@ function ApproveTermButton({ termId }: { termId: number }) {
 export const approvalColumns: ColumnDef<TermDb>[] = [
   {
     id: "select",
-    header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected()} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Select all" />,
-    cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
+    header: ({ table }) => {
+      const t = useTranslations("Dashboard.tables");
+      return <Checkbox className="ms-3" checked={table.getIsAllPageRowsSelected()} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label={t("selectAll")} />;
+    },
+    cell: ({ row }) => <Checkbox className="ms-3" checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
   },
   {
     id: "name",
@@ -58,9 +66,11 @@ export const approvalColumns: ColumnDef<TermDb>[] = [
       const locale = i18nAppConfig.defaultLocale;
       return row.content.default[locale]?.name || row.content.default.en?.name || "No Name";
     },
-    header: "Term Name",
+    header: ({ column }) => {
+      const t = useTranslations("Dashboard.forms.labels");
+      return t("name");
+    },
     cell: ({ row }) => {
-      console.log(row.original);
       const locale = useLocale() as AppLocale;
       const defaultLocale = i18nAppConfig.defaultLocale;
       const name = row.original.content.default[locale]?.name || row.original.content.default[defaultLocale]?.name || "";
@@ -73,12 +83,18 @@ export const approvalColumns: ColumnDef<TermDb>[] = [
   },
   {
     accessorKey: "categoryName",
-    header: "Category",
+    header: () => {
+      const t = useTranslations("Dashboard.forms.labels");
+      return <div>{t("category")}</div>;
+    },
     cell: ({ row }) => row.original.categoryName || "-",
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: () => {
+      const t = useTranslations("Dashboard.forms.labels");
+      return <div>{t("status")}</div>;
+    },
     cell: ({ row }) => (
       <Badge variant="outline" className="capitalize">
         {row.original.status}
@@ -88,25 +104,26 @@ export const approvalColumns: ColumnDef<TermDb>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
+      const [menuOpen, setMenuOpen] = useState(false);
       const term = row.original;
-      const tCommon = useTranslations("Common.actions");
+      const t = useTranslations("Common.actions");
 
       return (
         <div className="text-right">
-          <DropdownMenu>
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <ApproveTermButton termId={term.termId} />
+              <ApproveTermButton termId={term.termId} setMenuOpen={setMenuOpen} />
               <DropdownMenuItem asChild>
-                <Link href={`/dashboard/terms/${term.termId}`}>{tCommon("edit")}</Link>
+                <Link href={`/dashboard/terms/${term.termId}`}>{t("edit")}</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DeleteEntityButton entityId={term.termId} entityName="term" deleteAction={termDeleteAction} asChild>
-                <span className="text-destructive focus:bg-destructive/10 w-full cursor-pointer">{tCommon("delete")}</span>
+                <span className="text-destructive focus:bg-destructive/10 w-full cursor-pointer">{t("delete")}</span>
               </DeleteEntityButton>
             </DropdownMenuContent>
           </DropdownMenu>

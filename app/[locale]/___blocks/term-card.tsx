@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@components/ui/card";
 import i18nAppConfig, { AppLocale } from "@i18n/config";
@@ -12,7 +14,7 @@ export default function TermCard({ term, onSelect }: { term: TermDb; onSelect: (
   const currentLocale = useLocale() as AppLocale;
   const otherLocale = i18nAppConfig.locales.find((locale) => locale !== currentLocale) || currentLocale;
 
-  const primaryTitle = term.content.default[currentLocale]?.name || "N/A";
+  const primaryTitle = term.content.default[currentLocale]?.name || commonT("notAvailable");
   const secondaryTitle = term.content.default[otherLocale]?.name;
   const briefDescription = term.content.default[currentLocale]?.briefDescription || t("noDescription");
 

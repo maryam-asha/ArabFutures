@@ -1,18 +1,11 @@
-// File: dal/tags-dx.ts
 import i18nAppConfig, { AppLocale } from "@i18n/config";
 import { unstable_noStore as noStore } from "next/cache";
 import { cache } from "react";
 import { z } from "zod";
 
 import { dbClient } from "./client";
-import { TagDbSchema, TagOptionSchema } from "./dal.schema";
-import { TagDb, TagOption } from "./dal.types";
-
-const TagWithCountDbSchema = TagDbSchema.extend({
-  termCount: z.number(),
-});
-
-export type TagWithCount = z.infer<typeof TagWithCountDbSchema>;
+import { TagDbSchema, TagOptionDbSchema, TagWithCountDbSchema } from "./dal.schema";
+import { TagDb, TagOption, TagWithCount } from "./dal.types";
 
 export interface PaginatedTags {
   data: TagWithCount[];
@@ -39,12 +32,10 @@ export const findTags = async (props: { locale: AppLocale; query?: string; limit
 
   const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
 
-  // QUERY 1: Get the total count
   const countSql = `SELECT COUNT(*) as count FROM tags tg ${whereClause}`;
   const countResult = await dbClient.selectSingle(countSql, params, z.object({ count: z.number() }));
   const totalCount = countResult.count;
 
-  // QUERY 2: Get the paginated data
   const dataSql = `
     SELECT
       tg.*,
@@ -86,6 +77,6 @@ const findTagOptionsFn = async (locale: AppLocale): Promise<TagOption[]> => {
     FROM tags tg
     ORDER BY name ASC;
   `;
-  return dbClient.selectMany(sql, [], TagOptionSchema);
+  return dbClient.selectMany(sql, [], TagOptionDbSchema);
 };
 export const findTagOptions = cache(findTagOptionsFn);

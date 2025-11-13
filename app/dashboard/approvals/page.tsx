@@ -1,5 +1,6 @@
 import i18nAppConfig from "@i18n/config";
 import { findTerms } from "@root/dal/terms-dx";
+import { SearchParamsProps } from "@root/types";
 import { getTranslations } from "next-intl/server";
 
 import { DataTable } from "../___blocks/data-table";
@@ -7,13 +8,13 @@ import { BulkAction } from "../___blocks/data-table/data-table.type";
 import { termBulkDeleteAction, termsBulkUpdateAction } from "../terms/actions";
 import { approvalColumns } from "./___blocks/approvals-table-columns";
 
-export default async function ApprovalsPage(params: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
-  const queryString = await params.searchParams;
+export default async function ApprovalsPage(params: { searchParams: SearchParamsProps }) {
+  const searchParamsObject = await params.searchParams;
   const t = await getTranslations("Dashboard");
 
-  const page = Number(queryString?.page ?? "1");
-  const limit = Number(queryString?.limit ?? "10");
-  const query = (queryString?.query as string) ?? undefined;
+  const page = Number(searchParamsObject?.page ?? "1");
+  const limit = Number(searchParamsObject?.limit ?? "10");
+  const query = (searchParamsObject?.query as string) ?? undefined;
   const offset = (page - 1) * limit;
 
   const { data: pendingTerms, totalCount } = await findTerms({
@@ -24,7 +25,6 @@ export default async function ApprovalsPage(params: { searchParams: Promise<{ [k
     query,
   });
 
-  console.log(pendingTerms);
   const approvalBulkActions: BulkAction[] = [
     { label: "approve", action: termsBulkUpdateAction, actionType: "approve" },
     { label: "delete", action: termBulkDeleteAction, isDestructive: true },

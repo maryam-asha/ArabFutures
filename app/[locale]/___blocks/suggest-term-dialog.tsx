@@ -1,65 +1,134 @@
 "use client";
 
+import { useReactiveCsrf } from "@app/dashboard/___blocks/csrf-provider-client";
+import { TermTranslationFormSchema } from "@app/dashboard/terms/term.schema";
 import { suggestNewTermAction } from "@app/public-actions";
 import { Button } from "@components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@components/ui/form";
 import { Input } from "@components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
+import { Separator } from "@components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
 import { Textarea } from "@components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { setServerErrors } from "@lib/form-helpers";
 import { TermCategoryOption } from "@root/dal/dal.types";
+import { CsrfInput } from "@waelhabbaldev/next-jwt-auth/client";
+import { PlusCircle, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useActionState, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import { Control, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-// --- Client-side validation schema for the new suggestion form ---
-const TermTranslationFormSchema = z.object({
-  name: z.string().trim().min(2, "Name must be at least 2 characters."),
-  briefDescription: z.string().trim().optional(),
-});
+const SuggestTranslationFormSchema = TermTranslationFormSchema.omit({ briefDescription: true });
+
 const NewTermSuggestionSchema = z.object({
   categoryRef: z.coerce.number<number>().min(1, "Please select a category."),
   content: z.object({
     default: z.object({
-      en: TermTranslationFormSchema,
-      ar: TermTranslationFormSchema,
+      en: SuggestTranslationFormSchema,
+      ar: SuggestTranslationFormSchema,
     }),
   }),
 });
 type SuggestionFormValues = z.infer<typeof NewTermSuggestionSchema>;
 
-interface SuggestTermDialogProps {
-  categories: TermCategoryOption[];
-  children: React.ReactNode;
-}
+const ReferencesField = ({ control, path }: { control: Control<SuggestionFormValues>; path: `content.default.${"en" | "ar"}.references` }) => {
+  const t = useTranslations("Dashboard.forms.labels");
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: path,
+  });
 
-export function SuggestTermDialog({ categories, children }: SuggestTermDialogProps) {
+  return (
+    <div className="space-y-4">
+      <Separator />
+      <div className="flex justify-between items-center">
+        <h4 className="font-medium">{t("references")}</h4>
+        <Button type="button" variant="ghost" size="sm" onClick={() => append({ content: "", url: "" })}>
+          <PlusCircle className="h-4 w-4 mr-2" />
+          {t("addReference")}
+        </Button>
+      </div>
+      {fields.map((item, index) => (
+        <div key={item.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 p-3 border rounded-md bg-muted/50">
+          <FormField
+            control={control}
+            name={`${path}.${index}.content`}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs">{t("referenceContent")}</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value ?? ""} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name={`${path}.${index}.url`}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs">{t("referenceUrl")}</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value ?? ""} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="self-end text-destructive hover:bg-destructive/10">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export function SuggestTermDialog({ categories, children }: { categories: TermCategoryOption[]; children: React.ReactNode }) {
+  const formRef = useRef<HTMLFormElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [state, formAction] = useActionState(suggestNewTermAction, { success: false, errors: {} as any });
+  const [isPending, submitTransition] = useTransition();
+
   const t = useTranslations("Public.suggestDialog");
   const tCommon = useTranslations("Common");
-
+  const { setCsrfToken } = useReactiveCsrf();
   const form = useForm<SuggestionFormValues>({
     resolver: zodResolver(NewTermSuggestionSchema),
     defaultValues: {
       categoryRef: 0,
-      content: { default: { en: { name: "" }, ar: { name: "" } } },
+      content: {
+        default: {
+          en: { name: "", fullDescription: "", references: [] },
+          ar: { name: "", fullDescription: "", references: [] },
+        },
+      },
     },
   });
 
   useEffect(() => {
-    if (form.formState.isSubmitSuccessful && state.success) {
+    if (state.newCsrfToken) {
+      setCsrfToken(state.newCsrfToken);
+    }
+
+    if (state.success) {
       toast.success(state.message);
-      form.reset();
       setIsOpen(false);
-    } else if (state.message) {
+    } else if (!state.success && state.message) {
+      setServerErrors(state.errors, form.setError);
       toast.error(state.message);
     }
-  }, [form, state, t]);
+  }, [state, form.setError, setCsrfToken]);
+
+  const contentValue = useWatch({
+    control: form.control,
+    name: "content",
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -70,14 +139,32 @@ export function SuggestTermDialog({ categories, children }: SuggestTermDialogPro
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form action={formAction} className="space-y-6">
+          <form
+            ref={formRef}
+            action={formAction}
+            onSubmit={form.handleSubmit(() => {
+              submitTransition(() => {
+                formAction(new FormData(formRef.current!));
+              });
+            })}
+            className="space-y-4"
+          >
+            <CsrfInput />
+            <input type="hidden" name="content" value={JSON.stringify(contentValue)} />
             <FormField
               control={form.control}
               name="categoryRef"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("categoryLabel")}</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value > 0 ? String(field.value) : ""}>
+                  <Select
+                    {...field}
+                    onValueChange={(value) => {
+                      form.setValue("categoryRef", Number(value));
+                      field.onChange(Number(value));
+                    }}
+                    value={field.value > 0 ? String(field.value) : ""}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={t("categoryPlaceholder")} />
@@ -100,7 +187,7 @@ export function SuggestTermDialog({ categories, children }: SuggestTermDialogPro
                 <TabsTrigger value="en">English</TabsTrigger>
                 <TabsTrigger value="ar">Arabic</TabsTrigger>
               </TabsList>
-              <TabsContent value="en" className="space-y-4 pt-2">
+              <TabsContent forceMount value="en" className="space-y-4 pt-2">
                 <FormField
                   control={form.control}
                   name="content.default.en.name"
@@ -116,10 +203,10 @@ export function SuggestTermDialog({ categories, children }: SuggestTermDialogPro
                 />
                 <FormField
                   control={form.control}
-                  name="content.default.en.briefDescription"
+                  name="content.default.en.fullDescription"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("briefDescriptionLabel")}</FormLabel>
+                      <FormLabel>{t("fullDescritpionLabel")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
@@ -127,8 +214,10 @@ export function SuggestTermDialog({ categories, children }: SuggestTermDialogPro
                     </FormItem>
                   )}
                 />
+
+                <ReferencesField control={form.control} path="content.default.en.references" />
               </TabsContent>
-              <TabsContent value="ar" className="space-y-4 pt-2">
+              <TabsContent forceMount value="ar" className="space-y-4 pt-2">
                 <FormField
                   control={form.control}
                   name="content.default.ar.name"
@@ -144,10 +233,10 @@ export function SuggestTermDialog({ categories, children }: SuggestTermDialogPro
                 />
                 <FormField
                   control={form.control}
-                  name="content.default.ar.briefDescription"
+                  name="content.default.ar.fullDescription"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("briefDescriptionLabel")}</FormLabel>
+                      <FormLabel>{t("fullDescritpionLabel")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
@@ -155,6 +244,8 @@ export function SuggestTermDialog({ categories, children }: SuggestTermDialogPro
                     </FormItem>
                   )}
                 />
+                {/* FIX #2: Render the reused ReferencesField */}
+                <ReferencesField control={form.control} path="content.default.ar.references" />
               </TabsContent>
             </Tabs>
 

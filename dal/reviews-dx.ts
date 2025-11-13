@@ -2,14 +2,8 @@ import { unstable_noStore as noStore } from "next/cache";
 import { z } from "zod";
 
 import { dbClient } from "./client";
-import { TermReviewDbSchema } from "./dal.schema";
-import { TermReviewDb } from "./dal.types";
-
-// Extend the base schema to include the joined termName for this specific query
-const TermReviewWithTermNameSchema = TermReviewDbSchema.extend({
-  termName: z.string(),
-});
-export type TermReviewWithTermName = z.infer<typeof TermReviewWithTermNameSchema>;
+import { TermReviewDbSchema, TermReviewWithTermNameDbSchema } from "./dal.schema";
+import { TermReviewDb, TermReviewWithTermName } from "./dal.types";
 
 /**
  * Finds all reviews with a specific status, joining the term name for context.
@@ -26,7 +20,7 @@ export const findReviewsByStatus = async (status: "pending" | "approved" | "reje
     WHERE tr.status = ?
     ORDER BY tr.createdAt DESC;
   `;
-  return dbClient.selectMany(sql, [status], TermReviewWithTermNameSchema);
+  return dbClient.selectMany(sql, [status], TermReviewWithTermNameDbSchema);
 };
 
 /**

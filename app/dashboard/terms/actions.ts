@@ -4,56 +4,74 @@ import { type ActionHandler, createActionParser, createBulkDeleteAction, createD
 import { dbClient } from "@root/dal/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { z } from "zod";
 
-import { TermFormSchema, TermsBulkUpdateSchema } from "./term.schema";
-import { TermForm, TermFormState, TermsBulkUpdateData } from "./term.types";
+import { TermSaveActionSchema, TermsBulkUpdateActionSchema } from "./term.schema";
+import { TermFormState, TermSaveActionInput, TermsBulkUpdateActionInput } from "./term.types";
 
-// The parser now only needs to handle `isFeatured` and `tags` (if sent as JSON)
+/**
+ * Creates a parser for the Term form data.
+ * - `isFeatured`: Handles the 'on' value from a checkbox/switch.
+ * - `tagIds`: Parses the stringified array of tag IDs from the hidden input.
+ * - The 'content' object is handled by the default nesting logic and should NOT be in jsonFields.
+ */
 const termActionParser = createActionParser({
   booleanFields: ["isFeatured"],
-  jsonFields: ["tags"],
+  jsonFields: ["tagIds"],
 });
 
 /**
- * Handler to create or update a term.
- * Constructs the new 'content' JSON object from form data.
+ * The core handler for creating or updating a term in the database.
+ * This is a transactional operation to ensure data integrity.
  */
-const termSaveHandler: ActionHandler<TermForm> = async (data): Promise<TermFormState> => {
-  const { termId, categoryRef, status, isFeatured, tags, content } = data;
+const termSaveHandler: ActionHandler<TermSaveActionInput> = async (data): Promise<TermFormState> => {
+  const { termId, categoryRef, status, isFeatured, tagIds, content, reviewId } = data;
 
   const termPayload = {
     categoryRef,
     status,
     isFeatured,
-    content: JSON.stringify(content), // The entire content object is stringified
+    content: JSON.stringify(content),
   };
 
   await dbClient.executeTransaction(async (trx) => {
     let currentTermId = termId;
 
     if (currentTermId) {
-      // Update existing term
       await trx.update("terms", termPayload, { termId: currentTermId });
     } else {
-      // Insert new term and get its ID
       const result = await trx.insert("terms", termPayload);
       currentTermId = result.insertId;
-      if (!currentTermId) throw new Error("Failed to create term.");
+      if (!currentTermId) {
+        throw new Error("Failed to create the term and get an ID.");
+      }
     }
 
-    // Handle tags (unchanged logic)
     await trx.delete("termTags", { termId: currentTermId });
-    if (tags && tags.length > 0) {
-      const tagValues = tags.map((tagId) => ({ termId: currentTermId, tagId }));
+
+    if (tagIds && tagIds.length > 0) {
+      const tagValues = tagIds.map((tagId) => ({ termId: currentTermId, tagId }));
       await trx.insertMany("termTags", tagValues);
+    }
+
+    if (reviewId) {
+      await trx.update("termReviews", { status: "approved", resolvedAt: new Date() }, { reviewId });
+
+      const otherPendingReviews = await trx.selectSingle("SELECT COUNT(reviewId) as count FROM termReviews WHERE termRef = ? AND status = 'pending' AND reviewId != ?", [currentTermId, reviewId], z.object({ count: z.number() }));
+
+      if (otherPendingReviews.count === 0) {
+        const term = await trx.selectSingle("SELECT status FROM terms WHERE termId = ?", [currentTermId], z.object({ status: z.string() }));
+        if (term?.status === "has-pending-review") {
+          await trx.update("terms", { status: "published" }, { termId: currentTermId });
+        }
+      }
     }
   });
 
-  // Revalidate all relevant pages
   revalidatePath("/dashboard/terms", "layout");
   revalidatePath("/dashboard/approvals", "layout");
   revalidatePath("/dashboard/reviews", "layout");
-  revalidatePath("/", "layout"); // Revalidate public pages
+  revalidatePath("/", "layout");
 
   redirect(`/dashboard/terms`);
 };
@@ -61,13 +79,17 @@ const termSaveHandler: ActionHandler<TermForm> = async (data): Promise<TermFormS
 /**
  * Handler for bulk-updating term statuses or featured status.
  */
-const termsBulkUpdateHandler: ActionHandler<TermsBulkUpdateData> = async (data) => {
+const termsBulkUpdateHandler: ActionHandler<TermsBulkUpdateActionInput> = async (data) => {
   const { ids, actionType } = data;
 
+  if (!ids || ids.length === 0) {
+    return { success: true, message: "No items selected." };
+  }
+
   const actionPayloadMap = {
-    approve: { status: "published" },
-    pend: { status: "pending" },
-    reject: { status: "rejected" },
+    approve: { status: "published" as const },
+    pend: { status: "pending" as const },
+    reject: { status: "rejected" as const },
     feature: { isFeatured: true },
     unfeature: { isFeatured: false },
   };
@@ -75,14 +97,37 @@ const termsBulkUpdateHandler: ActionHandler<TermsBulkUpdateData> = async (data) 
   const payload = actionPayloadMap[actionType];
 
   await dbClient.update("terms", payload, { termId: { in: ids } });
+
   revalidatePath("/dashboard/terms", "layout");
   revalidatePath("/dashboard/approvals", "layout");
 
   return { success: true, message: "Terms updated successfully." };
 };
 
-// EXPORTED ACTIONS
-export const termSaveAction = createProtectedAction(TermFormSchema, termSaveHandler, termActionParser);
-export const termsBulkUpdateAction = createProtectedAction(TermsBulkUpdateSchema, termsBulkUpdateHandler, createActionParser({ jsonFields: ["ids"] }));
-export const termDeleteAction = createDeleteAction({ tableName: "terms", pkColumn: "termId", revalidatePaths: ["/dashboard/terms"] });
-export const termBulkDeleteAction = createBulkDeleteAction({ tableName: "terms", pkColumn: "termId", revalidatePaths: ["/dashboard/terms"] });
+/**
+ * Server Action for creating or updating a single term.
+ */
+export const termSaveAction = createProtectedAction(TermSaveActionSchema, termSaveHandler, termActionParser);
+
+/**
+ * Server Action for performing bulk updates on multiple terms.
+ */
+export const termsBulkUpdateAction = createProtectedAction(TermsBulkUpdateActionSchema, termsBulkUpdateHandler, createActionParser({ jsonFields: ["ids"] }));
+
+/**
+ * Server Action for deleting a single term. Generated by a factory.
+ */
+export const termDeleteAction = createDeleteAction({
+  tableName: "terms",
+  pkColumn: "termId",
+  revalidatePaths: ["/dashboard/terms"],
+});
+
+/**
+ * Server Action for deleting multiple terms in bulk. Generated by a factory.
+ */
+export const termBulkDeleteAction = createBulkDeleteAction({
+  tableName: "terms",
+  pkColumn: "termId",
+  revalidatePaths: ["/dashboard/terms"],
+});

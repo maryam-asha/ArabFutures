@@ -16,7 +16,6 @@ export function DataTable<TData, TValue>({ columns, data, totalCount, filterColu
   const searchParams = useSearchParams();
   const t = useTranslations("Dashboard.tables");
 
-  // URL → source of truth
   const page = Number(searchParams.get("page") || "1");
   const limit = Number(searchParams.get("limit") || "10");
   const query = searchParams.get("query") ?? "";
@@ -29,7 +28,6 @@ export function DataTable<TData, TValue>({ columns, data, totalCount, filterColu
   const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 
-  // Stable URL updater
   const updateUrlParams = React.useCallback(
     (params: Record<string, string | number | null>) => {
       const current = new URLSearchParams(window.location.search);

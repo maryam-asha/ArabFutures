@@ -14,17 +14,14 @@ export function DataTablePagination<TData>({ table }: { table: Table<TData> }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // 🔁 Always reactive — updated when URL changes
   const currentPage = Number(searchParams.get("page") || 1);
   const pageSize = Number(searchParams.get("limit") || 10);
 
-  // 🧮 Derived values
   const totalCount = table.options.rowCount ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const canPrev = currentPage > 1;
   const canNext = currentPage < totalPages;
 
-  // 🧭 URL update helper
   const updateParams = React.useCallback(
     (params: Record<string, string | number | null>) => {
       const next = new URLSearchParams(searchParams.toString());
@@ -38,7 +35,6 @@ export function DataTablePagination<TData>({ table }: { table: Table<TData> }) {
     [router, pathname, searchParams],
   );
 
-  // 🧩 Render
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">

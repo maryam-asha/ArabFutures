@@ -1,19 +1,12 @@
-// File: dal/termCategories-dx.ts
 import i18nAppConfig, { AppLocale } from "@i18n/config";
 import { unstable_noStore as noStore } from "next/cache";
 import { cache } from "react";
 import { z } from "zod";
 
 import { dbClient } from "./client";
-import { TermCategoryDbSchema, TermCategoryOptionSchema } from "./dal.schema";
-import { TermCategoryDb, TermCategoryOption } from "./dal.types";
+import { TermCategoryDbSchema, TermCategoryOptionDbSchema, TermCategoryWithCountDbSchema } from "./dal.schema";
+import { TermCategoryDb, TermCategoryOption, TermCategoryWithCount } from "./dal.types";
 
-const TermCategoryWithCountDbSchema = TermCategoryDbSchema.extend({
-  termCount: z.number(),
-});
-export type TermCategoryWithCount = z.infer<typeof TermCategoryWithCountDbSchema>;
-
-// NEW: Define a paginated return type
 export interface PaginatedTermCategories {
   data: TermCategoryWithCount[];
   totalCount: number;
@@ -38,12 +31,10 @@ export const findTermCategories = async (props: { locale: AppLocale; query?: str
 
   const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
 
-  // QUERY 1: Get the total count
   const countSql = `SELECT COUNT(*) as count FROM termCategories tc ${whereClause}`;
   const countResult = await dbClient.selectSingle(countSql, params, z.object({ count: z.number() }));
   const totalCount = countResult.count;
 
-  // QUERY 2: Get the paginated data
   const dataSql = `
     SELECT
       tc.*,
@@ -86,6 +77,6 @@ const findActiveCategoryOptionsFn = async (locale: AppLocale): Promise<TermCateg
     WHERE tc.isActive = TRUE
     ORDER BY tc.displayOrder ASC;
   `;
-  return dbClient.selectMany(sql, [], TermCategoryOptionSchema);
+  return dbClient.selectMany(sql, [], TermCategoryOptionDbSchema);
 };
 export const findActiveCategoryOptions = cache(findActiveCategoryOptionsFn);

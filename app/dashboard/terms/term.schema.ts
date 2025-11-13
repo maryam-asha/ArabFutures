@@ -1,6 +1,6 @@
+import i18nAppConfig from "@i18n/config";
 import { z } from "zod";
 
-// Reusable schemas for form validation, matching the new content structure.
 const TermReferenceFormSchema = z
   .object({
     content: z.string().trim().optional(),
@@ -10,7 +10,7 @@ const TermReferenceFormSchema = z
     message: "A reference must have content or a URL if it's not empty.",
   });
 
-const TermTranslationFormSchema = z.object({
+export const TermTranslationFormSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters."),
   briefDescription: z.string().trim().optional(),
   fullDescription: z.string().trim().optional(),
@@ -18,7 +18,7 @@ const TermTranslationFormSchema = z.object({
 });
 
 const TermMoreTranslationFormSchema = TermTranslationFormSchema.extend({
-  locale: z.string().min(2, "You must specify a locale (e.g., 'fr', 'ar-latn')."),
+  locale: z.enum(i18nAppConfig.locales, { message: "Invalid locale selected." }),
 });
 
 const TermContentFormSchema = z.object({
@@ -29,18 +29,20 @@ const TermContentFormSchema = z.object({
   more: z.array(TermMoreTranslationFormSchema).optional(),
 });
 
-// The main Zod schema for the Term creation/edit form
 export const TermFormSchema = z.object({
   termId: z.coerce.number<number>().optional(),
   categoryRef: z.coerce.number<number>({ error: () => ({ message: "Please select a category." }) }).min(1),
   status: z.enum(["pending", "published", "rejected", "has-pending-review"]),
   isFeatured: z.coerce.boolean<boolean>(),
-  tags: z.array(z.coerce.number<number>()).optional(),
+  tagIds: z.array(z.coerce.number<number>()).optional(),
   content: TermContentFormSchema,
 });
 
-// Schemas for bulk actions
-export const TermsBulkUpdateSchema = z.object({
+export const TermSaveActionSchema = TermFormSchema.extend({
+  reviewId: z.coerce.number().optional(),
+});
+
+export const TermsBulkUpdateActionSchema = z.object({
   ids: z.array(z.coerce.number<number>()),
   actionType: z.enum(["approve", "pend", "reject", "feature", "unfeature"]),
 });

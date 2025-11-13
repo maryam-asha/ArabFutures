@@ -5,10 +5,10 @@ import { Button } from "@components/ui/button";
 import { Checkbox } from "@components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@components/ui/dropdown-menu";
 import { AppLocale } from "@i18n/config";
-import { TermCategoryWithCount } from "@root/dal/termCategories-dx";
+import { TermCategoryWithCount } from "@root/dal/dal.types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@ui/badge";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 
@@ -26,12 +26,7 @@ export const columns: ColumnDef<TermCategoryWithCount>[] = [
     accessorKey: "name",
     header: ({ column }) => {
       const t = useTranslations("Dashboard.forms.labels");
-      return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          {t("name")}
-          <ArrowUpDown className="ms-2 h-4 w-4" />
-        </Button>
-      );
+      return t("name");
     },
     cell: ({ row }) => {
       const locale = useLocale() as AppLocale;

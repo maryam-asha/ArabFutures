@@ -6,15 +6,15 @@ import { Button } from "@components/ui/button";
 import { Checkbox } from "@components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@components/ui/dropdown-menu";
 import i18nAppConfig, { AppLocale } from "@i18n/config";
-import { TermDb } from "@root/dal/dal.types";
+import type { TermDb } from "@root/dal/dal.types";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 
 import { termDeleteAction } from "../actions";
 
-export const termColumns: ColumnDef<TermDb>[] = [
+export const columns: ColumnDef<TermDb>[] = [
   {
     id: "select",
     header: ({ table }) => {
@@ -27,25 +27,19 @@ export const termColumns: ColumnDef<TermDb>[] = [
   },
   {
     accessorKey: "content",
-    header: ({ column }) => {
+    header: () => {
       const t = useTranslations("Dashboard.forms.labels");
-      return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          {t("name")}
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
+      return t("name");
     },
     cell: ({ row }) => {
       const locale = useLocale() as AppLocale;
       const defaultLocale = i18nAppConfig.defaultLocale;
 
-      // Correctly access the name from the new nested structure
       const name = row.original.content.default[locale]?.name || row.original.content.default[defaultLocale]?.name;
 
       return <div className="font-medium">{name || "N/A"}</div>;
     },
-    // The filter function also needs to be updated
+
     filterFn: (row, id, value) => {
       const enName = row.original.content.default.en?.name?.toLowerCase();
       const arName = row.original.content.default.ar?.name?.toLowerCase();
@@ -64,26 +58,6 @@ export const termColumns: ColumnDef<TermDb>[] = [
     },
   },
   {
-    accessorKey: "tags",
-    header: () => {
-      const t = useTranslations("Dashboard.forms.labels");
-      return <div>{t("tags")}</div>;
-    },
-    cell: ({ row }) => {
-      const tags = row.original.tags;
-      if (!tags || tags.length === 0) return <span>-</span>;
-      return (
-        <div className="flex flex-wrap gap-1">
-          {tags.map((tag) => (
-            <Badge key={tag.tagId} variant="outline">
-              {tag.name}
-            </Badge>
-          ))}
-        </div>
-      );
-    },
-  },
-  {
     accessorKey: "status",
     header: () => {
       const t = useTranslations("Dashboard.forms.labels");
@@ -92,7 +66,7 @@ export const termColumns: ColumnDef<TermDb>[] = [
     cell: ({ row }) => {
       const status = row.original.status;
 
-      const variant: "secondary" | "outline" | "destructive" = status === "published" ? "secondary" : status === "rejected" ? "destructive" : "outline"; // for 'pending' and 'has-pending-review'
+      const variant: "secondary" | "outline" | "destructive" = status === "published" ? "secondary" : status === "rejected" ? "destructive" : "outline";
 
       return (
         <Badge variant={variant} className="capitalize">

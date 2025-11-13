@@ -1,3 +1,4 @@
+import { cn } from "@lib/utils";
 import i18nAppConfig from "@root/i18n/config";
 import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
@@ -5,6 +6,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { Inter, Tajawal } from "next/font/google";
 import { notFound } from "next/navigation";
 import type React from "react";
+import { Toaster } from "sonner";
 
 import "../globals.css";
 import PublicFooter from "./___blocks/footer";
@@ -61,8 +63,8 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} className={locale === "ar" ? `${tajawal.variable} font-sans-arabic` : `${inter.variable} font-sans antialiased`}>
-      <body className="bg-background text-foreground overflow-x-hidden">
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} className={cn("scroll-smooth", locale === "ar" ? `${tajawal.variable} font-sans-arabic` : `${inter.variable} font-sans antialiased`)}>
+      <body className="bg-background text-foreground overflow-x-hidden scroll-smooth">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <div className="flex flex-col min-h-dvh">
             <PublicHeader />
@@ -70,6 +72,7 @@ export default async function LocaleLayout({
             <PublicFooter />
           </div>
         </NextIntlClientProvider>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

@@ -1,13 +1,14 @@
 import { Button } from "@components/ui/button";
 import i18nAppConfig from "@i18n/config";
 import { findTerms } from "@root/dal/terms-dx";
+import { SearchParamsProps } from "@root/types";
 import { Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { DataTable } from "../___blocks/data-table";
 import { BulkAction } from "../___blocks/data-table/data-table.type";
-import { termColumns } from "./___blocks/term-table-columns";
+import { columns } from "./___blocks/term-table-columns";
 import { termBulkDeleteAction, termsBulkUpdateAction } from "./actions";
 
 const termBulkActions: BulkAction[] = [
@@ -18,12 +19,12 @@ const termBulkActions: BulkAction[] = [
   { label: "delete", action: termBulkDeleteAction, isDestructive: true },
 ];
 
-export default async function TermsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
-  const { page: _page, limit: _limit, query: _query } = await searchParams;
+export default async function TermsPage(props: { searchParams: SearchParamsProps }) {
+  const searchParamsObject = await props.searchParams;
 
-  const page = Number(_page ?? "1");
-  const limit = Number(_limit ?? "10");
-  const query = (_query as string) ?? undefined;
+  const page = Number(searchParamsObject?.page ?? "1");
+  const limit = Number(searchParamsObject?.limit ?? "10");
+  const query = (searchParamsObject?.query as string) ?? undefined;
   const offset = (page - 1) * limit;
 
   const { data: terms, totalCount } = await findTerms({
@@ -48,7 +49,7 @@ export default async function TermsPage({ searchParams }: { searchParams: Promis
         </Button>
       </div>
       <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <DataTable columns={termColumns} data={terms} totalCount={totalCount} filterColumnId="content" filterColumnPlaceholder={t("forms.placeholders.search")} bulkActions={termBulkActions} pkColumn="termId" />
+        <DataTable columns={columns} data={terms} totalCount={totalCount} filterColumnId="content" filterColumnPlaceholder={t("forms.placeholders.search")} bulkActions={termBulkActions} pkColumn="termId" />
       </div>
     </div>
   );

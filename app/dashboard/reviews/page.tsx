@@ -8,7 +8,6 @@ import { reviewColumns } from "./___blocks/review-table-columns";
 export default async function ReviewsPage() {
   const t = await getTranslations("Dashboard.pages.reviews");
 
-  // For now, we only show pending reviews. Tabs could be added later for approved/rejected.
   const pendingReviews = await findReviewsByStatus("pending");
 
   return (

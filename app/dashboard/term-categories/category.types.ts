@@ -3,5 +3,6 @@ import { z } from "zod";
 
 import { CategoryFormSchema } from "./category.schema";
 
-export type CategoryForm = z.infer<typeof CategoryFormSchema>;
-export type CategoryFormState = ActionState<CategoryForm>;
+export type CategoryFormValues = z.infer<typeof CategoryFormSchema>;
+
+export type CategoryFormState = ActionState<CategoryFormValues>;

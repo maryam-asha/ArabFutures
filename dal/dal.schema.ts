@@ -1,63 +1,87 @@
 import i18nAppConfig from "@root/i18n/config";
 import { z } from "zod";
 
-// Utility function for safely parsing JSON from the database
 const safeJsonParse = (val: unknown) => (typeof val === "string" ? JSON.parse(val) : val);
 
-// =================================================================
-// Schemas for the new 'terms.content' JSON structure
-// =================================================================
+export const LocaleKeySchema = z.enum(i18nAppConfig.locales);
+export const TranslatableStringDbSchema = z.record(LocaleKeySchema, z.string().optional());
 
-export const TermReferenceSchema = z
+export const TermCategoryDbSchema = z.object({
+  categoryId: z.number(),
+  displayOrder: z.number(),
+  isActive: z.coerce.boolean(),
+  name: z.preprocess(safeJsonParse, TranslatableStringDbSchema),
+});
+
+export const TermCategoryOptionDbSchema = z.object({
+  categoryId: z.number(),
+  name: z.string(),
+});
+
+export const TermCategoryWithCountDbSchema = TermCategoryDbSchema.extend({
+  termCount: z.number(),
+});
+
+export const TagDbSchema = z.object({
+  tagId: z.number(),
+  name: z.preprocess(safeJsonParse, TranslatableStringDbSchema),
+});
+
+export const TagOptionDbSchema = z.object({
+  tagId: z.number(),
+  name: z.string(),
+});
+
+export const TagWithCountDbSchema = TagDbSchema.extend({
+  termCount: z.number(),
+});
+
+export const TermReferenceDbSchema = z
   .object({
     content: z.string().trim().optional().or(z.literal("")),
-    url: z.url({ message: "Invalid URL" }).optional().or(z.literal("")),
+    url: z.url().optional().or(z.literal("")),
   })
   .refine((data) => !!data.content || !!data.url, {
     message: "Reference must have content or a URL.",
   });
 
-export const TermTranslationSchema = z.object({
-  name: z.string().min(1, "Name is required."),
-  briefDescription: z.string().optional().default(""),
-  fullDescription: z.string().optional().default(""),
-  references: z.array(TermReferenceSchema).optional().default([]),
+export const TermTranslationDbSchema = z.object({
+  name: z.string(),
+  briefDescription: z.string().optional(),
+  fullDescription: z.string().optional(),
+  references: z.array(TermReferenceDbSchema).optional(),
 });
 
-export const TermDefaultTranslationsSchema = z.object({
-  en: TermTranslationSchema,
-  ar: TermTranslationSchema,
+export const TermDefaultTranslationsDbSchema = z.object({
+  en: TermTranslationDbSchema,
+  ar: TermTranslationDbSchema,
 });
 
-export const TermMoreTranslationSchema = TermTranslationSchema.extend({
-  locale: z.string().min(2, "Locale identifier is required."),
+export const TermMoreTranslationDbSchema = TermTranslationDbSchema.extend({
+  locale: z.enum(i18nAppConfig.locales),
 });
 
-export const TermContentSchema = z.object({
-  default: TermDefaultTranslationsSchema,
-  more: z.array(TermMoreTranslationSchema).optional().default([]),
+export const TermContentDbSchema = z.object({
+  default: TermDefaultTranslationsDbSchema,
+  more: z.array(TermMoreTranslationDbSchema).optional(),
 });
-
-// =================================================================
-// Zod Schemas for Database Table Rows
-// =================================================================
 
 export const TermDbSchema = z.object({
   termId: z.number(),
   categoryRef: z.number().nullable(),
   status: z.enum(["pending", "published", "rejected", "has-pending-review"]),
   isFeatured: z.coerce.boolean<boolean>(),
-  content: z.preprocess(safeJsonParse, TermContentSchema),
+  content: z.preprocess(safeJsonParse, TermContentDbSchema),
   createdAt: z.date(),
   updatedAt: z.date(),
-  // Joined fields
+
+  tags: z.preprocess(safeJsonParse, z.array(TagDbSchema).nullable()).transform((val) => val || []),
   categoryName: z.string().nullable(),
-  tags: z.preprocess((val) => (typeof val === "string" && val ? JSON.parse(val) : []), z.array(z.object({ tagId: z.number(), name: z.string() })).nullable()).default([]),
 });
 
 export const TermForEditDbSchema = TermDbSchema.extend({
   tagIds: z
-    .preprocess((val) => (typeof val === "string" && val ? JSON.parse(val) : []), z.array(z.number()))
+    .preprocess((val) => (typeof val === "string" && val ? JSON.parse(val) : val), z.array(z.number()))
     .nullable()
     .transform((arr) => arr || []),
 });
@@ -69,43 +93,14 @@ export const TermReviewDbSchema = z.object({
   fieldKey: z.string(),
   suggestedValue: z.string(),
   explanation: z.string().nullable(),
-  references: z.preprocess(safeJsonParse, z.array(TermReferenceSchema).nullable()),
+  references: z.preprocess(safeJsonParse, z.array(TermReferenceDbSchema).nullable()),
   status: z.enum(["pending", "approved", "rejected"]),
   createdAt: z.date(),
   resolvedAt: z.date().nullable(),
-  // Joined field
-  termName: z.string().optional(), // Name of the term being reviewed
+
+  termName: z.string().optional(),
 });
 
-// =================================================================
-// Schemas for other tables (Unchanged Logic, Convention Alignment)
-// =================================================================
-
-export const LocaleKeySchema = z.enum(i18nAppConfig.locales);
-export const TranslatableStringSchema = z.record(LocaleKeySchema, z.string().optional());
-
-export const TermCategoryDbSchema = z.object({
-  categoryId: z.number(),
-  displayOrder: z.number(),
-  isActive: z.coerce.boolean(),
-  name: z.preprocess(safeJsonParse, TranslatableStringSchema),
-});
-
-export const TermCategoryOptionSchema = z.object({
-  categoryId: z.number(),
-  name: z.string(),
-});
-
-export const TermCategoryWithCountDbSchema = TermCategoryDbSchema.extend({
-  termCount: z.number(),
-});
-
-export const TagDbSchema = z.object({
-  tagId: z.number(),
-  name: z.preprocess(safeJsonParse, TranslatableStringSchema),
-});
-
-export const TagOptionSchema = z.object({
-  tagId: z.number(),
-  name: z.string(),
+export const TermReviewWithTermNameDbSchema = TermReviewDbSchema.extend({
+  termName: z.string(),
 });

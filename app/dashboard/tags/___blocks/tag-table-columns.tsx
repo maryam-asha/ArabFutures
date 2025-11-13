@@ -5,9 +5,9 @@ import { Button } from "@components/ui/button";
 import { Checkbox } from "@components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@components/ui/dropdown-menu";
 import { AppLocale } from "@i18n/config";
-import { TagWithCount } from "@root/dal/tags-dx";
+import { TagWithCount } from "@root/dal/dal.types";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 
@@ -16,7 +16,10 @@ import { tagDeleteAction } from "../actions";
 export const columns: ColumnDef<TagWithCount>[] = [
   {
     id: "select",
-    header: ({ table }) => <Checkbox className="ms-3" checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label="Select all" />,
+    header: ({ table }) => {
+      const t = useTranslations("Dashboard.tables");
+      return <Checkbox className="ms-3" checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} aria-label={t("selectAll")} />;
+    },
     cell: ({ row }) => <Checkbox className="ms-3" checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />,
     enableSorting: false,
     enableHiding: false,
@@ -25,12 +28,7 @@ export const columns: ColumnDef<TagWithCount>[] = [
     accessorKey: "name",
     header: ({ column }) => {
       const t = useTranslations("Dashboard.forms.labels");
-      return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          {t("name")}
-          <ArrowUpDown className="ms-2 h-4 w-4" />
-        </Button>
-      );
+      return t("name");
     },
     cell: ({ row }) => {
       const locale = useLocale() as AppLocale;

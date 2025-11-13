@@ -18,7 +18,7 @@ CREATE TABLE `users` (
   `username` varchar(255) NOT NULL,
   `passwordHash` varchar(255) NOT NULL,
   `version` INT NOT NULL DEFAULT 1,
-  `isForbidden` tinyint(1) NOT NULL DEFAULT 0,
+  `isForbidden` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `UQ_users_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -37,7 +37,7 @@ CREATE TABLE `revokedTokens` (
 CREATE TABLE `termCategories` (
   `categoryId` INT NOT NULL AUTO_INCREMENT,
   `displayOrder` INT NOT NULL DEFAULT 0,
-  `isActive` tinyint(1) NOT NULL DEFAULT 1,
+  `isActive` TINYINT NOT NULL DEFAULT 1,
   `name` json DEFAULT NULL,
   PRIMARY KEY (`categoryId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -56,7 +56,7 @@ CREATE TABLE `terms` (
   `termId` INT NOT NULL AUTO_INCREMENT,
   `categoryRef` INT DEFAULT NULL,
   `status` enum('pending','published','rejected','has-pending-review') NOT NULL DEFAULT 'pending',
-  `isFeatured` tinyint(1) NOT NULL DEFAULT 0,
+  `isFeatured` TINYINT NOT NULL DEFAULT 0,
   `content` json DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),

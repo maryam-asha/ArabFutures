@@ -6,7 +6,6 @@ declare global {
 }
 
 const createDbClient = () => {
-  console.log("[INFO] Initializing DatabaseClient...");
   const client = createDatabaseClient({
     config: {
       host: env.DB_HOST,
