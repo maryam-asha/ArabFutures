@@ -38,8 +38,11 @@ CREATE TABLE `termCategories` (
   `categoryId` INT NOT NULL AUTO_INCREMENT,
   `displayOrder` INT NOT NULL DEFAULT 0,
   `isActive` TINYINT NOT NULL DEFAULT 1,
-  `name` json DEFAULT NULL,
+  `name` JSON DEFAULT NULL,
+  `name_en` VARCHAR(255) AS (name->>'$.en') VIRTUAL,
+  `name_ar` VARCHAR(255) AS (name->>'$.ar') VIRTUAL,
   PRIMARY KEY (`categoryId`)
+  FULLTEXT INDEX `ft_tags_name` (name_en, name_ar),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: tags
@@ -57,10 +60,13 @@ CREATE TABLE `terms` (
   `categoryRef` INT DEFAULT NULL,
   `status` enum('pending','published','rejected','has-pending-review') NOT NULL DEFAULT 'pending',
   `isFeatured` TINYINT NOT NULL DEFAULT 0,
-  `content` json DEFAULT NULL,
+  `content` JSON DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `name_en` VARCHAR(255) AS (content->>'$.default.en.name') VIRTUAL,
+  `name_ar` VARCHAR(255) AS (content->>'$.default.ar.name') VIRTUAL,
   PRIMARY KEY (`termId`),
+  FULLTEXT INDEX ft_terms_name (name_en, name_ar),
   KEY `IX_terms_categoryRef` (`categoryRef`),
   CONSTRAINT `FK_terms_categoryRef` FOREIGN KEY (`categoryRef`) REFERENCES `termCategories` (`categoryId`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -81,11 +87,9 @@ CREATE TABLE `termTags` (
 CREATE TABLE `termReviews` (
   `reviewId` INT NOT NULL AUTO_INCREMENT,
   `termRef` INT NOT NULL,
-  `translationIdentifier` varchar(50) NOT NULL COMMENT 'e.g., ''default-en'', ''more-0''',
-  `fieldKey` varchar(50) NOT NULL COMMENT 'e.g., ''name'', ''briefDescription''',
-  `suggestedValue` text NOT NULL,
+  `suggestedChange` text NOT NULL,
   `explanation` text DEFAULT NULL,
-  `references` json DEFAULT NULL,
+  `references` JSON DEFAULT NULL,
   `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `resolvedAt` timestamp NULL DEFAULT NULL,

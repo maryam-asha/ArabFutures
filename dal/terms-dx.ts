@@ -56,17 +56,12 @@ export const findTerms = async (props: {
   }
 
   if (query) {
-    const searchQuery = `%${query}%`;
-    const searchClauses: string[] = [];
-
-    i18nAppConfig.locales.forEach((loc) => {
-      searchClauses.push(`t.content->>'$.default.${loc}.name' LIKE ?`);
-      searchClauses.push(`t.content->>'$.default.${loc}.briefDescription' LIKE ?`);
-      searchClauses.push(`t.content->>'$.default.${loc}.fullDescription' LIKE ?`);
-      params.push(searchQuery, searchQuery, searchQuery);
-    });
-
-    whereConditions.push(`(${searchClauses.join(" OR ")})`);
+    const searchQuery = query
+      .split(" ")
+      .map((word) => `+${word}`)
+      .join(" ");
+    whereConditions.push("(MATCH(name_en, name_ar) AGAINST(? IN BOOLEAN MODE))");
+    params.push(searchQuery);
   }
 
   const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";

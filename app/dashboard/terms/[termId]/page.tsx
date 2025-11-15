@@ -61,14 +61,13 @@ export default async function EditTermPage(props: EditTermPageProps) {
           <Info className="h-4 w-4" />
           <AlertTitle>{t("Dashboard.pages.terms.reviewAlertTitle")}</AlertTitle>
           <AlertDescription>
-            {t("Dashboard.pages.terms.reviewAlertDescription", { fieldKey: review.fieldKey })}
+            <p>{t("Dashboard.pages.terms.reviewAlertDescription")}</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="bg-background/50 p-3 rounded-md">
-                <p className="font-semibold text-foreground mb-1">{t(`Dashboard.forms.labels.${review.fieldKey}`)}</p>
-                <p className="text-foreground wrap-break-word">{review.suggestedValue}</p>
-              </div>
+            <div className="bg-background/50 p-3 rounded-md border">
+              <p className="font-semibold text-foreground mb-1">{t("Dashboard.forms.labels.SuggestedChange")}</p>
+              <p className="text-foreground whitespace-pre-wrap">{review.suggestedChange}</p>
             </div>
+
             {review.explanation && (
               <div className="bg-background/50 p-3 rounded-md">
                 <p className="font-semibold text-foreground mb-1">{t(`Dashboard.forms.labels.explanation`)}</p>

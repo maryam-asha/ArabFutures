@@ -3,8 +3,6 @@
 import { ActionHandler, createActionParser, createProtectedAction } from "@lib/action-handler";
 import { dbClient } from "@root/dal/client";
 import { findReviewById } from "@root/dal/reviews-dx";
-import { findTermById } from "@root/dal/terms-dx";
-import { set } from "lodash";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -16,41 +14,6 @@ import { ReviewActionInput } from "./review.type";
  * Handler for an admin approving a review.
  * This is a complex transactional operation.
  */
-const approveReviewHandler: ActionHandler<ReviewActionInput> = async (data) => {
-  const { reviewId } = data;
-  const review = await findReviewById(reviewId);
-  if (!review || review.status !== "pending") {
-    return { success: false, message: "Review not found or already resolved.", errors: {} as any };
-  }
-
-  const term = await findTermById({ termId: review.termRef, locale: "ar" });
-  if (!term) {
-    return { success: false, message: "Associated term not found.", errors: {} as any };
-  }
-
-  await dbClient.executeTransaction(async (trx) => {
-    const newContent = { ...term.content };
-
-    const path = review.translationIdentifier.replace("-", ".") + "." + review.fieldKey;
-    set(newContent, path, review.suggestedValue);
-
-    await trx.update("terms", { content: JSON.stringify(newContent) }, { termId: review.termRef });
-
-    await trx.update("termReviews", { status: "approved", resolvedAt: new Date() }, { reviewId });
-
-    const otherPendingReviews = await trx.selectSingle("SELECT COUNT(reviewId) as count FROM termReviews WHERE termRef = ? AND status = 'pending' AND reviewId != ?", [review.termRef, reviewId], z.object({ count: z.number() }));
-
-    if (otherPendingReviews.count === 0) {
-      await trx.update("terms", { status: "published" }, { termId: review.termRef });
-    }
-  });
-
-  revalidatePath("/dashboard/reviews", "layout");
-  revalidatePath("/dashboard/terms", "layout");
-  revalidatePath("/", "layout");
-
-  return { success: true, message: "Review approved and changes applied." };
-};
 
 /**
  * Handler for an admin rejecting a review.
@@ -81,5 +44,4 @@ const rejectReviewHandler: ActionHandler<ReviewActionInput> = async (data) => {
 
   redirect("/dashboard/reviews");
 };
-export const approveReviewAction = createProtectedAction(ReviewActionSchema, approveReviewHandler, createActionParser());
 export const rejectReviewAction = createProtectedAction(ReviewActionSchema, rejectReviewHandler, createActionParser());

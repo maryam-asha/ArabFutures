@@ -1,4 +1,3 @@
-import CsrfManager from "@app/dashboard/___blocks/csrf-provider-client";
 import { TermCategoryOption } from "@root/dal/dal.types";
 import { findActiveCategoryOptions } from "@root/dal/termCategories-dx";
 import { findFeaturedTerms } from "@root/dal/terms-dx";
@@ -11,7 +10,6 @@ import AboutSection from "./___blocks/about-section";
 import { FailedToLoad } from "./___blocks/failed-to-load";
 import { FeaturedTermsLoading } from "./___blocks/featured-terms-loading";
 import { FeaturedTermsSection } from "./___blocks/featured-terms-section";
-import FriendsSection from "./___blocks/friends-section";
 import HeroSection from "./___blocks/hero-section";
 import OurWorkSection from "./___blocks/our-work-section";
 import ProjectsSection from "./___blocks/projects-section";
@@ -33,7 +31,7 @@ async function FeaturedTermsDataWrapper() {
 export default async function LandingPage() {
   const locale = (await getLocale()) as AppLocale;
   const cookieStore = await cookies();
-  const csrfToken = cookieStore.get("csrf_token")?.value ?? "";
+  // const csrfToken = cookieStore.get("csrf_token")?.value ?? "";
 
   let categories: TermCategoryOption[] = [];
   try {
@@ -43,17 +41,17 @@ export default async function LandingPage() {
   }
 
   return (
-    <CsrfManager initialToken={csrfToken}>
-      <div className="flex flex-col space-y-8 md:space-y-16 lg:space-y-24 px-2 md:px-8">
-        <HeroSection categories={categories} />
-        <AboutSection />
-        <OurWorkSection />
-        <ProjectsSection />
-        <Suspense fallback={<FeaturedTermsLoading />}>
-          <FeaturedTermsDataWrapper />
-        </Suspense>
-        <FriendsSection />
-      </div>
-    </CsrfManager>
+    // <CsrfManager initialToken={csrfToken}>
+    <div className="flex flex-col space-y-8 md:space-y-16 lg:space-y-24 px-2 md:px-8">
+      <HeroSection categories={categories} />
+      <AboutSection />
+      <OurWorkSection />
+      <ProjectsSection />
+      <Suspense fallback={<FeaturedTermsLoading />}>
+        <FeaturedTermsDataWrapper />
+      </Suspense>
+      {/* <FriendsSection /> */}
+    </div>
+    // </CsrfManager>
   );
 }

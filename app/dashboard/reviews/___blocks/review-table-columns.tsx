@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@components/ui/badge";
 import { Button } from "@components/ui/button";
 import { TermReviewWithTermName } from "@root/dal/dal.types";
 import { ColumnDef } from "@tanstack/react-table";
@@ -21,17 +20,17 @@ export const reviewColumns: ColumnDef<TermReviewWithTermName>[] = [
       </Link>
     ),
   },
-  {
-    accessorKey: "fieldKey",
-    header: () => {
-      return null;
-    },
-    cell: ({ row }) => (
-      <Badge variant="secondary" className="capitalize">
-        {row.original.fieldKey.replace(/([A-Z])/g, " $1")}
-      </Badge>
-    ),
-  },
+  // {
+  //   accessorKey: "fieldKey",
+  //   header: () => {
+  //     return null;
+  //   },
+  //   cell: ({ row }) => (
+  //     <Badge variant="secondary" className="capitalize">
+  //       {row.original.fieldKey.replace(/([A-Z])/g, " $1")}
+  //     </Badge>
+  //   ),
+  // },
   {
     accessorKey: "suggestedValue",
     header: () => {
@@ -39,7 +38,7 @@ export const reviewColumns: ColumnDef<TermReviewWithTermName>[] = [
       return t("SuggestedChange");
     },
     cell: ({ row }) => {
-      return <div className="text-sm font-semibold text-primary truncate max-w-xs">{row.original.suggestedValue}</div>;
+      return <div className="text-sm font-semibold text-primary truncate max-w-xs">{row.original.suggestedChange}</div>;
     },
   },
   {

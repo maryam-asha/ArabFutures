@@ -1,5 +1,3 @@
-"use client";
-
 import { useReactiveCsrf } from "@app/dashboard/___blocks/csrf-provider-client";
 import { ReferencesField } from "@app/dashboard/___blocks/references-field";
 import { TermTranslationFormSchema } from "@app/dashboard/terms/term.schema";
@@ -21,7 +19,9 @@ import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const SuggestTranslationFormSchema = TermTranslationFormSchema.omit({ briefDescription: true });
+// FIX 1: Update the schema to include briefDescription.
+// We can now use the full TermTranslationFormSchema and omit nothing.
+const SuggestTranslationFormSchema = TermTranslationFormSchema;
 
 const NewTermSuggestionSchema = z.object({
   categoryRef: z.coerce.number<number>().min(1, "Please select a category."),
@@ -42,15 +42,18 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
 
   const t = useTranslations("Public.suggestDialog");
   const tCommon = useTranslations("Common");
+  const tLabels = useTranslations("Dashboard.forms.labels");
   const { setCsrfToken } = useReactiveCsrf();
+
   const form = useForm<SuggestionFormValues>({
     resolver: zodResolver(NewTermSuggestionSchema),
     defaultValues: {
       categoryRef: 0,
       content: {
         default: {
-          en: { name: "", fullDescription: "", references: [] },
-          ar: { name: "", fullDescription: "", references: [] },
+          // FIX 2: Add briefDescription to default values
+          en: { name: "", briefDescription: "", fullDescription: "", references: [] },
+          ar: { name: "", briefDescription: "", fullDescription: "", references: [] },
         },
       },
     },
@@ -64,11 +67,12 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
     if (state.success) {
       toast.success(state.message);
       setIsOpen(false);
+      form.reset(); // Reset form on success
     } else if (!state.success && state.message) {
       setServerErrors(state.errors, form.setError);
       toast.error(state.message);
     }
-  }, [state, form.setError, setCsrfToken]);
+  }, [state, form, setCsrfToken]);
 
   const contentValue = useWatch({
     control: form.control,
@@ -86,7 +90,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
         <Form {...form}>
           <form
             ref={formRef}
-            action={formAction}
+            // REFINEMENT 1: Simplified onSubmit handler
             onSubmit={form.handleSubmit(() => {
               submitTransition(() => {
                 formAction(new FormData(formRef.current!));
@@ -102,14 +106,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("categoryLabel")}</FormLabel>
-                  <Select
-                    {...field}
-                    onValueChange={(value) => {
-                      form.setValue("categoryRef", Number(value));
-                      field.onChange(Number(value));
-                    }}
-                    value={field.value > 0 ? String(field.value) : ""}
-                  >
+                  <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value > 0 ? String(field.value) : ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={t("categoryPlaceholder")} />
@@ -138,9 +135,23 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                   name="content.default.en.name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("nameLabel")}</FormLabel>
+                      <FormLabel>{tLabels("name")}</FormLabel>
                       <FormControl>
                         <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* FIX 3: Add Brief Description field for English */}
+                <FormField
+                  control={form.control}
+                  name="content.default.en.briefDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{tLabels("briefDescription")}</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -151,7 +162,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                   name="content.default.en.fullDescription"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("fullDescritpionLabel")}</FormLabel>
+                      <FormLabel>{tLabels("fullDescription")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
@@ -168,9 +179,23 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                   name="content.default.ar.name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("nameLabel")}</FormLabel>
+                      <FormLabel>{tLabels("name")}</FormLabel>
                       <FormControl>
                         <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* FIX 4: Add Brief Description field for Arabic */}
+                <FormField
+                  control={form.control}
+                  name="content.default.ar.briefDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{tLabels("briefDescription")}</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -181,7 +206,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                   name="content.default.ar.fullDescription"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("fullDescritpionLabel")}</FormLabel>
+                      <FormLabel>{tLabels("fullDescription")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
@@ -189,13 +214,12 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                     </FormItem>
                   )}
                 />
-                {/* FIX #2: Render the reused ReferencesField */}
                 <ReferencesField control={form.control} path="content.default.ar.references" />
               </TabsContent>
             </Tabs>
 
-            <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? tCommon("saving") : t("submitButton")}
+            <Button type="submit" className="w-full" size="lg" disabled={isPending}>
+              {isPending ? tCommon("saving") : t("submitButton")}
             </Button>
           </form>
         </Form>

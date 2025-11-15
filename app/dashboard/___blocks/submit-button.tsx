@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@components/ui/button";
+import { Loader2 } from "lucide-react";
 import { useFormStatus } from "react-dom";
 
 interface SubmitButtonProps {
@@ -15,6 +16,7 @@ export function SubmitButton({ isEditMode, createText = "Create", updateText = "
 
   return (
     <Button type="submit" disabled={pending} size="lg">
+      {pending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
       {pending ? pendingText : isEditMode ? updateText : createText}
     </Button>
   );

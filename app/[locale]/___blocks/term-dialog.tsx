@@ -9,7 +9,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { ReviewSubmissionDialog, ReviewTarget } from "./review-submission-dialog";
+import { ReviewSubmissionDialog } from "./review-submission-dialog";
 import { TermDialogBody } from "./term-dialog-body";
 
 interface TermDialogProps {
@@ -32,9 +32,10 @@ const LoadingSkeleton = () => (
 export function TermDialog({ termId, onClose }: TermDialogProps) {
   const [term, setTerm] = useState<TermForEditDb | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [reviewTarget, setReviewTarget] = useState<ReviewTarget | null>(null);
+  const [isReviewing, setIsReviewing] = useState(false);
 
   const t = useTranslations("Common");
+  const tPublic = useTranslations("Public.termDialog");
   const locale = useLocale() as AppLocale;
 
   useEffect(() => {
@@ -63,20 +64,18 @@ export function TermDialog({ termId, onClose }: TermDialogProps) {
   }, [termId, locale, onClose, t]);
 
   const handleReviewSuccess = () => {
-    setReviewTarget(null);
+    setIsReviewing(false);
     onClose();
   };
 
   return (
     <>
       <Dialog open={!!termId} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DialogContent className="max-w-3xl p-0">
-          <DialogTitle></DialogTitle>
-          <div className="max-h-[85vh] overflow-y-auto">{isLoading || !term ? <LoadingSkeleton /> : <TermDialogBody term={term} onEdit={setReviewTarget} />}</div>
-        </DialogContent>
+        <DialogTitle className="sr-only">{term?.content.default[locale]?.name || tPublic("termDetails")}</DialogTitle>
+        <DialogContent className="sm:max-w-max max-w-5xl p-0">{isLoading || !term ? <LoadingSkeleton /> : <TermDialogBody term={term} onStartReview={() => setIsReviewing(true)} />}</DialogContent>
       </Dialog>
 
-      <ReviewSubmissionDialog isOpen={!!reviewTarget} onClose={() => setReviewTarget(null)} target={reviewTarget} termId={termId ?? undefined} onSuccess={handleReviewSuccess} />
+      <ReviewSubmissionDialog isOpen={isReviewing} onClose={() => setIsReviewing(false)} termId={termId ?? undefined} onSuccess={handleReviewSuccess} />
     </>
   );
 }

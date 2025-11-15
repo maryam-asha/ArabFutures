@@ -73,7 +73,7 @@ const termSaveHandler: ActionHandler<TermSaveActionInput> = async (data): Promis
   revalidatePath("/dashboard/reviews", "layout");
   revalidatePath("/", "layout");
 
-  redirect(`/dashboard/terms`);
+  redirect(reviewId ? "/dashboard/reviews" : "/dashboard/terms");
 };
 
 /**

@@ -20,14 +20,14 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 bg-background w-full p-2 md:p-4 z-50">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-8">
-        <div className="text-muted-foreground  flex-1 items-center gap-8 font-medium hidden md:flex md:justify-center lg:gap-16">
+        <div className="text-muted-foreground font-bold text-lg flex-1 items-center gap-8 hidden md:flex md:justify-center lg:gap-16">
           {navLinks.map((item) =>
             item.label === "home" ? (
-              <Link key={`${item.label}`} href={item.href} className="ring-3 rounded-full p-1">
-                <Home className="w-8 h-8" />
+              <Link key={`${item.label}`} href={item.href} className="ring-2 rounded-full p-1">
+                <Home className="w-5 h-5" />
               </Link>
             ) : (
-              <Link key={`${item.label}`} href={item.href}>
+              <Link className="hover:border-b hover:-mt-1" key={`${item.label}`} href={item.href}>
                 {tNav(item.label)}
               </Link>
             ),
@@ -54,7 +54,7 @@ const Navbar = () => {
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          <div className="fixed end-8 bottom-8 flex flex-1 items-center justify-end gap-6">
+          <div className="fixed end-8 top-4 flex flex-1 items-center justify-end gap-6">
             <LanguageSwitcher />
           </div>
         </div>

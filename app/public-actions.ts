@@ -14,8 +14,8 @@ const NewTermSuggestionActionSchema = z.object({
   categoryRef: z.coerce.number().min(1, "Please select a category."),
   content: z.object({
     default: z.object({
-      en: TermTranslationDbSchema.pick({ name: true, fullDescription: true, references: true }),
-      ar: TermTranslationDbSchema.pick({ name: true, fullDescription: true, references: true }),
+      en: TermTranslationDbSchema,
+      ar: TermTranslationDbSchema,
     }),
   }),
 });
@@ -49,15 +49,9 @@ export const suggestNewTermAction = createPublicAction(NewTermSuggestionActionSc
 
 const SubmitReviewActionSchema = z.object({
   termRef: z.coerce.number(),
-  translationIdentifier: z.string().min(1),
-  fieldKey: z.string().min(1),
-  suggestedValue: z.string().min(1, "Your suggestion cannot be empty."),
+  suggestedChange: z.string().min(10, "Your suggestion must be at least 10 characters."),
   explanation: z.string().optional(),
-
-  references: z
-    .string()
-    .transform((val) => JSON.parse(val || "[]"))
-    .pipe(z.array(TermReferenceDbSchema)),
+  references: z.array(TermReferenceDbSchema),
 });
 
 type SubmitReviewActionInput = z.infer<typeof SubmitReviewActionSchema>;
@@ -65,7 +59,9 @@ type SubmitReviewActionInput = z.infer<typeof SubmitReviewActionSchema>;
 const submitReviewHandler = async (data: SubmitReviewActionInput): Promise<ActionState<SubmitReviewActionInput>> => {
   await dbClient.executeTransaction(async (trx) => {
     await trx.insert("termReviews", {
-      ...data,
+      termRef: data.termRef,
+      suggestedChange: data.suggestedChange,
+      explanation: data.explanation || "",
       references: JSON.stringify(data.references),
     });
 
@@ -79,7 +75,7 @@ const submitReviewHandler = async (data: SubmitReviewActionInput): Promise<Actio
   return { success: true, message: "Thank you! Your suggestion has been submitted for review." };
 };
 
-export const submitReviewAction = createPublicAction(SubmitReviewActionSchema, submitReviewHandler, createActionParser());
+export const submitReviewAction = createPublicAction(SubmitReviewActionSchema, submitReviewHandler, createActionParser({ jsonFields: ["references"] }));
 
 const ContactActionSchema = z.object({
   name: z.string().min(2, "Name is required."),

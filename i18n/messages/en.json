@@ -84,7 +84,7 @@
         "editTitle": "Edit Term",
         "editDescription": "You are editing the term: {entityName}",
         "reviewAlertTitle": "Reviewing Submission",
-        "reviewAlertDescription": "You are viewing a community suggestion for the field:{fieldKey}. The suggested value has been pre-filled. You can edit it further or save to approve the change."
+        "reviewAlertDescription": "A user has suggested an improvement for this term. Please review the suggestion below. To approve, manually apply the changes to the form fields and then click 'Save & Approve'. Alternatively, you can reject the suggestion directly."
       },
       "categories": {
         "title": "Term Categories",
@@ -207,8 +207,8 @@
     },
     "hero": {
       "title": "Arab Futures Society",
-      "slogan": "A collaborative platform for building a shared lexicon of future-oriented concepts in the Arab world.",
-      "ctaPrimary": "Suggest a Term",
+      "slogan": "A collective of Arab futurists, foresight practitioners, and researchers united by one goal: to ensure Arab futures are imagined, shaped, and owned by Arabs.",
+      "ctaPrimary": "Join the Society",
       "ctaSecondary": "Explore the Lexicon"
     },
     "ourWork": {
@@ -242,8 +242,8 @@
       ]
     },
     "about": {
-      "title": "About Arab Futures Society",
-      "p1": "We are a collective of thinkers, creators, and innovators dedicated to exploring and shaping the future of the Arab world through foresight, research, and collaborative projects.",
+      "title": "About Us",
+      "p1": "We exist to build a foresight ecosystem that speaks our language, reflects our diversity, and reclaims our agency in shaping tomorrow. Rooted in our shared culture yet connected globally, we bridge scholarship, movement, and practice to build capacities, cultivate thought leadership, and democratise access to futures thinking.{br} We believe foresight is not only a discipline but a cultural right: the right to imagine futures on our own terms.",
       "breakoutTitle": "Our Driving Force",
       "breakoutDescription": "We aspire to make foresight equitable and connected, accessible to all and reflective of our shared humanity. are guided by an Arab ethos of trust, humility, and courage before the unknown, acting with clarity even amid uncertainty.",
       "valuesTitle": "Our Values",
@@ -280,10 +280,10 @@
       "features": [
         {
           "id": "lexicon-project",
-          "heading": "The Futures Lexicon",
-          "subheading": "A Collaborative Knowledge Base",
-          "label": "Ongoing Project",
-          "description": "Our primary initiative is the creation of a comprehensive, bilingual (Arabic/English), open-source lexicon of terms related to future studies, technology, and societal transformation. It serves as a foundational tool for researchers, policymakers, and the public.",
+          "heading": "The Arab Futures Lexicon",
+          "subheading": "The first regional effort to unify and evolve the language of foresight in Arabic",
+          "label": "",
+          "description": "For decades, futures terminology has been scattered across translations, institutions, and publications, creating fragmentation and barriers for researchers, policymakers, and educators. This initiative addresses that gap by creating a living, collaborative, and authoritative reference for Arabic foresight terminology. It serves as both a knowledge base and a community platform, where experts and contributors work together to shape the evolving language of Arab futures.",
           "image": "/future-foresight-terms-project.jpg",
           "url": "/terms"
         }
@@ -312,25 +312,23 @@
       "noDescription": "No description available."
     },
     "termDialog": {
+      "termDetails": "Term Details",
       "fullDescription": "Full Description",
       "tags": "Tags",
       "references": "References",
       "otherTranslations": "Other Translations",
-      "suggestEdit": "Suggest an Edit"
+      "suggestEdit": "Suggest an Edit",
+      "suggestImprovement": "Suggest an alternative translation",
+      "suggestionDisclaimer": "See something wrong? Help us improve it."
     },
     "reviewDialog": {
-      "title": "Suggest a Change for \"{fieldName}\"",
-      "field-name": "Name",
-      "field-briefDescription": "Brief Description",
-      "field-fullDescription": "Full Description",
-
-      "description": "Your suggestion will be reviewed by our team before being published.",
-      "currentValue": "Current Value",
+      "title": "Suggest an Improvement",
+      "description": "Your valuable feedback helps us maintain accuracy. Please describe your suggested change and provide an explanation or references if possible.",
       "suggestionLabel": "Your Suggestion",
-      "explanationLabel": "Explanation (Optional)",
+      "suggestionPlaceholder": "Describe the change you'd like to see. For example, correct a typo, add more detail, or clarify a definition.",
+      "explanationLabel": "Reason for Change (Optional)",
       "explanationPlaceholder": "Briefly explain why this change is needed.",
-      "submitButton": "Submit Suggestion",
-      "submitting": "Submitting..."
+      "submitButton": "Submit Suggestion"
     },
     "suggestDialog": {
       "title": "Suggest a New Term",
@@ -341,7 +339,6 @@
       "fullDescritpionLabel": "Full Description",
       "submitButton": "Submit for Review"
     },
-
     "signin": {
       "title": "Sign In",
       "description": "Welcome back! Please enter your credentials to access the dashboard.",
@@ -355,7 +352,6 @@
       "showPassword": "Show password",
       "hidePassword": "Hide password"
     },
-
     "contact": {
       "title": "Get in Touch",
       "description": "We'd love to hear from you. Whether you have a question, a proposal, or just want to say hello, feel free to reach out.",
@@ -385,7 +381,33 @@
         "oldest": "oldest",
         "placeholder": "sort"
       },
-      "searchPlaceholder": "search ..."
+      "searchPlaceholder": "search ...",
+      "title": "The Arab Futures Lexicon",
+      "description_1": "The Arab Futures Lexicon is the first regional effort to unify and evolve the language of foresight in Arabic.",
+      "description_2": "For decades, futures terminology has been scattered across translations, institutions, and publications, creating fragmentation and barriers for researchers, policymakers, and educators.",
+      "description_3": "This initiative addresses that gap by creating a living, collaborative, and authoritative reference for Arabic foresight terminology. It serves as both a knowledge base and a community platform, where experts and contributors work together to shape the evolving language of Arab futures.",
+      "why_it_matters": {
+        "title": "Why It Matters",
+        "intro": "Language shapes imagination, and imagination shapes the future.",
+        "subtitle": "By developing a shared, contextually rooted lexicon, we are:",
+        "points": [
+          "Enabling regional foresight capacity: Scholars, practitioners, and institutions gain a unified reference, reducing duplication and confusion.",
+          "Strengthening cultural sovereignty: The Arab world develops its own conceptual vocabulary of futures, independent yet globally connected.",
+          "Democratizing access to foresight: Translators, students, and emerging futurists gain free access to knowledge once locked in academic silos.",
+          "Preserving and evolving the Arabic language: Ensuring Arabic remains a language capable of leading global conversations about the future."
+        ]
+      },
+      "what_makes_it_different": {
+        "title": "What Makes It Different",
+        "points": [
+          "Collaborative design: Experts and contributors across the Arab world can suggest, debate, and refine terminology.",
+          "Rigorous methodology: Every translation is annotated, sourced, and reviewed for contextual precision.",
+          "Open access: The platform will remain free and public, embodying our mission to democratize foresight knowledge.",
+          "Scalable foundation: Future versions will include sectoral lexicons (e.g., climate, AI, governance) and bilingual search capabilities."
+        ]
+      },
+      "exploreTitle": "Explore the Terms",
+      "exploreDescription": "Search for specific terms, filter by category, and sort by date to find the information you need."
     }
   }
 }
