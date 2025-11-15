@@ -4,6 +4,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { Home, MenuIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { LanguageSwitcher } from "./language-switcher";
+
 const navLinks = [
   { label: "about", href: "/#about" },
   { label: "work", href: "/#work" },
@@ -52,6 +54,9 @@ const Navbar = () => {
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          <div className="fixed end-8 bottom-8 flex flex-1 items-center justify-end gap-6">
+            <LanguageSwitcher />
+          </div>
         </div>
       </div>
     </header>

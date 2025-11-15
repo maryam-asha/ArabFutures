@@ -10,9 +10,9 @@ export default async function OurWorkSection() {
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-pretty text-4xl font-bold lg:text-5xl mb-12">{t("title")}</h2>
         </div>
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-4">
           {features.map((feature: any, index: number) => (
-            <div key={index} className="bg-muted/50 flex flex-col justify-between rounded-2xl overflow-hidden">
+            <div key={index} className="bg-muted/50 flex flex-col justify-between rounded-2xl overflow-hidden last:col-span-2 last:justify-self-center ">
               <div className="p-8">
                 <span className="text-primary  text-sm font-semibold">{feature.label}</span>
                 <h3 className="text-3xl font-bold mt-4 mb-2">{feature.heading}</h3>

@@ -2,6 +2,7 @@
 
 import { useReactiveCsrf } from "@app/dashboard/___blocks/csrf-provider-client";
 import { MultiSelectCombobox } from "@app/dashboard/___blocks/multi-select-combobox";
+import { ReferencesField } from "@app/dashboard/___blocks/references-field";
 import { Button } from "@components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@components/ui/form";
@@ -330,59 +331,6 @@ const TranslationFields = ({ control, path }: { control: Control<TermFormValues>
       />
       <Separator />
       <ReferencesField control={control} path={`${path}.references`} />
-    </div>
-  );
-};
-
-const ReferencesField = ({ control, path }: { control: Control<TermFormValues>; path: `content.default.${"en" | "ar"}.references` | `content.more.${number}.references` }) => {
-  const t = useTranslations("Dashboard.forms.labels");
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: path,
-  });
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h4 className="font-medium">{t("references")}</h4>
-        <Button type="button" variant="ghost" size="sm" onClick={() => append({ content: "", url: "" })}>
-          <PlusCircle className="h-4 w-4 mr-2" />
-          {t("addReference")}
-        </Button>
-      </div>
-      {fields.map((item, index) => (
-        <div key={item.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 p-3 border rounded-md bg-muted/50">
-          <FormField
-            control={control}
-            name={`${path}.${index}.content`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs">{t("referenceContent")}</FormLabel>
-                <FormControl>
-                  <Input {...field} value={field.value ?? ""} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name={`${path}.${index}.url`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs">{t("referenceUrl")}</FormLabel>
-                <FormControl>
-                  <Input {...field} value={field.value ?? ""} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="self-end text-destructive hover:bg-destructive/10">
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ))}
     </div>
   );
 };

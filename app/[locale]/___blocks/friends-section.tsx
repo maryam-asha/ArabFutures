@@ -52,12 +52,8 @@ export default function FriendsSection() {
     <section id="freinds-section" className="scroll-mt-36">
       <div className="bg-muted/20 mx-auto mb-8 md:mb-16 lg:mb-24">
         <div className="container mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-16">{t("title")}</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-16 text-center">{t("title")}</h2>
 
-          {/* 
-          - The animation and duplication have been removed.
-          - We now use a flexbox with `justify-center` and `gap` for clean, centered alignment.
-        */}
           <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-12">
             {logos.map((logo, index) => (
               <div key={index} className="shrink-0">

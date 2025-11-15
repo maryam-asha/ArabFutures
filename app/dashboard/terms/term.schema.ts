@@ -4,7 +4,7 @@ import { z } from "zod";
 const TermReferenceFormSchema = z
   .object({
     content: z.string().trim().optional(),
-    url: z.string().trim().optional(),
+    url: z.url().optional(),
   })
   .refine((data) => !!data.content || !!data.url, {
     message: "A reference must have content or a URL if it's not empty.",

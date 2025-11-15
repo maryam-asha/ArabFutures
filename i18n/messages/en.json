@@ -9,6 +9,9 @@
     "notAvailable": "N/A",
     "yes": "Yes",
     "no": "No",
+    "loadErrorTitile": "Failed to Load Content",
+    "loadErrorDescription": "The requested data could not be retrieved from the server. Please try again.",
+    "reload": "Reload",
 
     "actions": {
       "title": "Actions",
@@ -211,8 +214,31 @@
     "ourWork": {
       "title": "What We Do",
       "features": [
-        { "label": "Research & Analysis", "heading": "Deep Dives into Future Trends", "description": "We systematically identify, analyze, and synthesize emerging trends relevant to the Arab world, from technological shifts to social dynamics." },
-        { "label": "Community & Collaboration", "heading": "Building a Network of Futurists", "description": "We facilitate workshops, discussions, and collaborative projects to build a vibrant community dedicated to foresight." }
+        {
+          "label": "Contextualization",
+          "heading": "Foresight for the Arab Context",
+          "description": "Localizing foresight tools and frameworks to align with Arab contexts, mindsets, and languages."
+        },
+        {
+          "label": "Research & Culture",
+          "heading": "Exploring Cultural & Social Futures",
+          "description": "Researching cultural and social futures, amplifying local narratives of change and advancing Arab cultural and contextual foresight."
+        },
+        {
+          "label": "Capacity Building",
+          "heading": "Empowering Through Training & Education",
+          "description": "Building capacity through training, education, and collaboration across sectors."
+        },
+        {
+          "label": "Advisory & Guidance",
+          "heading": "Consulting for Future-Oriented Action",
+          "description": "Consulting and speaking to guide institutions, policymakers, and innovators toward future-oriented action."
+        },
+        {
+          "label": "Community & Awareness",
+          "heading": "Fostering a Regional Foresight Community",
+          "description": "Spreading awareness to promote futures literacy and expand regional participation through fostering a vibrant, connected foresight community."
+        }
       ]
     },
     "about": {
@@ -277,7 +303,9 @@
       "suggestTerm": "Suggest a Term",
       "viewAll": "View All Terms",
       "searchPlaceholder": "Search for a term...",
-      "loadMore": "Load More"
+      "loadMore": "Load More",
+      "errorTitle": "Could Not Load Featured Terms",
+      "errorDescription": "We're having trouble connecting to the database right now. Please try again in a few moments."
     },
     "termCard": {
       "readMore": "Read More",

@@ -1,5 +1,6 @@
 "use client";
 
+// The component remains a Client Component for state management
 import { Button } from "@components/ui/button";
 import { Link } from "@i18n/navigation";
 import { TermCategoryOption, TermDb } from "@root/dal/dal.types";
@@ -10,9 +11,18 @@ import { SuggestTermDialog } from "./suggest-term-dialog";
 import TermCard from "./term-card";
 import { TermDialog } from "./term-dialog";
 
-export function FeaturedTermsSection({ terms, categories }: { terms: TermDb[]; categories: TermCategoryOption[] }) {
+// The component now receives its data directly as props
+interface FeaturedTermsSectionProps {
+  terms: TermDb[];
+  categories: TermCategoryOption[];
+}
+
+export function FeaturedTermsSection({ terms, categories }: FeaturedTermsSectionProps) {
   const t = useTranslations("Public.featuredTerms");
   const [selectedTermId, setSelectedTermId] = useState<number | null>(null);
+
+  // If there are no terms (due to an error or just no data), we can show a message.
+  const hasTerms = terms && terms.length > 0;
 
   return (
     <section id="featured-terms" className="scroll-mt-36">
@@ -32,14 +42,20 @@ export function FeaturedTermsSection({ terms, categories }: { terms: TermDb[]; c
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
-          {terms.map((term) => (
-            <TermCard key={term.termId} term={term} onSelect={() => setSelectedTermId(term.termId)} />
-          ))}
-        </div>
-
-        <TermDialog termId={selectedTermId} onClose={() => setSelectedTermId(null)} />
+        {hasTerms ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+            {terms.map((term) => (
+              <TermCard key={term.termId} term={term} onSelect={() => setSelectedTermId(term.termId)} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center text-muted-foreground p-8 mt-8 bg-muted/50 rounded-lg">
+            <p>Could not load featured terms at this time.</p>
+          </div>
+        )}
       </div>
+
+      <TermDialog termId={selectedTermId} onClose={() => setSelectedTermId(null)} />
     </section>
   );
 }

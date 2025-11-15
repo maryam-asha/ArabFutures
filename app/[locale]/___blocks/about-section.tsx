@@ -7,6 +7,12 @@ export default async function AboutSection() {
   return (
     <section id="about" className="scroll-mt-36">
       <div className="container mx-auto space-y-8 md:space-y-16 lg:space-y-24">
+        {/* --- Original About Intro --- */}
+        <div className="grid gap-5 text-center md:grid-cols-2 md:text-left items-center rtl:text-center">
+          <h1 className="text-5xl font-bold">{t("title")}</h1>
+          <p className="text-lg text-muted-foreground">{t("p1")}</p>
+        </div>
+
         {/* --- Original Values Section --- */}
         <div className="grid gap-7 lg:grid-cols-3">
           <div className="bg-primary text-primary-foreground flex flex-col justify-between gap-6 rounded-2xl p-8 lg:col-span-1">
@@ -24,12 +30,6 @@ export default async function AboutSection() {
               ))}
             </div>
           </div>
-        </div>
-
-        {/* --- Original About Intro --- */}
-        <div className="grid gap-5 text-center md:grid-cols-2 md:text-left items-center">
-          <h1 className="text-5xl font-bold">{t("title")}</h1>
-          <p className="text-lg text-muted-foreground">{t("p1")}</p>
         </div>
 
         {/* --- MERGED VISION & MISSION SECTION --- */}

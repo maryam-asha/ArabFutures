@@ -1,6 +1,7 @@
 "use client";
 
 import { useReactiveCsrf } from "@app/dashboard/___blocks/csrf-provider-client";
+import { ReferencesField } from "@app/dashboard/___blocks/references-field";
 import { TermTranslationFormSchema } from "@app/dashboard/terms/term.schema";
 import { suggestNewTermAction } from "@app/public-actions";
 import { Button } from "@components/ui/button";
@@ -8,17 +9,15 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@components/ui/form";
 import { Input } from "@components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@components/ui/select";
-import { Separator } from "@components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
 import { Textarea } from "@components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { setServerErrors } from "@lib/form-helpers";
 import { TermCategoryOption } from "@root/dal/dal.types";
 import { CsrfInput } from "@waelhabbaldev/next-jwt-auth/client";
-import { PlusCircle, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
-import { Control, useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -34,60 +33,6 @@ const NewTermSuggestionSchema = z.object({
   }),
 });
 type SuggestionFormValues = z.infer<typeof NewTermSuggestionSchema>;
-
-const ReferencesField = ({ control, path }: { control: Control<SuggestionFormValues>; path: `content.default.${"en" | "ar"}.references` }) => {
-  const t = useTranslations("Dashboard.forms.labels");
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: path,
-  });
-
-  return (
-    <div className="space-y-4">
-      <Separator />
-      <div className="flex justify-between items-center">
-        <h4 className="font-medium">{t("references")}</h4>
-        <Button type="button" variant="ghost" size="sm" onClick={() => append({ content: "", url: "" })}>
-          <PlusCircle className="h-4 w-4 mr-2" />
-          {t("addReference")}
-        </Button>
-      </div>
-      {fields.map((item, index) => (
-        <div key={item.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 p-3 border rounded-md bg-muted/50">
-          <FormField
-            control={control}
-            name={`${path}.${index}.content`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs">{t("referenceContent")}</FormLabel>
-                <FormControl>
-                  <Input {...field} value={field.value ?? ""} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name={`${path}.${index}.url`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs">{t("referenceUrl")}</FormLabel>
-                <FormControl>
-                  <Input {...field} value={field.value ?? ""} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="self-end text-destructive hover:bg-destructive/10">
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      ))}
-    </div>
-  );
-};
 
 export function SuggestTermDialog({ categories, children }: { categories: TermCategoryOption[]; children: React.ReactNode }) {
   const formRef = useRef<HTMLFormElement>(null);
