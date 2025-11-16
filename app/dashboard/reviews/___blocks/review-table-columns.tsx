@@ -20,17 +20,7 @@ export const reviewColumns: ColumnDef<TermReviewWithTermName>[] = [
       </Link>
     ),
   },
-  // {
-  //   accessorKey: "fieldKey",
-  //   header: () => {
-  //     return null;
-  //   },
-  //   cell: ({ row }) => (
-  //     <Badge variant="secondary" className="capitalize">
-  //       {row.original.fieldKey.replace(/([A-Z])/g, " $1")}
-  //     </Badge>
-  //   ),
-  // },
+
   {
     accessorKey: "suggestedValue",
     header: () => {

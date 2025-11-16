@@ -15,7 +15,6 @@ export function LanguageSwitcher() {
   const pathname = usePathname();
 
   const handleLocaleChange = (nextLocale: string) => {
-    // This is a transition, so the UI won't block
     startTransition(() => {
       router.replace(pathname, { locale: nextLocale });
     });

@@ -408,6 +408,16 @@
       },
       "exploreTitle": "Explore the Terms",
       "exploreDescription": "Search for specific terms, filter by category, and sort by date to find the information you need."
+    },
+    "newsletter": {
+      "title": "Stay Ahead of the Curve",
+      "description": "Join our newsletter to receive the latest updates, articles, and insights directly in your inbox. No spam, just valuable information.",
+      "placeholder": "Enter your email address",
+      "cta": "Subscribe",
+      "subscribeSuccess": "Thank you for subscribing! Please check your inbox to confirm.",
+      "alreadySubscribed": "You are already subscribed to our newsletter!",
+      "tooManyRequests": "Too many requests. Please try again in a moment.",
+      "genericError": "Something went wrong. Could not subscribe at this time."
     }
   }
 }

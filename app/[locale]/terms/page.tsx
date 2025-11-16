@@ -7,7 +7,6 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { TermList } from "../___blocks/term-list";
 
-// A reusable component for styled list items, inspired by your contact page.
 const ListItem = ({ children }: { children: React.ReactNode }) => (
   <li className="flex items-start gap-3">
     <CheckCircle className="h-5 w-5 mt-1 shrink-0 text-primary" />
@@ -32,7 +31,6 @@ export default async function TermsPage(params: { searchParams: SearchParamsProp
 
   const [categories, initialTerms] = await Promise.all([findActiveCategoryOptions(locale), loadMoreTermsAction(locale, 0, query, categoryIds, sort as any)]);
   return (
-    // Use a container and consistent padding like other public pages.
     <div className="container mx-auto py-16 sm:py-24">
       {/* Centered header section for title and description. */}
       <header className="max-w-5xl mx-auto mb-16">

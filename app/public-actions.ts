@@ -79,7 +79,7 @@ export const submitReviewAction = createPublicAction(SubmitReviewActionSchema, s
 
 const ContactActionSchema = z.object({
   name: z.string().min(2, "Name is required."),
-  email: z.string().email("Please enter a valid email."),
+  email: z.email("Please enter a valid email."),
   message: z.string().min(10, "Message must be at least 10 characters long."),
 });
 type ContactActionInput = z.infer<typeof ContactActionSchema>;

@@ -89,9 +89,7 @@ export const TermForEditDbSchema = TermDbSchema.extend({
 export const TermReviewDbSchema = z.object({
   reviewId: z.number(),
   termRef: z.number(),
-  // REMOVED: translationIdentifier: z.string(),
-  // REMOVED: fieldKey: z.string(),
-  // RENAMED and type changed to handle longer text
+
   suggestedChange: z.string(),
   explanation: z.string().nullable(),
   references: z.preprocess(safeJsonParse, z.array(TermReferenceDbSchema).nullable()),

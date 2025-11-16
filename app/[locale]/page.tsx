@@ -11,10 +11,10 @@ import { FailedToLoad } from "./___blocks/failed-to-load";
 import { FeaturedTermsLoading } from "./___blocks/featured-terms-loading";
 import { FeaturedTermsSection } from "./___blocks/featured-terms-section";
 import HeroSection from "./___blocks/hero-section";
+import NewsletterSection from "./___blocks/newsletter-section";
 import OurWorkSection from "./___blocks/our-work-section";
 import ProjectsSection from "./___blocks/projects-section";
 
-// This is our new self-contained, async component
 async function FeaturedTermsDataWrapper() {
   const locale = (await getLocale()) as AppLocale;
   const t = await getTranslations("Public.featuredTerms");
@@ -31,7 +31,6 @@ async function FeaturedTermsDataWrapper() {
 export default async function LandingPage() {
   const locale = (await getLocale()) as AppLocale;
   const cookieStore = await cookies();
-  // const csrfToken = cookieStore.get("csrf_token")?.value ?? "";
 
   let categories: TermCategoryOption[] = [];
   try {
@@ -41,7 +40,6 @@ export default async function LandingPage() {
   }
 
   return (
-    // <CsrfManager initialToken={csrfToken}>
     <div className="flex flex-col space-y-8 md:space-y-16 lg:space-y-24 px-2 md:px-8">
       <HeroSection categories={categories} />
       <AboutSection />
@@ -51,7 +49,7 @@ export default async function LandingPage() {
         <FeaturedTermsDataWrapper />
       </Suspense>
       {/* <FriendsSection /> */}
+      <NewsletterSection />
     </div>
-    // </CsrfManager>
   );
 }

@@ -33,7 +33,7 @@ export function ReferencesField<T extends FieldValues>({ control, path }: Refere
   const t = useTranslations("Dashboard.forms.labels");
   const { fields, append, remove } = useFieldArray({
     control,
-    name: path, // Now TypeScript is happy because it knows `path` must be an ArrayPath.
+    name: path,
   });
 
   return (
@@ -50,7 +50,6 @@ export function ReferencesField<T extends FieldValues>({ control, path }: Refere
         <div key={item.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 p-3 border rounded-md bg-muted/50">
           <FormField
             control={control}
-            // The rest of the component is now type-safe because the base 'path' is constrained.
             name={`${path}.${index}.content` as any}
             render={({ field }) => (
               <FormItem>

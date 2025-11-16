@@ -1,6 +1,5 @@
 "use client";
 
-// The component remains a Client Component for state management
 import { Button } from "@components/ui/button";
 import { Link } from "@i18n/navigation";
 import { TermCategoryOption, TermDb } from "@root/dal/dal.types";
@@ -11,7 +10,6 @@ import { SuggestTermDialog } from "./suggest-term-dialog";
 import TermCard from "./term-card";
 import { TermDialog } from "./term-dialog";
 
-// The component now receives its data directly as props
 interface FeaturedTermsSectionProps {
   terms: TermDb[];
   categories: TermCategoryOption[];
@@ -21,7 +19,6 @@ export function FeaturedTermsSection({ terms, categories }: FeaturedTermsSection
   const t = useTranslations("Public.featuredTerms");
   const [selectedTermId, setSelectedTermId] = useState<number | null>(null);
 
-  // If there are no terms (due to an error or just no data), we can show a message.
   const hasTerms = terms && terms.length > 0;
 
   return (

@@ -65,11 +65,14 @@ export function createActionParser(
 export function createPublicAction<TInput>(schema: z.ZodSchema<TInput>, handler: ActionHandler<TInput>, parser: (formData: FormData) => Record<string, any>): ServerAction<TInput> {
   return async function publicAction(prevState: ActionState<TInput>, formData: FormData): Promise<ActionState<TInput>> {
     try {
+      const newCsrfToken = await getCsrfTokenAction();
+
       const dataToParse = parser(formData);
       const parsed = schema.safeParse(dataToParse);
 
       if (!parsed.success) {
         return {
+          newCsrfToken: newCsrfToken,
           success: false,
           message: "Validation failed. Please check the fields for errors.",
           errors: z.treeifyError(parsed.error),
@@ -77,11 +80,13 @@ export function createPublicAction<TInput>(schema: z.ZodSchema<TInput>, handler:
       }
 
       const result = await handler(parsed.data);
+      result.newCsrfToken = newCsrfToken;
       return result;
     } catch (e) {
       if (isRedirectError(e)) throw e;
 
       console.error("Server Action Error:", e);
+
       return {
         success: false,
         message: (e as Error).message || "An unexpected server error occurred.",

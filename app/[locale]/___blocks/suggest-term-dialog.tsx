@@ -19,8 +19,6 @@ import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-// FIX 1: Update the schema to include briefDescription.
-// We can now use the full TermTranslationFormSchema and omit nothing.
 const SuggestTranslationFormSchema = TermTranslationFormSchema;
 
 const NewTermSuggestionSchema = z.object({
@@ -51,7 +49,6 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
       categoryRef: 0,
       content: {
         default: {
-          // FIX 2: Add briefDescription to default values
           en: { name: "", briefDescription: "", fullDescription: "", references: [] },
           ar: { name: "", briefDescription: "", fullDescription: "", references: [] },
         },
@@ -67,7 +64,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
     if (state.success) {
       toast.success(state.message);
       setIsOpen(false);
-      form.reset(); // Reset form on success
+      form.reset();
     } else if (!state.success && state.message) {
       setServerErrors(state.errors, form.setError);
       toast.error(state.message);
@@ -90,7 +87,6 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
         <Form {...form}>
           <form
             ref={formRef}
-            // REFINEMENT 1: Simplified onSubmit handler
             onSubmit={form.handleSubmit(() => {
               submitTransition(() => {
                 formAction(new FormData(formRef.current!));

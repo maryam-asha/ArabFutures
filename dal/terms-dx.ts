@@ -33,7 +33,7 @@ export const findTerms = async (props: {
   status?: "pending" | "published" | "rejected" | "has-pending-review";
   categoryIds?: number[];
   query?: string;
-  orderBy?: "newest" | "oldest"; // <-- ADDED: New sorting parameter
+  orderBy?: "newest" | "oldest";
   limit?: number;
   offset?: number;
 }): Promise<{

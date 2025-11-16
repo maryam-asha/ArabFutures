@@ -12,9 +12,10 @@ const zodEnv = z.object({
   ACCESS_TOKEN_SECRET: z.string().length(64),
   REFRESH_TOKEN_SECRET: z.string().length(64),
 
-  NODE_ENV: z
-    .enum(["development", "test", "production"])
-    .default("development"),
+  BREVO_API_KEY: z.string(),
+  BREVO_LIST_ID: z.string(),
+
+  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
 export const envObj = zodEnv.parse(process.env);

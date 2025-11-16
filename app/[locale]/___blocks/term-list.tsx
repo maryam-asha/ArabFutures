@@ -105,13 +105,7 @@ export function TermList({ initialTerms, categories, initialQuery, initialCatego
       <div className="flex flex-col md:flex-row items-center gap-4 mt-12">
         <div className="relative grow w-full">
           <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground rtl:left-auto rtl:right-4" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("searchPlaceholder")}
-            className="w-full text-lg h-14 pl-12 rtl:pl-4 rtl:pr-12 rounded-full shadow-sm"
-            disabled={isFiltering} // FIX: Disable during transition
-          />
+          <Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t("searchPlaceholder")} className="w-full text-lg h-14 pl-12 rtl:pl-4 rtl:pr-12 rounded-full shadow-sm" disabled={isFiltering} />
         </div>
         <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as "newest" | "oldest")} disabled={isFiltering}>
           {" "}
@@ -133,12 +127,7 @@ export function TermList({ initialTerms, categories, initialQuery, initialCatego
           {t("allCategories")}
         </Button>
         {categories.map((cat) => (
-          <Button
-            key={cat.categoryId}
-            variant={selectedCategoryIds.includes(cat.categoryId) ? "default" : "outline"}
-            onClick={() => handleCategoryClick(cat.categoryId)}
-            disabled={isFiltering} // FIX: Disable during transition
-          >
+          <Button key={cat.categoryId} variant={selectedCategoryIds.includes(cat.categoryId) ? "default" : "outline"} onClick={() => handleCategoryClick(cat.categoryId)} disabled={isFiltering}>
             {cat.name}
           </Button>
         ))}

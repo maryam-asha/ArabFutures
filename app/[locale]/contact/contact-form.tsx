@@ -1,5 +1,6 @@
 "use client";
 
+import { useReactiveCsrf } from "@app/dashboard/___blocks/csrf-provider-client";
 import { contactAction } from "@app/public-actions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ActionState } from "@root/types";
@@ -27,6 +28,7 @@ export function ContactForm() {
   const t = useTranslations("Public.contact");
   const commonT = useTranslations("Common");
   const formRef = useRef<HTMLFormElement>(null);
+  const { setCsrfToken } = useReactiveCsrf();
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(ContactSchema),
@@ -34,13 +36,17 @@ export function ContactForm() {
   });
 
   useEffect(() => {
+    if (state.newCsrfToken) {
+      setCsrfToken(state.newCsrfToken);
+    }
+
     if (state.success) {
       toast.success(t("successMessage"));
       form.reset();
     } else if (state.message && form.formState.isSubmitted) {
       toast.error(t("errorMessage"));
     }
-  }, [state, form, t]);
+  }, [state, form, t, setCsrfToken]);
 
   return (
     <Form {...form}>

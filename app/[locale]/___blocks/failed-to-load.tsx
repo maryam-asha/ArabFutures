@@ -1,6 +1,5 @@
 "use client";
 
-// Needs to be a client component for the onClick handler
 import { Button } from "@components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@components/ui/card";
 import { ServerCrash } from "lucide-react";
