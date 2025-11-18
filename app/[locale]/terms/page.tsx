@@ -3,9 +3,39 @@ import { findActiveCategoryOptions } from "@root/dal/termCategories-dx";
 import { AppLocale } from "@root/i18n/config";
 import { SearchParamsProps } from "@root/types";
 import { CheckCircle } from "lucide-react";
+import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { TermList } from "../___blocks/term-list";
+
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: "Public.metadata.terms" });
+  const siteName = await getTranslations({ locale, namespace: "Public.metadata" }).then((t) => t("siteName"));
+
+  return {
+    title: `${t("title")} | ${siteName}`,
+    description: t("description"),
+
+    openGraph: {
+      title: `${t("title")} | ${siteName}`,
+      description: t("description"),
+      url: `/${locale}/terms`,
+    },
+
+    twitter: {
+      title: `${t("title")} | ${siteName}`,
+      description: t("description"),
+    },
+
+    alternates: {
+      canonical: `/${locale}/terms`,
+      languages: {
+        en: "/en/terms",
+        ar: "/ar/terms",
+      },
+    },
+  };
+}
 
 const ListItem = ({ children }: { children: React.ReactNode }) => (
   <li className="flex items-start gap-3">

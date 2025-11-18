@@ -24,7 +24,7 @@ export default async function HeroSection({ categories }: HeroSectionProps) {
           <div className="flex w-full flex-col justify-center gap-4 sm:flex-row lg:justify-start">
             {/* </SuggestTermDialog> */}
             <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-              <Link href="/#featured-terms">
+              <Link href="/#newsletter">
                 {t("ctaSecondary")}
                 {locale === "ar" ? <ArrowDownLeft className="size-4" /> : <ArrowDownRight className="size-4" />}
               </Link>

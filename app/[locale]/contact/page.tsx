@@ -1,7 +1,37 @@
 import { LinkedinIcon, MailIcon, TwitterIcon } from "lucide-react";
+import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { ContactForm } from "./contact-form";
+
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: "Public.metadata.contact" });
+  const siteName = await getTranslations({ locale, namespace: "Public.metadata" }).then((t) => t("siteName"));
+
+  return {
+    title: `${t("title")} | ${siteName}`,
+    description: t("description"),
+
+    openGraph: {
+      title: `${t("title")} | ${siteName}`,
+      description: t("description"),
+      url: `/${locale}/contact`,
+    },
+
+    twitter: {
+      title: `${t("title")} | ${siteName}`,
+      description: t("description"),
+    },
+
+    alternates: {
+      canonical: `/${locale}/contact`,
+      languages: {
+        en: "/en/contact",
+        ar: "/ar/contact",
+      },
+    },
+  };
+}
 
 const ReasonItem = ({ title, description }: { title: string; description: string }) => (
   <div className="relative ps-8">

@@ -12,7 +12,7 @@ export default function PublicFooter() {
           <p>
             {`©${new Date().getFullYear()}`}{" "}
             <a href="#" className="font-semibold text-foreground hover:underline">
-              {t("title")}
+              {t("siteName")}
             </a>
             .
           </p>

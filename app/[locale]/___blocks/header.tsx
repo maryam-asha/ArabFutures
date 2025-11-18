@@ -1,8 +1,10 @@
-import { Link } from "@i18n/navigation";
+"use client";
+
+import { Link, useRouter } from "@i18n/navigation";
 import { Button } from "@ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@ui/dropdown-menu";
 import { Home, MenuIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { LanguageSwitcher } from "./language-switcher";
 
@@ -14,7 +16,23 @@ const navLinks = [
   { label: "contact", href: "/contact" },
 ];
 
+function moveItemToFront(arr: typeof navLinks, prop: keyof (typeof navLinks)[0], value: string) {
+  const itemIndex = arr.findIndex((item) => item[prop] === value);
+
+  if (itemIndex > -1) {
+    // 1. Remove the item from its current position
+    const [itemToMove] = arr.splice(itemIndex, 1);
+
+    // 2. Insert the item at the beginning
+    arr.unshift(itemToMove);
+  }
+
+  return arr; // Return the modified array
+}
+
 const Navbar = () => {
+  const locale = useLocale();
+  const router = useRouter();
   const tNav = useTranslations("Public.nav");
 
   return (
@@ -34,27 +52,31 @@ const Navbar = () => {
           )}
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className=" flex items-center gap-6">
           <DropdownMenu>
             <DropdownMenuTrigger className="md:hidden" asChild>
               <Button variant="outline" size="icon">
                 <MenuIcon />
-                <span className="sr-only">Menu</span>
+                <span className="sr-only">{tNav("menu-sr")}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end">
+            <DropdownMenuContent className="w-56" align="center">
               <DropdownMenuGroup>
-                {navLinks
-                  .filter((item) => item.label !== "home")
-                  .map((item, index) => (
-                    <DropdownMenuItem key={index}>
-                      <Link href={item.href}>{tNav(item.label)}</Link>
-                    </DropdownMenuItem>
-                  ))}
+                {moveItemToFront(navLinks, "label", "home").map((item, index) => (
+                  <DropdownMenuItem
+                    key={index}
+                    onClick={() => {
+                      router.push(item.href);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    {tNav(item.label)}
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          <div className="fixed end-8 top-4 flex flex-1 items-center justify-end gap-6">
+          <div className="fixed end-2 top-2 flex flex-1 items-center justify-end gap-6">
             <LanguageSwitcher />
           </div>
         </div>

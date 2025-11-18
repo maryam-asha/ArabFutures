@@ -27,25 +27,73 @@ const tajawal = Tajawal({
   weight: ["400", "500", "700"],
 });
 
-export async function generateMetadata(params: Promise<{ locale: string }>): Promise<Metadata> {
-  const { locale } = await params;
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await props.params;
+
   const t = await getTranslations({ locale, namespace: "Public.metadata" });
-  const title = t("title");
+  const siteName = t("siteName");
   const description = t("description");
 
   return {
-    title,
-    description,
+    metadataBase: new URL(process.env.BASE_URL!),
+    title: siteName,
+    description: description,
+    // --- ICONS ---
+    icons: {
+      icon: "/favicon.ico",
+      shortcut: "/favicon-16x16.png",
+      apple: "/apple-touch-icon.png",
+    },
+
+    // --- SEO & CRAWLERS ---
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        en: "/en",
+        ar: "/ar",
+        "x-default": `/${i18nAppConfig.defaultLocale}`,
+      },
+    },
+
     openGraph: {
-      siteName: title,
-      title,
-      description,
+      title: siteName,
+      description: description,
+      url: "/",
+      siteName: siteName,
+
+      images: [
+        {
+          url: "/og_image.png",
+          width: 1200,
+          height: 630,
+          alt: `Logo for ${siteName}`,
+        },
+      ],
+      locale: locale,
       type: "website",
-      url: process.env.BASE_URL,
-      locale,
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: siteName,
+      description: description,
+      images: ["/og-image.png"],
     },
   };
 }
+
 export function generateStaticParams() {
   return i18nAppConfig.locales.map((locale) => ({ locale }));
 }

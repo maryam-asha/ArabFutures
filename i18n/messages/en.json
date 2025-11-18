@@ -12,7 +12,6 @@
     "loadErrorTitile": "Failed to Load Content",
     "loadErrorDescription": "The requested data could not be retrieved from the server. Please try again.",
     "reload": "Reload",
-
     "actions": {
       "title": "Actions",
       "add": "Add New",
@@ -193,8 +192,20 @@
   },
   "Public": {
     "metadata": {
-      "title": "Arab Futures Society",
-      "description": "Exploring and shaping the future of the Arab world through foresight and collaborative knowledge."
+      "siteName": "Arab Futures Society",
+      "description": "Exploring and shaping the future of the Arab world through foresight, research, and collaborative projects on key societal transformations.",
+      "home": {
+        "title": "Arab Futures Society: Shaping Tomorrow's Dialogue",
+        "description": "A pioneering initiative dedicated to building a comprehensive, multilingual glossary of future-focused terms and concepts for the Arab region. Join us in defining the future."
+      },
+      "contact": {
+        "title": "Contact Us",
+        "description": "Get in touch with the Arab Futures Society. We are open to collaborations, speaking engagements, and inquiries about our work and mission."
+      },
+      "terms": {
+        "title": "Explore the Glossary",
+        "description": "Browse, search, and discover a comprehensive glossary of future-focused terms and their meanings in both Arabic and English."
+      }
     },
     "nav": {
       "home": "Home",
@@ -203,13 +214,16 @@
       "about": "About Us",
       "projects": "Lexicon",
       "blogs": "Blogs",
-      "contact": "Contact"
+      "contact": "Contact",
+
+      "change-language-sr": "Change language",
+      "menu-sr": "Menu"
     },
     "hero": {
       "title": "Arab Futures Society",
       "slogan": "A collective of Arab futurists, foresight practitioners, and researchers united by one goal: to ensure Arab futures are imagined, shaped, and owned by Arabs.",
       "ctaPrimary": "Join the Society",
-      "ctaSecondary": "Explore the Lexicon"
+      "ctaSecondary": "Join Our Newsletter"
     },
     "ourWork": {
       "title": "What We Do",
@@ -243,7 +257,7 @@
     },
     "about": {
       "title": "About Us",
-      "p1": "We exist to build a foresight ecosystem that speaks our language, reflects our diversity, and reclaims our agency in shaping tomorrow. Rooted in our shared culture yet connected globally, we bridge scholarship, movement, and practice to build capacities, cultivate thought leadership, and democratise access to futures thinking.{br} We believe foresight is not only a discipline but a cultural right: the right to imagine futures on our own terms.",
+      "p1": "We exist to build a foresight ecosystem that speaks our language, reflects our diversity, and reclaims our agency in shaping tomorrow. Rooted in our shared culture yet connected globally, we bridge scholarship, movement, and practice to build capacities, cultivate thought leadership, and democratise access to futures thinking.<br></br> We believe foresight is not only a discipline but a cultural right: the right to imagine futures on our own terms.",
       "breakoutTitle": "Our Driving Force",
       "breakoutDescription": "We aspire to make foresight equitable and connected, accessible to all and reflective of our shared humanity. are guided by an Arab ethos of trust, humility, and courage before the unknown, acting with clarity even amid uncertainty.",
       "valuesTitle": "Our Values",

@@ -8,9 +8,9 @@ export default async function AboutSection() {
     <section id="about" className="scroll-mt-36">
       <div className="container mx-auto space-y-8 md:space-y-16 lg:space-y-24">
         {/* --- Original About Intro --- */}
-        <div className="flex text-center md:text-left items-center rtl:text-center">
-          <h1 className="text-5xl font-bold me-8">{t("title")}</h1>
-          <p className="text-lg text-muted-foreground">{t("p1", { br: "\n" })}</p>
+        <div className="block lg:flex text-center md:text-left items-center rtl:text-center">
+          <h1 className="text-5xl font-bold me-8 min-w-48">{t("title")}</h1>
+          <p className="text-lg text-muted-foreground">{t.rich("p1", { br: () => <br /> })}</p>
         </div>
 
         {/* --- Original Values Section --- */}
