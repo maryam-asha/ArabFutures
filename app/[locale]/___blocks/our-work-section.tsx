@@ -12,7 +12,7 @@ export default async function OurWorkSection() {
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-4 space-y-4">
           {features.map((feature: any, index: number) => (
-            <div key={index} className="bg-muted/50 flex flex-col rounded-2xl overflow-hidden col-span-1 justify-self-auto sm:last:col-span-2 sm:last:justify-self-center">
+            <div key={index} className="bg-muted/50 flex flex-col rounded-2xl overflow-hidden">
               <div className="p-8">
                 <span className="text-primary  text-sm font-semibold">{feature.label}</span>
                 <h3 className="text-3xl font-bold mt-4 mb-2">{feature.heading}</h3>
