@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/dashboard/", "/setup-admin/"], // Block crawlers from admin areas
+      disallow: ["/dashboard/", "/setup-admin/"],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };

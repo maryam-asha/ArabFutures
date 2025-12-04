@@ -14,6 +14,7 @@ import { BulkAction } from "./data-table.type";
 export function BulkActionMenuItem<TData>({ table, pkColumn, label, action, actionType, isDestructive }: BulkAction & { table: Table<TData>; pkColumn: keyof TData }) {
   const tDialog = useTranslations("Dashboard.dialogs");
   const tCommon = useTranslations("Common");
+  const tActions = useTranslations("Common.actions");
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -38,21 +39,25 @@ export function BulkActionMenuItem<TData>({ table, pkColumn, label, action, acti
             }
             table.resetRowSelection();
             router.refresh();
-            return result.message || tCommon("actionSuccess");
+            return tCommon(result.message as any) || tCommon("actionSuccess");
           }
           throw new Error(result.message || tCommon("actionError"));
         },
-        error: (error: Error) => error.message,
+        error: (error: Error) => {
+          return tCommon(error.message as any) || tCommon("actionError");
+        },
       });
     });
   };
+
+  const actionLabel = tActions(label as any);
 
   if (isDestructive) {
     return (
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <DropdownMenuItem className="text-destructive focus:bg-destructive/10" onSelect={(e) => e.preventDefault()} disabled={isPending}>
-            {label}
+            {actionLabel}
           </DropdownMenuItem>
         </AlertDialogTrigger>
         <AlertDialogContent>
@@ -63,7 +68,7 @@ export function BulkActionMenuItem<TData>({ table, pkColumn, label, action, acti
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isPending}>{tCommon("actions.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleAction} className="bg-destructive hover:bg-destructive/90" disabled={isPending}>
-              {isPending ? tCommon("deleting") : tCommon("actions.delete")}
+              {isPending ? tCommon("deleting") : tActions("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -73,7 +78,7 @@ export function BulkActionMenuItem<TData>({ table, pkColumn, label, action, acti
 
   return (
     <DropdownMenuItem onClick={handleAction} disabled={isPending}>
-      {label}
+      {actionLabel}
     </DropdownMenuItem>
   );
 }

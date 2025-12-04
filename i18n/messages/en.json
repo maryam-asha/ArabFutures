@@ -2,175 +2,163 @@
   "Common": {
     "loading": "Loading...",
     "saving": "Saving...",
-    "processing": "Processing...",
     "deleting": "Deleting...",
-    "actionSuccess": "Action completed successfully.",
-    "actionError": "An unexpected error occurred.",
+    "processing": "Processing...",
     "notAvailable": "N/A",
     "yes": "Yes",
     "no": "No",
-    "loadErrorTitile": "Failed to Load Content",
-    "loadErrorDescription": "The requested data could not be retrieved from the server. Please try again.",
+    "loadError": "Failed to load data. Please try again.",
+    "actionSuccess": "Action completed successfully.",
+    "actionError": "An error occurred.",
     "reload": "Reload",
+    "loadErrorTitle": "Something Went Wrong",
+    "loadErrorDescription": "We couldn't load the requested data. Please try reloading the page.",
+    "unexpectedError": "An unexpected server error occurred. Please try again.",
+    "deleteSuccess": "Item deleted successfully.",
+    "bulkDeleteSuccess": "Selected items deleted successfully.",
+    "noItemsSelected": "No items selected to perform action.",
+    "updateSuccess": "Items updated successfully.",
     "actions": {
       "title": "Actions",
       "add": "Add New",
       "edit": "Edit",
       "delete": "Delete",
+      "cancel": "Cancel",
       "create": "Create",
       "save": "Save Changes",
-      "cancel": "Cancel",
-      "submit": "Submit",
-      "reset": "Reset",
-      "approve": "Approve",
-      "pending": "Pending",
-      "reject": "Reject",
       "review": "Review",
-      "view": "View",
-      "pend": "Set to Pending",
-      "feature": "Feature",
-      "unfeature": "Unfeature",
+      "approve": "Approve",
+      "reject": "Reject",
+      "close": "Close",
       "openMenu": "Open menu",
-      "close": "Close"
+      "view": "View"
+    }
+  },
+  "Validation": {
+    "validationFailed": "Validation failed. Please check the fields for errors.",
+    "nameRequired": "Name is required.",
+    "emailInvalid": "Please enter a valid email address.",
+    "messageMinLength": "Message must be at least {min} characters long."
+  },
+  "Email": {
+    "contactSubject": "New Contact Form Submission from {name}",
+    "contactTitle": "New Contact Form Submission",
+    "contactIntro": "You have received a new message from your website's contact form.",
+    "name": "Name",
+    "email": "Email",
+    "message": "Message"
+  },
+  "Public": {
+    "metadata": {
+      "siteName": "Arab Futures Society",
+      "description": "A collaborative platform for translating and contextualizing key global terms into Arabic.",
+      "contact": {
+        "title": "Contact Us",
+        "description": "Get in touch with the Arab Futures Society team."
+      },
+      "terms": {
+        "title": "Explore Terms",
+        "description": "Browse the full glossary of translated and contextualized terms."
+      }
+    },
+    "nav": {
+      "home": "Home",
+      "about": "About Us",
+      "work": "Our Work",
+      "projects": "Projects",
+      "contact": "Contact",
+      "menu-sr": "Toggle main menu",
+      "change-language-sr": "Change language"
+    },
+    "hero": {
+      "title": "Arab Futures Society",
+      "slogan": "Translating tomorrow's conversations into today's Arabic dialogue.",
+      "ctaPrimary": "Suggest a New Term",
+      "ctaSecondary": "Join Newsletter"
+    },
+    "contact": {
+      "title": "Get in Touch",
+      "description": "We’d love to hear from you. Whether you have a question, a proposal, or just want to say hello, our team is ready to answer all your questions.",
+      "whyConnectTitle": "Why Connect With Us?",
+      "reasons": {
+        "collaborate": {
+          "title": "Collaborate on a Project",
+          "description": "We are always open to new ideas and partnerships."
+        },
+        "learn": {
+          "title": "Learn More About Our Work",
+          "description": "Ask us anything about our mission and methodology."
+        },
+        "speak": {
+          "title": "Speaking Engagements",
+          "description": "Invite our experts to speak at your events."
+        },
+        "join": {
+          "title": "Join Our Community",
+          "description": "Find out how you can contribute to our mission."
+        }
+      },
+      "contactInfoTitle": "Contact Information",
+      "emailAddress": "infor@yourdomain.com",
+      "socialTitle": "Follow Us",
+      "formTitle": "Send Us a Message",
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "sendMessage": "Send Message",
+      "successMessage": "Your message has been sent successfully!",
+      "errorMessage": "Sorry, there was an issue sending your message. Please try again."
+    },
+    "newsletter": {
+      "title": "Stay Updated",
+      "description": "Subscribe to our newsletter to get the latest updates on our projects and research.",
+      "placeholder": "Enter your email...",
+      "cta": "Subscribe",
+      "subscribeSuccess": "Thank you for subscribing!",
+      "alreadySubscribed": "You are already subscribed.",
+      "tooManyRequests": "Too many requests. Please try again later.",
+      "genericError": "An error occurred. Please try again."
+    },
+    "signin": {
+      "errors": {
+        "invalidCredentials": "Invalid username or password.",
+        "rateLimit": "Too many attempts. Please try again later.",
+        "genericAuthError": "An authentication error occurred. Please check your credentials."
+      }
+    },
+    "featuredTerms": {
+      "noTerms": "Could not load featured terms at this time."
     }
   },
   "Dashboard": {
     "home": "Home",
     "overview": "Overview",
-    "profile": {
-      "myAccount": "My Account",
-      "settings": "Settings",
-      "billing": "Billing",
-      "manageTeam": "Manage Team",
-      "customization": "Customization",
-      "addTeam": "Add New Team",
-      "logout": "Logout"
-    },
     "sidebar": {
-      "title": "Sidebar Navigation",
-      "description": "Main navigation links for the dashboard.",
+      "title": "Sidebar",
+      "description": "Main navigation for the dashboard.",
       "toggle": "Toggle sidebar",
       "overview": "Overview",
       "contentManagement": "Content Management",
       "terms": "Terms",
       "termCategories": "Categories",
       "tags": "Tags",
-      "approvals": "Approvals",
-      "reviews": "Reviews"
+      "reviews": "Reviews",
+      "approvals": "Approvals"
     },
-    "pages": {
-      "home": {
-        "title": "Dashboard",
-        "welcome": "Welcome back! Here's a summary of your knowledge base.",
-        "totalTerms": "Total Terms",
-        "totalTermsDesc": "All terms in the system.",
-        "publishedTerms": "Published Terms",
-        "publishedTermsDesc": "Terms visible to the public.",
-        "pendingSuggestions": "Pending Suggestions",
-        "pendingSuggestionsDesc": "New terms awaiting approval.",
-        "recentActivity": "Recent Activity",
-        "recentActivityDesc": "The latest terms added to the system.",
-        "noRecentActivity": "No recent terms have been added.",
-        "quickActions": "Quick Actions",
-        "addTerm": "Add New Term",
-        "addCategory": "Add New Category",
-        "dataToBePopulated": "Data will be populated here."
-      },
-      "terms": {
-        "title": "Terms",
-        "addTitle": "Add New Term",
-        "addDescription": "Create a new lexicographical term with all its translations and details.",
-        "editTitle": "Edit Term",
-        "editDescription": "You are editing the term: {entityName}",
-        "reviewAlertTitle": "Reviewing Submission",
-        "reviewAlertDescription": "A user has suggested an improvement for this term. Please review the suggestion below. To approve, manually apply the changes to the form fields and then click 'Save & Approve'. Alternatively, you can reject the suggestion directly."
-      },
-      "categories": {
-        "title": "Term Categories",
-        "addTitle": "Add New Category",
-        "addDescription": "Create a new category to organize terms.",
-        "editTitle": "Edit Category",
-        "editDescription": "You are editing the category: {entityName}"
-      },
-      "tags": {
-        "title": "Tags",
-        "addTitle": "Add New Tag",
-        "addDescription": "Create a new tag to associate with terms.",
-        "editTitle": "Edit Tag",
-        "editDescription": "You are editing the tag: {entityName}"
-      },
-      "reviews": {
-        "title": "Community Reviews",
-        "pendingTitle": "Pending Submissions",
-        "pendingDescription": "Review, approve, or reject changes suggested by the community."
-      }
-    },
-    "forms": {
-      "labels": {
-        "name": "Name",
-        "title": "Title",
-        "status": "Status",
-        "active": "Active",
-        "inactive": "Inactive",
-        "featured": "Featured",
-        "category": "Category",
-        "tags": "Tags",
-        "visibility": "Visibility",
-        "organization": "Organization",
-        "briefDescription": "Brief Description",
-        "fullDescription": "Full Description",
-        "references": "References",
-        "addReference": "Add Reference",
-        "referenceContent": "Content / Title",
-        "referenceUrl": "URL",
-        "defaultTranslations": "Default Translations",
-        "moreTranslations": "More Translations (Optional)",
-        "addTranslation": "Add Translation",
-        "localeIdentifier": "Locale Identifier",
-        "SuggestedChange": "Suggested Change",
-        "explanation": "explanation"
-      },
-      "placeholders": {
-        "search": "Search...",
-        "select": "Select...",
-        "selectCategory": "Select a category",
-        "selectTags": "Select one or more tags",
-        "selectStatus": "Select a status"
-      },
-      "statuses": {
-        "published": "Published",
-        "pending": "Pending",
-        "has-pending-review": "Has Review",
-        "rejected": "Rejected"
-      },
-      "helpers": {
-        "defaultTranslations": "The required English and Arabic versions of the term.",
-        "moreTranslations": "Add alternative translations, such as latinized Arabic or other languages.",
-        "noExtraTranslations": "No additional translations provided."
-      }
-    },
-    "tables": {
-      "headers": {
-        "termName": "Term Name",
-        "field": "Field",
-        "suggestedChange": "Suggested Change",
-        "explanation": "Explanation",
-        "category": "Category",
-        "tags": "Tags",
-        "status": "Status",
-        "featured": "Featured"
-      },
-      "noResults": "No results found.",
-      "selectedRows": "{count, plural, =0 {No rows selected.} =1 {1 row selected.} other {# rows selected.}} of {total}",
-      "rowsPerPage": "Rows per page",
-      "pageIndicator": "Page {page} of {totalPages}",
-      "selectAll": "Select all"
+    "profile": {
+      "myAccount": "My Account",
+      "settings": "Settings",
+      "billing": "Billing",
+      "manageTeam": "Manage Team",
+      "customization": "Customization",
+      "addTeam": "Add Team",
+      "logout": "Log Out"
     },
     "dialogs": {
       "areYouSure": "Are you absolutely sure?",
       "noUndo": "This action cannot be undone.",
       "confirmDelete": "This will permanently delete the selected {entityName}.",
-      "confirmBulkDelete": "This will permanently delete the {count, plural, =1 {1 selected item} other {# selected items}}.",
+      "confirmBulkDelete": "This will permanently delete the {count, plural, =1 {selected item} other {{count} selected items}}.",
       "deletePermanently": "Yes, delete permanently"
     },
     "toasts": {
@@ -178,260 +166,14 @@
       "deleteError": "Failed to delete {entityName}.",
       "approveSuccess": "{entityName} approved successfully.",
       "approveError": "Failed to approve {entityName}.",
-      "rejectSuccess": "{entityName} rejected successfully.",
-      "rejectError": "Failed to reject {entityName}.",
-      "processing": "Processing...",
-      "approving": "Approving...",
-      "bulkUpdateSuccess": "Items updated successfully.",
-      "noItemsSelected": "No items were selected.",
-      "reviewApproved": "Review approved and changes applied.",
-      "reviewRejected": "Review rejected.",
-      "reviewNotFound": "Review not found or already resolved.",
-      "termNotFound": "Associated term not found."
-    }
-  },
-  "Public": {
-    "metadata": {
-      "siteName": "Arab Futures Society",
-      "description": "Exploring and shaping the future of the Arab world through foresight, research, and collaborative projects on key societal transformations.",
-      "home": {
-        "title": "Arab Futures Society: Shaping Tomorrow's Dialogue",
-        "description": "A pioneering initiative dedicated to building a comprehensive, multilingual glossary of future-focused terms and concepts for the Arab region. Join us in defining the future."
-      },
-      "contact": {
-        "title": "Contact Us",
-        "description": "Get in touch with the Arab Futures Society. We are open to collaborations, speaking engagements, and inquiries about our work and mission."
-      },
-      "terms": {
-        "title": "Explore the Glossary",
-        "description": "Browse, search, and discover a comprehensive glossary of future-focused terms and their meanings in both Arabic and English."
-      }
+      "rejectSuccess": "Suggestion has been rejected.",
+      "rejectError": "Failed to reject suggestion."
     },
-    "nav": {
-      "home": "Home",
-      "vision": "Vision",
-      "work": "Our Work",
-      "about": "About Us",
-      "projects": "Lexicon",
-      "blogs": "Blogs",
-      "contact": "Contact",
-
-      "change-language-sr": "Change language",
-      "menu-sr": "Menu"
-    },
-    "hero": {
-      "title": "Arab Futures Society",
-      "slogan": "A collective of Arab futurists, foresight practitioners, and researchers united by one goal: to ensure Arab futures are imagined, shaped, and owned by Arabs.",
-      "ctaPrimary": "Join the Society",
-      "ctaSecondary": "Join Our Newsletter"
-    },
-    "ourWork": {
-      "title": "What We Do",
-      "features": [
-        {
-          "label": "Contextualization",
-          "heading": "Foresight for the Arab Context",
-          "description": "Localizing foresight tools and frameworks to align with Arab contexts, mindsets, and languages."
-        },
-        {
-          "label": "Research & Culture",
-          "heading": "Exploring Cultural & Social Futures",
-          "description": "Researching cultural and social futures, amplifying local narratives of change and advancing Arab cultural and contextual foresight."
-        },
-        {
-          "label": "Capacity Building",
-          "heading": "Empowering Through Training & Education",
-          "description": "Building capacity through training, education, and collaboration across sectors."
-        },
-        {
-          "label": "Advisory & Guidance",
-          "heading": "Consulting for Future-Oriented Action",
-          "description": "Consulting and speaking to guide institutions, policymakers, and innovators toward future-oriented action."
-        },
-        {
-          "label": "Community & Awareness",
-          "heading": "Fostering a Regional Foresight Community",
-          "description": "Spreading awareness to promote futures literacy and expand regional participation through fostering a vibrant, connected foresight community."
-        }
-      ]
-    },
-    "about": {
-      "title": "About Us",
-      "p1": "We exist to build a foresight ecosystem that speaks our language, reflects our diversity, and reclaims our agency in shaping tomorrow. Rooted in our shared culture yet connected globally, we bridge scholarship, movement, and practice to build capacities, cultivate thought leadership, and democratise access to futures thinking.<br></br> We believe foresight is not only a discipline but a cultural right: the right to imagine futures on our own terms.",
-      "breakoutTitle": "Our Driving Force",
-      "breakoutDescription": "We aspire to make foresight equitable and connected, accessible to all and reflective of our shared humanity. are guided by an Arab ethos of trust, humility, and courage before the unknown, acting with clarity even amid uncertainty.",
-      "valuesTitle": "Our Values",
-      "values": {
-        "ParticipatoryAndInclusive": {
-          "label": "Inclusion & Collective Ownership",
-          "value": "We are participatory, fostering inclusion and collective ownership of the future."
-        },
-        "UpholdingAgency": {
-          "label": "Empowerment & Agency",
-          "value": "We uphold agency, empowering individuals and institutions to shape their own trajectories."
-        },
-        "ChampioningRepresentation": {
-          "label": "Authentic Arab Representation",
-          "value": "We champion representation, so Arab futures are told by Arab voices."
-        },
-        "impaPioneeringAndAdaptivect": {
-          "label": "Pioneering & Future-Focused",
-          "value": "We are pioneering, driven to challenge, adapt, and create what our region needs."
-        }
-      },
-      "vision": {
-        "title": "Our Vision",
-        "text": "A future where the Arab world is a global leader in innovation, culture, and sustainable development, driven by the foresight and creativity of its people."
-      },
-      "mission": {
-        "title": "Our Mission",
-        "text": "To cultivate a foresight culture across the Arab region by providing accessible knowledge, fostering collaborative networks, and initiating impactful future-oriented projects."
-      }
-    },
-    "projects": {
-      "title": "Our Flagship Project: The Lexicon",
-      "viewProject": "View Project",
-      "features": [
-        {
-          "id": "lexicon-project",
-          "heading": "The Arab Futures Lexicon",
-          "subheading": "The first regional effort to unify and evolve the language of foresight in Arabic",
-          "label": "",
-          "description": "For decades, futures terminology has been scattered across translations, institutions, and publications, creating fragmentation and barriers for researchers, policymakers, and educators. This initiative addresses that gap by creating a living, collaborative, and authoritative reference for Arabic foresight terminology. It serves as both a knowledge base and a community platform, where experts and contributors work together to shape the evolving language of Arab futures.",
-          "image": "/future-foresight-terms-project.jpg",
-          "url": "/terms"
-        }
-      ]
-    },
-    "friends": {
-      "title": "Friends & Partners",
-      "yourLogoAlt": "Your Logo",
-      "partnerLogoAlt": "Partner Logo {number}"
-    },
-    "toasts": {
-      "loadError": "Failed to load more terms."
-    },
-    "featuredTerms": {
-      "title": "All Terms",
-      "description": "Explore our curated collection of key concepts and ideas.",
-      "suggestTerm": "Suggest a Term",
-      "viewAll": "View All Terms",
-      "searchPlaceholder": "Search for a term...",
-      "loadMore": "Load More",
-      "errorTitle": "Could Not Load Featured Terms",
-      "errorDescription": "We're having trouble connecting to the database right now. Please try again in a few moments."
-    },
-    "termCard": {
-      "readMore": "Read More",
-      "noDescription": "No description available."
-    },
-    "termDialog": {
-      "termDetails": "Term Details",
-      "fullDescription": "Full Description",
-      "tags": "Tags",
-      "references": "References",
-      "otherTranslations": "Other Translations",
-      "suggestEdit": "Suggest an Edit",
-      "suggestImprovement": "Suggest an alternative translation",
-      "suggestionDisclaimer": "See something wrong? Help us improve it."
-    },
-    "reviewDialog": {
-      "title": "Suggest an Improvement",
-      "description": "Your valuable feedback helps us maintain accuracy. Please describe your suggested change and provide an explanation or references if possible.",
-      "suggestionLabel": "Your Suggestion",
-      "suggestionPlaceholder": "Describe the change you'd like to see. For example, correct a typo, add more detail, or clarify a definition.",
-      "explanationLabel": "Reason for Change (Optional)",
-      "explanationPlaceholder": "Briefly explain why this change is needed.",
-      "submitButton": "Submit Suggestion"
-    },
-    "suggestDialog": {
-      "title": "Suggest a New Term",
-      "description": "Contribute to the knowledge base by suggesting a new term. Your submission will be reviewed by our team.",
-      "categoryLabel": "Category",
-      "categoryPlaceholder": "Select the most relevant category",
-      "nameLabel": "Term Name",
-      "fullDescritpionLabel": "Full Description",
-      "submitButton": "Submit for Review"
-    },
-    "signin": {
-      "title": "Sign In",
-      "description": "Welcome back! Please enter your credentials to access the dashboard.",
-      "username": "Username",
-      "usernamePlaceholder": "Enter your username",
-      "password": "Password",
-      "passwordPlaceholder": "Enter your password",
-      "rememberMe": "Remember me",
-      "forgotPassword": "Forgot password?",
-      "cta": "Sign In",
-      "showPassword": "Show password",
-      "hidePassword": "Hide password"
-    },
-    "contact": {
-      "title": "Get in Touch",
-      "description": "We'd love to hear from you. Whether you have a question, a proposal, or just want to say hello, feel free to reach out.",
-      "whyConnectTitle": "Why Connect With Us?",
-      "reasons": {
-        "collaborate": { "title": "Collaborate on Research", "description": "Partner with us on exploring a specific future-focused topic." },
-        "learn": { "title": "Learn More", "description": "Inquire about our methodologies and upcoming publications." },
-        "speak": { "title": "Speaking Engagements", "description": "Invite us to speak at your event or organization." },
-        "join": { "title": "Join the Community", "description": "Find out how you can become a contributing member." }
-      },
-      "contactInfoTitle": "Contact Information",
-      "emailAddress": "contact@arabfutures.org",
-      "socialTitle": "Follow Us",
-      "formTitle": "Send us a Message",
-      "name": "Name",
-      "email": "Email",
-      "message": "Message",
-      "sendMessage": "Send Message",
-      "successMessage": "Your message has been sent!",
-      "errorMessage": "Failed to send message. Please try again."
-    },
-    "termsPage": {
-      "allCategories": "All",
-      "loadMore": "Load More",
-      "sort": {
-        "newest": "newest",
-        "oldest": "oldest",
-        "placeholder": "sort"
-      },
-      "searchPlaceholder": "search ...",
-      "title": "The Arab Futures Lexicon",
-      "description_1": "The Arab Futures Lexicon is the first regional effort to unify and evolve the language of foresight in Arabic.",
-      "description_2": "For decades, futures terminology has been scattered across translations, institutions, and publications, creating fragmentation and barriers for researchers, policymakers, and educators.",
-      "description_3": "This initiative addresses that gap by creating a living, collaborative, and authoritative reference for Arabic foresight terminology. It serves as both a knowledge base and a community platform, where experts and contributors work together to shape the evolving language of Arab futures.",
-      "why_it_matters": {
-        "title": "Why It Matters",
-        "intro": "Language shapes imagination, and imagination shapes the future.",
-        "subtitle": "By developing a shared, contextually rooted lexicon, we are:",
-        "points": [
-          "Enabling regional foresight capacity: Scholars, practitioners, and institutions gain a unified reference, reducing duplication and confusion.",
-          "Strengthening cultural sovereignty: The Arab world develops its own conceptual vocabulary of futures, independent yet globally connected.",
-          "Democratizing access to foresight: Translators, students, and emerging futurists gain free access to knowledge once locked in academic silos.",
-          "Preserving and evolving the Arabic language: Ensuring Arabic remains a language capable of leading global conversations about the future."
-        ]
-      },
-      "what_makes_it_different": {
-        "title": "What Makes It Different",
-        "points": [
-          "Collaborative design: Experts and contributors across the Arab world can suggest, debate, and refine terminology.",
-          "Rigorous methodology: Every translation is annotated, sourced, and reviewed for contextual precision.",
-          "Open access: The platform will remain free and public, embodying our mission to democratize foresight knowledge.",
-          "Scalable foundation: Future versions will include sectoral lexicons (e.g., climate, AI, governance) and bilingual search capabilities."
-        ]
-      },
-      "exploreTitle": "Explore the Terms",
-      "exploreDescription": "Search for specific terms, filter by category, and sort by date to find the information you need."
-    },
-    "newsletter": {
-      "title": "Stay Ahead of the Curve",
-      "description": "Join our newsletter to receive the latest updates, articles, and insights directly in your inbox. No spam, just valuable information.",
-      "placeholder": "Enter your email address",
-      "cta": "Subscribe",
-      "subscribeSuccess": "Thank you for subscribing! Please check your inbox to confirm.",
-      "alreadySubscribed": "You are already subscribed to our newsletter!",
-      "tooManyRequests": "Too many requests. Please try again in a moment.",
-      "genericError": "Something went wrong. Could not subscribe at this time."
+    "statuses": {
+      "published": "Published",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "has_pending_review": "Has Pending Review"
     }
   }
 }

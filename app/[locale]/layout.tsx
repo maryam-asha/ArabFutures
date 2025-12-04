@@ -38,14 +38,13 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     metadataBase: new URL(process.env.BASE_URL!),
     title: siteName,
     description: description,
-    // --- ICONS ---
+
     icons: {
       icon: "/favicon.ico",
       shortcut: "/favicon-16x16.png",
       apple: "/apple-touch-icon.png",
     },
 
-    // --- SEO & CRAWLERS ---
     robots: {
       index: true,
       follow: true,

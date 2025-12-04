@@ -95,11 +95,16 @@ export const approvalColumns: ColumnDef<TermDb>[] = [
       const t = useTranslations("Dashboard.forms.labels");
       return <div>{t("status")}</div>;
     },
-    cell: ({ row }) => (
-      <Badge variant="outline" className="capitalize">
-        {row.original.status}
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      const tStatus = useTranslations("Dashboard.status");
+      const status = row.original.status;
+
+      return (
+        <Badge variant="outline" className="capitalize">
+          {tStatus(status)}
+        </Badge>
+      );
+    },
   },
   {
     id: "actions",

@@ -1,4 +1,4 @@
-import { loadMoreTermsAction } from "@app/public-actions";
+import { loadMoreTermsAction } from "@app/[locale]/public-actions";
 import { findActiveCategoryOptions } from "@root/dal/termCategories-dx";
 import { AppLocale } from "@root/i18n/config";
 import { SearchParamsProps } from "@root/types";

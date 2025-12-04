@@ -1,8 +1,8 @@
 "use client";
 
+import { submitReviewAction } from "@app/[locale]/public-actions";
 import { useReactiveCsrf } from "@app/dashboard/___blocks/csrf-provider-client";
 import { ReferencesField } from "@app/dashboard/___blocks/references-field";
-import { submitReviewAction } from "@app/public-actions";
 import { Button } from "@components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@components/ui/form";

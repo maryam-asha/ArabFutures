@@ -20,14 +20,12 @@ function moveItemToFront(arr: typeof navLinks, prop: keyof (typeof navLinks)[0],
   const itemIndex = arr.findIndex((item) => item[prop] === value);
 
   if (itemIndex > -1) {
-    // 1. Remove the item from its current position
     const [itemToMove] = arr.splice(itemIndex, 1);
 
-    // 2. Insert the item at the beginning
     arr.unshift(itemToMove);
   }
 
-  return arr; // Return the modified array
+  return arr;
 }
 
 const Navbar = () => {

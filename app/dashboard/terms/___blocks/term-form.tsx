@@ -89,7 +89,6 @@ export function TermForm({ initialData, categories, tags, children }: TermFormPr
   }, [state, setError, setCsrfToken]);
 
   const tagOptions = tags.map((t) => ({ value: t.tagId, label: t.name }));
-
   return (
     <Form {...form}>
       <form action={formAction}>

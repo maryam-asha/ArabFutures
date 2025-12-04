@@ -1,6 +1,6 @@
 "use client";
 
-import { loadMoreTermsAction } from "@app/public-actions";
+import { loadMoreTermsAction } from "@app/[locale]/public-actions";
 import { AppLocale } from "@i18n/config";
 import { cn } from "@lib/utils";
 import { TermCategoryOption, TermDb } from "@root/dal/dal.types";

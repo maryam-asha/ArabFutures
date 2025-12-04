@@ -19,13 +19,11 @@ function SigninForm() {
 
   return (
     <form className="space-y-4" action={formAction}>
-      {/* Username */}
       <div className="space-y-1">
         <Label htmlFor="username">{t("username")}</Label>
         <Input type="text" id="username" placeholder={t("usernamePlaceholder")} name="username" />
       </div>
 
-      {/* Password */}
       <div className="w-full space-y-1">
         <Label htmlFor="password">{t("password")}</Label>
         <div className="relative">
@@ -37,7 +35,6 @@ function SigninForm() {
         </div>
       </div>
 
-      {/* Remember Me and Forgot Password */}
       <div className="flex items-center justify-between gap-y-2">
         <div className="flex items-center gap-3">
           <Checkbox id="rememberMe" />
@@ -52,14 +49,14 @@ function SigninForm() {
 
       <SubmitButton isEditMode={false} createText={t("cta")} pendingText={tCommon("saving")} />
 
-      {state?.error && <p className="text-sm text-destructive text-center">{state.error}</p>}
+      {state?.error && <p className="text-sm text-destructive text-center">{t(state.error as any)}</p>}
     </form>
   );
 }
 
 export default function SigninPage() {
   const t = useTranslations("Public.signin");
-  const commonT = useTranslations("Common");
+  const tCommon = useTranslations("Common");
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -70,7 +67,7 @@ export default function SigninPage() {
   }, []);
 
   if (isLoading || !csrfToken) {
-    return <div className="w-full max-w-md text-center text-gray-500">{commonT("loading")}</div>;
+    return <div className="w-full max-w-md text-center text-gray-500">{tCommon("loading")}</div>;
   }
 
   return (

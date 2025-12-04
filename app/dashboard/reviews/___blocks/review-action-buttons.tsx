@@ -5,13 +5,13 @@ import { FormPageActions, FormPageSubmitButton } from "@app/dashboard/___blocks/
 import { rejectReviewAction } from "@app/dashboard/reviews/actions";
 import { Button } from "@components/ui/button";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
 function ReviewActionButtons({ reviewId }: { reviewId: number }) {
   const t = useTranslations();
-  const router = useRouter();
+  const tCommon = useTranslations("Common");
+  const tToasts = useTranslations("Dashboard.toasts");
   const { csrfToken } = useReactiveCsrf();
   const [isRejecting, startRejectTransition] = useTransition();
 
@@ -22,11 +22,9 @@ function ReviewActionButtons({ reviewId }: { reviewId: number }) {
 
     startRejectTransition(() => {
       toast.promise(rejectReviewAction({} as any, formData), {
-        loading: t("Common.processing"),
-        success: (result) => {
-          return "Suggestion has been rejected.";
-        },
-        error: (err) => err.message || "Failed to reject suggestion.",
+        loading: tCommon("processing"),
+        success: () => tToasts("rejectSuccess"),
+        error: () => tToasts("rejectError"),
       });
     });
   };
@@ -34,9 +32,9 @@ function ReviewActionButtons({ reviewId }: { reviewId: number }) {
   return (
     <FormPageActions>
       <Button variant="destructive" size="lg" onClick={handleReject} disabled={isRejecting}>
-        {isRejecting ? t("Common.processing") : t("Common.actions.reject")}
+        {isRejecting ? tCommon("processing") : t("Common.actions.reject")}
       </Button>
-      <FormPageSubmitButton updateText={t("Common.actions.approve")} pendingText={t("Common.saving")} />
+      <FormPageSubmitButton updateText={t("Common.actions.approve")} pendingText={tCommon("saving")} />
     </FormPageActions>
   );
 }

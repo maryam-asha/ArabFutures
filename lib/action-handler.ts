@@ -74,7 +74,7 @@ export function createPublicAction<TInput>(schema: z.ZodSchema<TInput>, handler:
         return {
           newCsrfToken: newCsrfToken,
           success: false,
-          message: "Validation failed. Please check the fields for errors.",
+          message: "Validation.validationFailed",
           errors: z.treeifyError(parsed.error),
         };
       }
@@ -87,11 +87,22 @@ export function createPublicAction<TInput>(schema: z.ZodSchema<TInput>, handler:
 
       console.error("Server Action Error:", e);
 
-      return {
-        success: false,
-        message: (e as Error).message || "An unexpected server error occurred.",
-        errors: {} as any,
-      };
+      try {
+        const newCsrfToken = await getCsrfTokenAction();
+        return {
+          success: false,
+          message: "Common.unexpectedError",
+          errors: {} as any,
+          newCsrfToken: newCsrfToken,
+        };
+      } catch (csrfError) {
+        console.error("Failed to get new CSRF token during error handling:", csrfError);
+        return {
+          success: false,
+          message: "Common.unexpectedError",
+          errors: {} as any,
+        };
+      }
     }
   };
 }
@@ -109,7 +120,7 @@ export function createProtectedAction<TInput>(schema: z.ZodSchema<TInput>, handl
         return {
           newCsrfToken: newCsrfToken,
           success: false,
-          message: "Validation failed. Please check the fields for errors.",
+          message: "Validation.validationFailed",
           errors: z.treeifyError(parsed.error),
         };
       }
@@ -122,11 +133,23 @@ export function createProtectedAction<TInput>(schema: z.ZodSchema<TInput>, handl
       if (isRedirectError(e)) throw e;
 
       console.error("Server Action Error:", e);
-      return {
-        success: false,
-        message: (e as Error).message || "An unexpected server error occurred.",
-        errors: {} as any,
-      };
+
+      try {
+        const newCsrfToken = await getCsrfTokenAction();
+        return {
+          success: false,
+          message: "Common.unexpectedError",
+          errors: {} as any,
+          newCsrfToken: newCsrfToken,
+        };
+      } catch (csrfError) {
+        console.error("Failed to get new CSRF token during error handling:", csrfError);
+        return {
+          success: false,
+          message: "Common.unexpectedError",
+          errors: {} as any,
+        };
+      }
     }
   };
 }
@@ -139,7 +162,7 @@ export function createDeleteAction({ tableName, pkColumn, revalidatePaths }: Del
   const handler: ActionHandler<z.infer<typeof schema>> = async (data) => {
     await dbClient.delete(tableName, { [pkColumn]: data[pkColumn as keyof typeof data] });
     revalidatePaths.forEach((path) => revalidatePath(path, "layout"));
-    return { success: true, message: "Item deleted successfully." };
+    return { success: true, message: "Common.deleteSuccess" };
   };
 
   return createProtectedAction(schema, handler, createActionParser());
@@ -147,10 +170,12 @@ export function createDeleteAction({ tableName, pkColumn, revalidatePaths }: Del
 
 export function createBulkDeleteAction({ tableName, pkColumn, revalidatePaths }: DeleteActionParams) {
   const handler: ActionHandler<BulkDeleteData> = async (data) => {
-    if (data.ids.length === 0) return { success: true, message: "No items to delete." };
+    if (data.ids.length === 0) {
+      return { success: true, message: "Common.noItemsSelected" };
+    }
     await dbClient.delete(tableName, { [pkColumn]: { in: data.ids } });
     revalidatePaths.forEach((path) => revalidatePath(path, "layout"));
-    return { success: true, message: "Selected items deleted successfully." };
+    return { success: true, message: "Common.bulkDeleteSuccess" };
   };
 
   return createProtectedAction(BulkDeleteSchema, handler, createActionParser({ jsonFields: ["ids"] }));

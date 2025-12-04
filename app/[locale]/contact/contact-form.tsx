@@ -1,37 +1,42 @@
 "use client";
 
+import { contactAction } from "@app/[locale]/public-actions";
 import { useReactiveCsrf } from "@app/dashboard/___blocks/csrf-provider-client";
-import { contactAction } from "@app/public-actions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ActionState } from "@root/types";
 import { Button } from "@ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@ui/form";
 import { Input } from "@ui/input";
 import { Textarea } from "@ui/textarea";
-import { useTranslations } from "next-intl";
+import { CsrfInput } from "@waelhabbaldev/next-jwt-auth/client";
+import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import z from "zod";
 
-const ContactSchema = z.object({
-  name: z.string().min(2, "Name is required."),
-  email: z.string().email("Please enter a valid email."),
-  message: z.string().min(10, "Message must be at least 10 characters long."),
-});
-type ContactFormValues = z.infer<typeof ContactSchema>;
+import { ContactActionSchema } from "../public.schema";
 
 const initialFormState: ActionState<any> = { success: false, errors: {} as any, message: "" };
 
 export function ContactForm() {
+  const locale = useLocale();
   const [state, formAction, isPending] = useActionState(contactAction, initialFormState);
   const t = useTranslations("Public.contact");
+
   const commonT = useTranslations("Common");
+
+  const ClientContactSchema = ContactActionSchema.extend({
+    name: z.string().min(2, t("nameRequired")),
+    email: z.email(t("emailInvalid")),
+    message: z.string().min(10, t("messageMinLength", { min: 10 })),
+  });
+
   const formRef = useRef<HTMLFormElement>(null);
   const { setCsrfToken } = useReactiveCsrf();
 
-  const form = useForm<ContactFormValues>({
-    resolver: zodResolver(ContactSchema),
+  const form = useForm<z.infer<typeof ClientContactSchema>>({
+    resolver: zodResolver(ClientContactSchema),
     defaultValues: { name: "", email: "", message: "" },
   });
 
@@ -61,6 +66,23 @@ export function ContactForm() {
           })(evt);
         }}
       >
+        <CsrfInput />
+        <input type="hidden" name="locale" value={locale} />
+        <div className="hidden" aria-hidden="true">
+          <FormField
+            control={form.control}
+            name="website"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Website</FormLabel>
+                <FormControl>
+                  <Input {...field} tabIndex={-1} autoComplete="off" />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="name"

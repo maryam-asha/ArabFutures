@@ -47,7 +47,7 @@ export function FeaturedTermsSection({ terms, categories }: FeaturedTermsSection
           </div>
         ) : (
           <div className="text-center text-muted-foreground p-8 mt-8 bg-muted/50 rounded-lg">
-            <p>Could not load featured terms at this time.</p>
+            <p>{t("noTerms")}</p>
           </div>
         )}
       </div>

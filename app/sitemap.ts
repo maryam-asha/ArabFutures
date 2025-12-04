@@ -9,7 +9,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     throw new Error("BASE_URL is not defined in environment variables");
   }
 
-  // 1. Static pages (Home, Contact, etc.)
   const staticRoutes = ["", "/contact", "/terms"].flatMap((route) =>
     i18nAppConfig.locales.map((locale) => ({
       url: `${baseUrl}/${locale}${route}`,
@@ -17,12 +16,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
-  // 2. Dynamic pages (e.g., individual terms)
-  // Fetch all published terms to generate their sitemap entries
-  const { data: terms } = await findTerms({ locale: "en", status: "published", limit: 10000 }); // Fetch a large number
+  const { data: terms } = await findTerms({ locale: "en", status: "published", limit: 10000 });
   const termRoutes = terms.flatMap((term) =>
     i18nAppConfig.locales.map((locale) => ({
-      url: `${baseUrl}/${locale}/terms/${term.termId}`, // Assuming this is your URL structure
+      url: `${baseUrl}/${locale}/terms/${term.termId}`,
       lastModified: new Date(term.updatedAt),
     })),
   );

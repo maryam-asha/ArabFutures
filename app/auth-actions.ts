@@ -12,16 +12,18 @@ export async function signInAction(prevState: { error: string } | undefined, for
 
     await auth.signIn(username, password);
   } catch (error) {
-    if (error instanceof InvalidCredentialsError || error instanceof RateLimitError) {
-      return { error: error.message };
+    if (error instanceof InvalidCredentialsError) {
+      return { error: "Public.signin.errors.invalidCredentials" };
     }
-
+    if (error instanceof RateLimitError) {
+      return { error: "Public.signin.errors.rateLimit" };
+    }
     if (error instanceof AuthError) {
-      return { error: error.message };
+      return { error: "Public.signin.errors.genericAuthError" };
     }
 
     console.error("An unexpected sign-in error occurred:", error);
-    return { error: "An unexpected server error occurred. Please try again." };
+    return { error: "Common.unexpectedError" };
   }
 
   const callbackUrl = (formData.get("callbackUrl") as string) || "/dashboard";

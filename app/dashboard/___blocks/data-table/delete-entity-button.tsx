@@ -48,13 +48,15 @@ export function DeleteEntityButton({ entityId, entityName, deleteAction, onSucce
             } else {
               router.refresh();
             }
-            return result.message || tToast("deleteSuccess", { entityName });
+            // Now safely translate server message key
+            return tToast(result.message as any) || tToast("deleteSuccess", { entityName });
           } else {
             throw new Error(result.message);
           }
         },
         error: (error: Error) => {
-          return error.message || tToast("deleteError", { entityName });
+          // Also translate server error keys
+          return tToast(error.message as any) || tToast("deleteError", { entityName });
         },
       });
     });

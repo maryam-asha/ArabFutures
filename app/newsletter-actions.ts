@@ -26,7 +26,7 @@ function checkRateLimit(ip: string = "global") {
 }
 
 const NewsletterSchema = z.object({
-  email: z.string().email("Please enter a valid email address."),
+  email: z.email("Please enter a valid email address."),
 });
 type NewsletterInput = z.infer<typeof NewsletterSchema>;
 
