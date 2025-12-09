@@ -9,6 +9,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { BulkAction } from "../___blocks/data-table/data-table.type";
+import { ToastHandler } from "../___blocks/toast-handler";
 import { columns } from "./___blocks/category-table-columns";
 import { termCategoryBulkDeleteAction } from "./action";
 
@@ -35,21 +36,24 @@ export default async function TermCategoriesPage(props: TermCategoriesPageProps)
   const categoryBulkActions: BulkAction[] = [{ label: "delete", action: termCategoryBulkDeleteAction, isDestructive: true }];
 
   return (
-    <DataTablePage>
-      <DataTablePage.Header>
-        <DataTablePage.Title>{t("title")}</DataTablePage.Title>
-        <DataTablePage.Actions>
-          <Button asChild>
-            <Link href="/dashboard/term-categories/create">
-              <Plus className="w-4 h-4 me-2" />
-              {t("addTitle")}
-            </Link>
-          </Button>
-        </DataTablePage.Actions>
-      </DataTablePage.Header>
-      <DataTablePage.Table>
-        <DataTable columns={columns} data={categories} totalCount={totalCount} filterColumnId="name" bulkActions={categoryBulkActions} pkColumn="categoryId" />
-      </DataTablePage.Table>
-    </DataTablePage>
+    <>
+      <ToastHandler />
+      <DataTablePage>
+        <DataTablePage.Header>
+          <DataTablePage.Title>{t("title")}</DataTablePage.Title>
+          <DataTablePage.Actions>
+            <Button asChild>
+              <Link href="/dashboard/term-categories/create">
+                <Plus className="w-4 h-4 me-2" />
+                {t("addTitle")}
+              </Link>
+            </Button>
+          </DataTablePage.Actions>
+        </DataTablePage.Header>
+        <DataTablePage.Table>
+          <DataTable columns={columns} data={categories} totalCount={totalCount} filterColumnId="name" bulkActions={categoryBulkActions} pkColumn="categoryId" />
+        </DataTablePage.Table>
+      </DataTablePage>
+    </>
   );
 }

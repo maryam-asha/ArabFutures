@@ -4,12 +4,33 @@ import { z } from "zod";
 const TermReferenceFormSchema = z
   .object({
     content: z.string().trim().optional(),
-    url: z.url().optional(),
-  })
-  .refine((data) => !!data.content || !!data.url, {
-    message: "A reference must have content or a URL if it's not empty.",
-  });
 
+    url: z.string().trim().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.url && !data.content) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "A label or content is required when a URL is provided.",
+      path: ["content"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.url) {
+        return z.string().url().safeParse(data.url).success;
+      }
+      return true;
+    },
+    {
+      message: "Please enter a valid URL.",
+      path: ["url"],
+    },
+  );
 export const TermTranslationFormSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters."),
   briefDescription: z.string().trim().optional(),
@@ -36,10 +57,10 @@ export const TermFormSchema = z.object({
   isFeatured: z.coerce.boolean<boolean>(),
   tagIds: z.array(z.coerce.number<number>()).optional(),
   content: TermContentFormSchema,
-});
 
-export const TermSaveActionSchema = TermFormSchema.extend({
-  reviewId: z.coerce.number().optional(),
+  reviewIds: z.array(z.coerce.number<number>()).optional(),
+  // source: z.literal("reviews").optional(),
+  source: z.enum(["reviews", "approvals"]).optional(),
 });
 
 export const TermsBulkUpdateActionSchema = z.object({

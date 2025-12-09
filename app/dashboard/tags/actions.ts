@@ -2,7 +2,8 @@
 
 import { createActionParser, createBulkDeleteAction, createDeleteAction, createProtectedAction } from "@lib/action-handler";
 import { dbClient } from "@root/dal/client";
-import i18nAppConfig from "@root/i18n/config";
+import { findTagOptions, findTags } from "@root/dal/tags-dx";
+import i18nAppConfig, { AppLocale } from "@root/i18n/config";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -39,20 +40,26 @@ const tagSaveHandler = async (data: TagFormValues): Promise<TagFormState> => {
   });
 
   revalidatePath("/dashboard/tags", "layout");
-  redirect(`/dashboard/tags`);
+  const messageKey = data.tagId ? "updateSuccess" : "createSuccess";
 
-  return {
-    success: true,
-    message: `Tag successfully ${tagId ? "updated" : "created"}.`,
-  };
+  redirect(`/dashboard/tags?toast=${messageKey}&entity=tags`);
 };
 
 export const tagSaveAction = createProtectedAction(TagFormSchema, tagSaveHandler, tagActionParser);
-
 export const tagDeleteAction = createDeleteAction({
   tableName: "tags",
   pkColumn: "tagId",
   revalidatePaths: ["/dashboard/terms", "/dashboard/tags"],
 });
-
 export const tagBulkDeleteAction = createBulkDeleteAction({ tableName: "tags", pkColumn: "tagId", revalidatePaths: ["/dashboard/tags", "layout"] });
+
+export async function getTagsAction(props: Parameters<typeof findTags>[0]) {
+  return findTags(props);
+}
+
+/**
+ * Action to fetch all tags for use in form multi-select components.
+ */
+export async function getTagOptionsAction(locale: AppLocale) {
+  return findTagOptions(locale);
+}

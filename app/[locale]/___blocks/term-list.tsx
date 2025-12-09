@@ -101,16 +101,13 @@ export function TermList({ initialTerms, categories, initialQuery, initialCatego
 
   return (
     <>
-      {/* --- FILTER CONTROLS --- */}
       <div className="flex flex-col md:flex-row items-center gap-4 mt-12">
         <div className="relative grow w-full">
           <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground rtl:left-auto rtl:right-4" />
           <Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t("searchPlaceholder")} className="w-full text-lg h-14 pl-12 rtl:pl-4 rtl:pr-12 rounded-full shadow-sm" disabled={isFiltering} />
         </div>
         <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as "newest" | "oldest")} disabled={isFiltering}>
-          {" "}
-          {/* FIX: Disable during transition */}
-          <SelectTrigger className="w-full md:w-[180px] h-14 rounded-full text-lg shadow-sm">
+          <SelectTrigger className="w-full md:w-[180px] h-14 rounded-full text-lg shadow-sm p-6">
             <SelectValue placeholder={t("sort.placeholder")} />
           </SelectTrigger>
           <SelectContent>
@@ -122,8 +119,6 @@ export function TermList({ initialTerms, categories, initialQuery, initialCatego
 
       <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
         <Button variant={selectedCategoryIds.length === 0 ? "default" : "outline"} onClick={() => handleCategoryClick(null)} disabled={isFiltering}>
-          {" "}
-          {/* FIX: Disable during transition */}
           {t("allCategories")}
         </Button>
         {categories.map((cat) => (
@@ -133,8 +128,6 @@ export function TermList({ initialTerms, categories, initialQuery, initialCatego
         ))}
       </div>
 
-      {/* --- TERMS GRID & PAGINATION WRAPPER --- */}
-      {/* FIX: This wrapper preserves the layout. Opacity is used to show loading state. */}
       <div className={cn("transition-opacity duration-200", isFiltering && "opacity-50 pointer-events-none")}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-16">
           {terms.map((term) => (

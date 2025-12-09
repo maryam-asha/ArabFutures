@@ -39,10 +39,10 @@ CREATE TABLE `termCategories` (
   `displayOrder` INT NOT NULL DEFAULT 0,
   `isActive` TINYINT NOT NULL DEFAULT 1,
   `name` JSON DEFAULT NULL,
-  `name_en` VARCHAR(255) AS (name->>'$.en') VIRTUAL,
-  `name_ar` VARCHAR(255) AS (name->>'$.ar') VIRTUAL,
-  PRIMARY KEY (`categoryId`)
-  FULLTEXT INDEX `ft_tags_name` (name_en, name_ar),
+  `name_en` VARCHAR(255) GENERATED ALWAYS AS (name->>'$.en') STORED,
+  `name_ar` VARCHAR(255) GENERATED ALWAYS AS (name->>'$.ar') STORED,
+  PRIMARY KEY (`categoryId`),
+  FULLTEXT INDEX `ft_tags_name` (name_en, name_ar)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table: tags
@@ -63,10 +63,10 @@ CREATE TABLE `terms` (
   `content` JSON DEFAULT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `name_en` VARCHAR(255) AS (content->>'$.default.en.name') VIRTUAL,
-  `name_ar` VARCHAR(255) AS (content->>'$.default.ar.name') VIRTUAL,
+  `name_en` VARCHAR(255)   GENERATED ALWAYS AS (content->>'$.default.en.name') STORED,
+  `name_ar` VARCHAR(255)  GENERATED ALWAYS AS (content->>'$.default.ar.name') STORED,
   PRIMARY KEY (`termId`),
-  FULLTEXT INDEX ft_terms_name (name_en, name_ar),
+  FULLTEXT INDEX `ft_terms_name` (name_en, name_ar),
   KEY `IX_terms_categoryRef` (`categoryRef`),
   CONSTRAINT `FK_terms_categoryRef` FOREIGN KEY (`categoryRef`) REFERENCES `termCategories` (`categoryId`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

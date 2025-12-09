@@ -2,15 +2,16 @@ import { getCsrfTokenAction } from "@app/auth-actions";
 import { SidebarProvider, SidebarTrigger } from "@components/ui/sidebar";
 import { auth } from "@lib/auth";
 import { getPendingReviewCount } from "@root/dal/reviews-dx";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@ui/breadcrumb";
 import { Separator } from "@ui/separator";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { Inter, Tajawal } from "next/font/google";
+import { Toaster } from "sonner";
 
 import "../globals.css";
 import CsrfManager from "./___blocks/csrf-provider-client";
 import DashboardSidebar from "./___blocks/dashboard-sidebar";
+import { DynamicBreadcrumb } from "./___blocks/dynamic-breadcrumb";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -46,17 +47,7 @@ export default async function DashboardShell({ children }: { children: React.Rea
                     <div className="flex items-center gap-4">
                       <SidebarTrigger />
                       <Separator orientation="vertical" className="hidden h-4! sm:block" />
-                      <Breadcrumb className="hidden sm:block">
-                        <BreadcrumbList>
-                          <BreadcrumbItem>
-                            <BreadcrumbLink href="/dashboard">{t("Dashboard.home")}</BreadcrumbLink>
-                          </BreadcrumbItem>
-                          <BreadcrumbSeparator />
-                          <BreadcrumbItem>
-                            <BreadcrumbPage>{t("Dashboard.overview")}</BreadcrumbPage>
-                          </BreadcrumbItem>
-                        </BreadcrumbList>
-                      </Breadcrumb>
+                      <DynamicBreadcrumb />
                     </div>
                   </div>
                 </header>
@@ -77,6 +68,7 @@ export default async function DashboardShell({ children }: { children: React.Rea
             </SidebarProvider>
           </div>
         </NextIntlClientProvider>
+        <Toaster richColors position="bottom-left" />
       </body>
     </html>
   );

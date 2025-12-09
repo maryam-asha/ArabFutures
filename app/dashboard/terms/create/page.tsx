@@ -1,15 +1,15 @@
 import FormPage, { FormPageActions, FormPageContent, FormPageDescription, FormPageHeader, FormPageSubmitButton, FormPageTitle } from "@app/dashboard/___blocks/form-page";
+import { getTagOptionsAction } from "@app/dashboard/tags/actions";
+import { getActiveCategoryOptionsAction } from "@app/dashboard/term-categories/action";
 import { Button } from "@components/ui/button";
 import i18nAppConfig from "@i18n/config";
-import { findTagOptions } from "@root/dal/tags-dx";
-import { findActiveCategoryOptions } from "@root/dal/termCategories-dx";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { TermForm } from "../___blocks/term-form";
 
 export default async function CreateTermPage() {
-  const [categories, tags] = await Promise.all([findActiveCategoryOptions(i18nAppConfig.defaultLocale), findTagOptions(i18nAppConfig.defaultLocale)]);
+  const [categories, tags] = await Promise.all([getActiveCategoryOptionsAction(i18nAppConfig.defaultLocale), getTagOptionsAction(i18nAppConfig.defaultLocale)]);
   const t = await getTranslations();
 
   return (

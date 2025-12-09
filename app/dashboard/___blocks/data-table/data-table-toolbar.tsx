@@ -86,11 +86,11 @@ function BulkActionMenuItem<TData>({ table, pkColumn, label, action, actionType,
           if (result.success) {
             table.resetRowSelection();
             router.refresh();
-            return result.message || t("Common.actionSuccess");
+            return t(result.message as any) || t("Common.actionSuccess");
           }
           throw new Error(result.message || t("Common.actionError"));
         },
-        error: (err: Error) => err.message,
+        error: (err: Error) => t(err.message as any) || t("Common.actionError"),
       });
     });
   };
@@ -105,8 +105,8 @@ function BulkActionMenuItem<TData>({ table, pkColumn, label, action, actionType,
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("Dashboard.dialogs.areYouSure")}</AlertDialogTitle>
-            <AlertDialogDescription>{t("Dashboard.dialogs.confirmBulkDelete", { count: selectedIds.length })}</AlertDialogDescription>
+            <AlertDialogTitle className="text-start">{t("Dashboard.dialogs.areYouSure")}</AlertDialogTitle>
+            <AlertDialogDescription className="text-start">{t("Dashboard.dialogs.confirmBulkDelete", { count: selectedIds.length })}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isPending}>{t("Common.actions.cancel")}</AlertDialogCancel>

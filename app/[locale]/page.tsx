@@ -1,9 +1,7 @@
-import { TermCategoryOption } from "@root/dal/dal.types";
-import { findActiveCategoryOptions } from "@root/dal/termCategories-dx";
+import { getActiveCategoryOptionsAction } from "@app/dashboard/term-categories/action";
 import { findFeaturedTerms } from "@root/dal/terms-dx";
 import { AppLocale } from "@root/i18n/config";
 import { getLocale, getTranslations } from "next-intl/server";
-import { cookies } from "next/headers";
 import { Suspense } from "react";
 
 import AboutSection from "./___blocks/about-section";
@@ -15,12 +13,12 @@ import NewsletterSection from "./___blocks/newsletter-section";
 import OurWorkSection from "./___blocks/our-work-section";
 import ProjectsSection from "./___blocks/projects-section";
 
-async function FeaturedTermsDataWrapper() {
+async function FeaturedTermsWrapper() {
   const locale = (await getLocale()) as AppLocale;
   const t = await getTranslations("Public.featuredTerms");
 
   try {
-    const [featuredTerms, categories] = await Promise.all([findFeaturedTerms(locale), findActiveCategoryOptions(locale)]);
+    const [featuredTerms, categories] = await Promise.all([findFeaturedTerms(locale), getActiveCategoryOptionsAction(locale)]);
     return <FeaturedTermsSection terms={featuredTerms} categories={categories} />;
   } catch (error) {
     console.error("Database fetch failed for FeaturedTermsDataWrapper:", error);
@@ -29,24 +27,14 @@ async function FeaturedTermsDataWrapper() {
 }
 
 export default async function LandingPage() {
-  const locale = (await getLocale()) as AppLocale;
-  const cookieStore = await cookies();
-
-  let categories: TermCategoryOption[] = [];
-  try {
-    categories = await findActiveCategoryOptions(locale);
-  } catch (error) {
-    console.error("Could not fetch categories for Hero section:", error);
-  }
-
   return (
     <div className="flex flex-col space-y-8 md:space-y-16 lg:space-y-24 px-2 md:px-8">
-      <HeroSection categories={categories} />
+      <HeroSection />
       <AboutSection />
       <OurWorkSection />
       <ProjectsSection />
       <Suspense fallback={<FeaturedTermsLoading />}>
-        <FeaturedTermsDataWrapper />
+        <FeaturedTermsWrapper />
       </Suspense>
       {/* <FriendsSection /> */}
       <NewsletterSection />

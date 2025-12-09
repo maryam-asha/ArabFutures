@@ -10,7 +10,7 @@ export default async function AboutSection() {
         {/* --- Original About Intro --- */}
         <div className="block lg:flex text-center md:text-left items-center rtl:text-center">
           <h1 className="text-5xl font-bold me-8 min-w-48">{t("title")}</h1>
-          <p className="text-lg text-muted-foreground">{t.rich("p1", { br: () => <br /> })}</p>
+          {/* <p className="text-lg text-muted-foreground">{t.rich("p1", { br: () => <br /> })}</p> */}
         </div>
 
         {/* --- Original Values Section --- */}
@@ -32,7 +32,6 @@ export default async function AboutSection() {
           </div>
         </div>
 
-        {/* --- MERGED VISION & MISSION SECTION --- */}
         <div id="vision" className="bg-primary text-primary-foreground rounded-2xl p-8 md:p-12 lg:p-16 mb-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
             <div className="flex flex-col gap-4 text-center md:text-start">

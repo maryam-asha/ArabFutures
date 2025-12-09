@@ -33,13 +33,6 @@ export const findReviewById = async (reviewId: number): Promise<TermReviewDb | n
 };
 
 /**
- * Updates the status of a review and sets the resolvedAt timestamp.
- */
-export const updateReviewStatus = async (reviewId: number, status: "approved" | "rejected"): Promise<void> => {
-  await dbClient.update("termReviews", { status, resolvedAt: new Date() }, { reviewId });
-};
-
-/**
  * Gets the count of currently pending reviews.
  */
 export const getPendingReviewCount = async (): Promise<number> => {
@@ -47,4 +40,19 @@ export const getPendingReviewCount = async (): Promise<number> => {
   const sql = `SELECT COUNT(reviewId) as count FROM termReviews WHERE status = 'pending'`;
   const result = await dbClient.selectSingle(sql, [], z.object({ count: z.number() }));
   return result.count;
+};
+
+/**
+ * Finds all PENDING reviews for a specific term.
+ * Used on the term edit page to show all suggestions.
+ */
+export const findPendingReviewsByTermId = async (termId: number): Promise<TermReviewDb[]> => {
+  noStore();
+  const sql = `
+    SELECT *
+    FROM termReviews
+    WHERE termRef = ? AND status = 'pending'
+    ORDER BY createdAt DESC;
+  `;
+  return dbClient.selectMany(sql, [termId], TermReviewDbSchema);
 };

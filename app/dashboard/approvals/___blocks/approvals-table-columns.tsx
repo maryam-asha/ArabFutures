@@ -75,7 +75,7 @@ export const approvalColumns: ColumnDef<TermDb>[] = [
       const defaultLocale = i18nAppConfig.defaultLocale;
       const name = row.original.content.default[locale]?.name || row.original.content.default[defaultLocale]?.name || "";
       return (
-        <Link href={`/dashboard/terms/${row.original.termId}`} className="font-medium hover:underline">
+        <Link href={`/dashboard/terms/${row.original.termId}?source=approvals`} className="font-medium hover:underline">
           {name}
         </Link>
       );
@@ -96,7 +96,7 @@ export const approvalColumns: ColumnDef<TermDb>[] = [
       return <div>{t("status")}</div>;
     },
     cell: ({ row }) => {
-      const tStatus = useTranslations("Dashboard.status");
+      const tStatus = useTranslations("Dashboard.forms.statuses");
       const status = row.original.status;
 
       return (

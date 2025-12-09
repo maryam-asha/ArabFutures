@@ -15,7 +15,7 @@ export const reviewColumns: ColumnDef<TermReviewWithTermName>[] = [
       return t("name");
     },
     cell: ({ row }) => (
-      <Link href={`/dashboard/terms/${row.original.termRef}`} className="font-medium hover:underline">
+      <Link href={`/dashboard/terms/${row.original.termRef}?source=reviews`} className="font-medium hover:underline">
         {row.original.termName}
       </Link>
     ),
@@ -25,7 +25,7 @@ export const reviewColumns: ColumnDef<TermReviewWithTermName>[] = [
     accessorKey: "suggestedValue",
     header: () => {
       const t = useTranslations("Dashboard.forms.labels");
-      return t("SuggestedChange");
+      return t("suggestedChange");
     },
     cell: ({ row }) => {
       return <div className="text-sm font-semibold text-primary truncate max-w-xs">{row.original.suggestedChange}</div>;

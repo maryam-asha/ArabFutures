@@ -61,10 +61,10 @@ export const columns: ColumnDef<TermDb>[] = [
       return <div>{t("status")}</div>;
     },
     cell: ({ row }) => {
-      const t = useTranslations("Dashboard.statuses");
+      const t = useTranslations("Dashboard.forms.statuses");
       const status = row.original.status;
       const variant: "secondary" | "outline" | "destructive" = status === "published" ? "secondary" : status === "rejected" ? "destructive" : "outline";
-      const translatedStatus = t(status.replace(/-/g, "_"));
+      const translatedStatus = t(status);
       return (
         <Badge variant={variant} className="capitalize">
           {translatedStatus}

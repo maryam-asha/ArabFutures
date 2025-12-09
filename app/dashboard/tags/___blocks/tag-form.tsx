@@ -1,5 +1,6 @@
 "use client";
 
+import { useReactiveCsrf } from "@app/dashboard/___blocks/csrf-provider-client";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@components/ui/form";
 import { Input } from "@components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
@@ -27,7 +28,8 @@ interface TagFormProps {
 export function TagForm({ initialData, children }: TagFormProps) {
   const locale = useLocale();
   const [state, formAction] = useActionState(tagSaveAction, initialFormState);
-  const tLabels = useTranslations("Dashboard.forms.labels");
+  const t = useTranslations();
+  const { setCsrfToken } = useReactiveCsrf();
 
   const form = useForm<TagFormValues>({
     resolver: zodResolver(TagFormSchema),
@@ -37,28 +39,30 @@ export function TagForm({ initialData, children }: TagFormProps) {
   const { formState, setError } = form;
 
   useEffect(() => {
-    if (state.success) {
-      toast.success(state.message);
-    } else if (state.message && state.errors) {
-      setServerErrors(state.errors, setError);
-      toast.error(state.message);
+    if (state.newCsrfToken) {
+      setCsrfToken(state.newCsrfToken);
     }
-  }, [state, setError]);
+
+    if (!state.success && state.message && state.errors) {
+      setServerErrors(state.errors, setError);
+      toast.error(t(state.message));
+    }
+  }, [state, setError, setCsrfToken]);
 
   return (
     <Form {...form}>
       <form action={formAction}>
         <CsrfInput />
         {initialData.tagId && <input type="hidden" name="tagId" value={initialData.tagId} />}
-
         <div className="space-y-8">
           <Tabs defaultValue={i18nAppConfig.defaultLocale} dir={locale === "ar" ? "rtl" : "ltr"}>
             <TabsList>
               {i18nAppConfig.locales.map((locale) => {
                 const hasError = !!formState.errors.translations?.[locale];
+
                 return (
                   <TabsTrigger key={locale} value={locale} className={cn(hasError && "text-destructive")}>
-                    {locale.toUpperCase()} {hasError && "*"}
+                    {i18nAppConfig.labels[locale]} {hasError && "*"}
                   </TabsTrigger>
                 );
               })}
@@ -71,7 +75,7 @@ export function TagForm({ initialData, children }: TagFormProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        {tLabels("name")} - ({locale.toUpperCase()})
+                        {t("Dashboard.forms.labels.name")} - ({i18nAppConfig.labels[locale]})
                       </FormLabel>
                       <FormControl>
                         <Input {...field} value={field.value ?? ""} />
@@ -83,7 +87,6 @@ export function TagForm({ initialData, children }: TagFormProps) {
               </TabsContent>
             ))}
           </Tabs>
-
           {children}
         </div>
       </form>

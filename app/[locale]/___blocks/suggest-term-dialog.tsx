@@ -10,10 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@components/ui/tabs";
 import { Textarea } from "@components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
+import i18nAppConfig from "@i18n/config";
 import { setServerErrors } from "@lib/form-helpers";
+import { cn } from "@lib/utils";
 import { TermCategoryOption } from "@root/dal/dal.types";
 import { CsrfInput } from "@waelhabbaldev/next-jwt-auth/client";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -33,14 +35,12 @@ const NewTermSuggestionSchema = z.object({
 type SuggestionFormValues = z.infer<typeof NewTermSuggestionSchema>;
 
 export function SuggestTermDialog({ categories, children }: { categories: TermCategoryOption[]; children: React.ReactNode }) {
+  const locale = useLocale();
+  const t = useTranslations();
   const formRef = useRef<HTMLFormElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [state, formAction] = useActionState(suggestNewTermAction, { success: false, errors: {} as any });
   const [isPending, submitTransition] = useTransition();
-
-  const t = useTranslations("Public.suggestDialog");
-  const tCommon = useTranslations("Common");
-  const tLabels = useTranslations("Dashboard.forms.labels");
   const { setCsrfToken } = useReactiveCsrf();
 
   const form = useForm<SuggestionFormValues>({
@@ -62,12 +62,12 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
     }
 
     if (state.success) {
-      toast.success(state.message);
+      toast.success(t(state.message || "Public.suggestDialog.successMessage"));
       setIsOpen(false);
       form.reset();
     } else if (!state.success && state.message) {
       setServerErrors(state.errors, form.setError);
-      toast.error(state.message);
+      toast.error(t(state.message));
     }
   }, [state, form, setCsrfToken]);
 
@@ -81,8 +81,8 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
-          <DialogTitle>{t("title")}</DialogTitle>
-          <DialogDescription>{t("description")}</DialogDescription>
+          <DialogTitle>{t("Public.suggestDialog.title")}</DialogTitle>
+          <DialogDescription>{t("Public.suggestDialog.description")}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -101,11 +101,18 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
               name="categoryRef"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("categoryLabel")}</FormLabel>
-                  <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value > 0 ? String(field.value) : ""}>
+                  <FormLabel>{t("Public.suggestDialog.categoryLabel")}</FormLabel>
+                  <Select
+                    {...field}
+                    onValueChange={(value) => {
+                      form.setValue("categoryRef", Number(value));
+                      field.onChange(value);
+                    }}
+                    value={field.value ? String(field.value) : ""}
+                  >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={t("categoryPlaceholder")} />
+                        <SelectValue placeholder={t("Public.suggestDialog.categoryPlaceholder")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -120,10 +127,17 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                 </FormItem>
               )}
             />
-            <Tabs defaultValue="en" className="pt-2">
+            <Tabs className="pt-2" defaultValue={i18nAppConfig.defaultLocale} dir={locale === "ar" ? "rtl" : "ltr"}>
               <TabsList>
-                <TabsTrigger value="en">English</TabsTrigger>
-                <TabsTrigger value="ar">Arabic</TabsTrigger>
+                {i18nAppConfig.locales.map((locale) => {
+                  const hasError = !!form.formState.errors.content?.default?.[locale];
+
+                  return (
+                    <TabsTrigger key={locale} value={locale} className={cn(hasError && "text-destructive")}>
+                      {i18nAppConfig.labels[locale]} {hasError && "*"}
+                    </TabsTrigger>
+                  );
+                })}
               </TabsList>
               <TabsContent forceMount value="en" className="space-y-4 pt-2">
                 <FormField
@@ -131,7 +145,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                   name="content.default.en.name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{tLabels("name")}</FormLabel>
+                      <FormLabel>{t("Dashboard.forms.labels.name")}</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -145,7 +159,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                   name="content.default.en.briefDescription"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{tLabels("briefDescription")}</FormLabel>
+                      <FormLabel>{t("Dashboard.forms.labels.briefDescription")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
@@ -158,7 +172,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                   name="content.default.en.fullDescription"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{tLabels("fullDescription")}</FormLabel>
+                      <FormLabel>{t("Dashboard.forms.labels.fullDescription")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
@@ -175,7 +189,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                   name="content.default.ar.name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{tLabels("name")}</FormLabel>
+                      <FormLabel>{t("Dashboard.forms.labels.name")}</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -189,7 +203,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                   name="content.default.ar.briefDescription"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{tLabels("briefDescription")}</FormLabel>
+                      <FormLabel>{t("Dashboard.forms.labels.briefDescription")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
@@ -202,7 +216,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
                   name="content.default.ar.fullDescription"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{tLabels("fullDescription")}</FormLabel>
+                      <FormLabel>{t("Dashboard.forms.labels.fullDescription")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
@@ -215,7 +229,7 @@ export function SuggestTermDialog({ categories, children }: { categories: TermCa
             </Tabs>
 
             <Button type="submit" className="w-full" size="lg" disabled={isPending}>
-              {isPending ? tCommon("saving") : t("submitButton")}
+              {isPending ? t("Common.saving") : t("Public.suggestDialog.submitButton")}
             </Button>
           </form>
         </Form>

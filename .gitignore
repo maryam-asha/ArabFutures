@@ -40,6 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+#password generator
+generate-hash.js
+
 
 bun.lock
 text-grab.config.json

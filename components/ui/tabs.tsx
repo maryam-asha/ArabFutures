@@ -2,6 +2,7 @@
 
 import { cn } from "@lib/utils";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { useLocale } from "next-intl";
 import * as React from "react";
 
 function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
@@ -26,7 +27,9 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
 }
 
 function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) {
-  return <TabsPrimitive.Content data-slot="tabs-content" className={cn("flex-1 outline-none", className)} {...props} />;
+  const locale = useLocale();
+  const dir = locale === "ar" ? "rtl" : "ltr";
+  return <TabsPrimitive.Content data-slot="tabs-content" className={cn("flex-1 outline-none", className)} dir={dir} {...props} />;
 }
 
 export { Tabs, TabsContent, TabsList, TabsTrigger };

@@ -12,7 +12,7 @@ import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useState } from "react";
 
 function SigninForm() {
-  const t = useTranslations("Public.signin");
+  const t = useTranslations();
   const tCommon = useTranslations("Common");
   const [state, formAction] = useActionState(signInAction, undefined);
   const [isVisible, setIsVisible] = useState(false);
@@ -20,17 +20,17 @@ function SigninForm() {
   return (
     <form className="space-y-4" action={formAction}>
       <div className="space-y-1">
-        <Label htmlFor="username">{t("username")}</Label>
-        <Input type="text" id="username" placeholder={t("usernamePlaceholder")} name="username" />
+        <Label htmlFor="username">{t("Public.signin.username")}</Label>
+        <Input type="text" id="username" placeholder={t("Public.signin.usernamePlaceholder")} name="username" />
       </div>
 
       <div className="w-full space-y-1">
-        <Label htmlFor="password">{t("password")}</Label>
+        <Label htmlFor="password">{t("Public.signin.password")}</Label>
         <div className="relative">
-          <Input id="password" type={isVisible ? "text" : "password"} placeholder={t("passwordPlaceholder")} className="pr-9" name="password" />
+          <Input id="password" type={isVisible ? "text" : "password"} placeholder={t("Public.signin.passwordPlaceholder")} className="pr-9" name="password" />
           <Button type="button" variant="ghost" size="icon" onClick={() => setIsVisible((prevState) => !prevState)} className="text-muted-foreground focus-visible:ring-ring/50 absolute inset-y-0 right-0 rounded-l-none hover:bg-transparent">
             {isVisible ? <EyeOffIcon /> : <EyeIcon />}
-            <span className="sr-only">{isVisible ? t("hidePassword") : t("showPassword")}</span>
+            <span className="sr-only">{isVisible ? t("Public.signin.hidePassword") : t("Public.signin.showPassword")}</span>
           </Button>
         </div>
       </div>
@@ -39,15 +39,15 @@ function SigninForm() {
         <div className="flex items-center gap-3">
           <Checkbox id="rememberMe" />
           <Label htmlFor="rememberMe" className="text-muted-foreground font-normal">
-            {t("rememberMe")}
+            {t("Public.signin.rememberMe")}
           </Label>
         </div>
         <a href="#" className="hover:underline text-sm">
-          {t("forgotPassword")}
+          {t("Public.signin.forgotPassword")}
         </a>
       </div>
 
-      <SubmitButton isEditMode={false} createText={t("cta")} pendingText={tCommon("saving")} />
+      <SubmitButton isEditMode={false} createText={t("Public.signin.cta")} pendingText={tCommon("saving")} />
 
       {state?.error && <p className="text-sm text-destructive text-center">{t(state.error as any)}</p>}
     </form>
@@ -72,7 +72,7 @@ export default function SigninPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md border border-primary rounded-2xl p-16">
         <h1 className="text-center text-3xl font-bold mb-2 text-gray-800">{t("title")}</h1>
         <p className="text-center text-gray-500 mb-8">{t("description")}</p>
         <CsrfProvider token={csrfToken}>

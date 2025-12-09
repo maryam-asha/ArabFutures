@@ -1,43 +1,82 @@
+"use client";
+
 import FormPage, { FormPageActions, FormPageContent, FormPageDescription, FormPageHeader, FormPageSubmitButton, FormPageTitle } from "@app/dashboard/___blocks/form-page";
-import ReviewActionButtons from "@app/dashboard/reviews/___blocks/review-action-buttons";
-import { Alert, AlertDescription, AlertTitle } from "@components/ui/alert";
-import "@components/ui/alert-dialog";
+import { getPendingReviewsByTermId } from "@app/dashboard/reviews/actions";
+import { getTagOptionsAction } from "@app/dashboard/tags/actions";
+import { getActiveCategoryOptionsAction } from "@app/dashboard/term-categories/action";
+import { getTermDetailsAction } from "@app/terms-actions";
 import { Button } from "@components/ui/button";
 import i18nAppConfig from "@i18n/config";
-import { getIdFromParams } from "@lib/action-handler";
-import { findReviewById } from "@root/dal/reviews-dx";
-import { findTagOptions } from "@root/dal/tags-dx";
-import { findActiveCategoryOptions } from "@root/dal/termCategories-dx";
-import { findTermById } from "@root/dal/terms-dx";
-import { SearchParamsProps } from "@root/types";
-import { Info } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { TagOption, TermCategoryOption, TermForEditDb, TermReviewDb } from "@root/dal/dal.types";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
+import { ReviewAccordion } from "../___blocks/review-accordion";
 import { TermForm } from "../___blocks/term-form";
+import { TermFormSkeleton } from "../___blocks/term-form-skeleton";
 import { TermFormValues } from "../term.types";
 
-interface EditTermPageProps {
-  params: Promise<{ termId: string }>;
-  searchParams: SearchParamsProps;
-}
+export default function EditTermPage() {
+  const params = useParams();
+  const termId = Number(params.termId);
+  console.log(termId);
 
-export default async function EditTermPage(props: EditTermPageProps) {
-  const termId = await getIdFromParams(Promise.resolve(props.params), "termId");
-  const searchParamsObject = await props.searchParams;
-  const reviewId = Number(searchParamsObject?.reviewId);
+  const [term, setTerm] = useState<TermForEditDb | null>(null);
+  const [categories, setCategories] = useState<TermCategoryOption[]>([]);
+  const [tags, setTags] = useState<TagOption[]>([]);
+  const [reviews, setReviews] = useState<TermReviewDb[]>([]);
+  const [selectedReviewIds, setSelectedReviewIds] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const t = useTranslations();
 
-  const [term, categories, tags, review] = await Promise.all([
-    findTermById({ termId, locale: "ar" }),
-    findActiveCategoryOptions(i18nAppConfig.defaultLocale),
-    findTagOptions(i18nAppConfig.defaultLocale),
-    reviewId ? findReviewById(reviewId) : Promise.resolve(null),
-  ]);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [termData, categoriesData, tagsData, reviewsData] = await Promise.all([
+          getTermDetailsAction("ar", termId),
+          getActiveCategoryOptionsAction(i18nAppConfig.defaultLocale),
+          getTagOptionsAction(i18nAppConfig.defaultLocale),
+          getPendingReviewsByTermId(termId),
+        ]);
 
-  if (!term) notFound();
+        if (!termData) {
+          notFound();
+        }
 
-  const t = await getTranslations();
+        setTerm(termData);
+        setCategories(categoriesData);
+        setTags(tagsData);
+        setReviews(reviewsData);
+      } catch (error) {
+        console.error("Failed to fetch term data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (termId) {
+      fetchData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [termId]);
+
+  const handleReviewSelect = (id: number) => {
+    setSelectedReviewIds((prevIds) => (prevIds.includes(id) ? prevIds.filter((prevId) => prevId !== id) : [...prevIds, id]));
+  };
+
+  if (isLoading) {
+    return <TermFormSkeleton />;
+  }
+
+  // This check is now safe because isLoading is false. If term is still null,
+  // it means notFound() was called and this component will unmount.
+  if (!term) {
+    notFound();
+  }
+
   const initialDataForForm: Partial<TermFormValues> = {
     termId: term.termId,
     status: term.status,
@@ -56,43 +95,16 @@ export default async function EditTermPage(props: EditTermPageProps) {
         <FormPageDescription>{t("Dashboard.pages.terms.editDescription", { entityName: termName })}</FormPageDescription>
       </FormPageHeader>
 
-      {review && (
-        <Alert className="mx-6 box-border w-auto bg-blue-50 border-blue-200">
-          <Info className="h-4 w-4" />
-          <AlertTitle>{t("Dashboard.pages.terms.reviewAlertTitle")}</AlertTitle>
-          <AlertDescription>
-            <p>{t("Dashboard.pages.terms.reviewAlertDescription")}</p>
-
-            <div className="bg-background/50 p-3 rounded-md border">
-              <p className="font-semibold text-foreground mb-1">{t("Dashboard.forms.labels.SuggestedChange")}</p>
-              <p className="text-foreground whitespace-pre-wrap">{review.suggestedChange}</p>
-            </div>
-
-            {review.explanation && (
-              <div className="bg-background/50 p-3 rounded-md">
-                <p className="font-semibold text-foreground mb-1">{t(`Dashboard.forms.labels.explanation`)}</p>
-                <p className="text-muted-foreground italic wrap-break-word">"{review.explanation}"</p>
-              </div>
-            )}
-          </AlertDescription>
-        </Alert>
-      )}
+      <ReviewAccordion reviews={reviews} selectedReviewIds={selectedReviewIds} onReviewSelect={handleReviewSelect} />
 
       <FormPageContent>
-        <TermForm initialData={initialDataForForm} categories={categories} tags={tags}>
-          {/* Also pass the reviewId to the form if it exists */}
-          {review && <input type="hidden" name="reviewId" value={review.reviewId} />}
-
-          {review ? (
-            <ReviewActionButtons reviewId={review.reviewId} />
-          ) : (
-            <FormPageActions>
-              <Button variant="outline" size="lg" asChild>
-                <Link href="/dashboard/terms">{t("Common.actions.cancel")}</Link>
-              </Button>
-              <FormPageSubmitButton createText={t("Common.actions.create")} updateText={t("Common.actions.save")} pendingText={t("Common.saving")} />
-            </FormPageActions>
-          )}
+        <TermForm initialData={initialDataForForm} categories={categories} tags={tags} selectedReviewIds={selectedReviewIds}>
+          <FormPageActions>
+            <Button variant="outline" size="lg" asChild>
+              <Link href="/dashboard/terms">{t("Common.actions.cancel")}</Link>
+            </Button>
+            <FormPageSubmitButton createText={t("Common.actions.create")} updateText={t("Common.actions.save")} pendingText={t("Common.saving")} />
+          </FormPageActions>
         </TermForm>
       </FormPageContent>
     </FormPage>

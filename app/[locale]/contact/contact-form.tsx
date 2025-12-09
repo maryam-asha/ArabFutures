@@ -10,10 +10,10 @@ import { Input } from "@ui/input";
 import { Textarea } from "@ui/textarea";
 import { CsrfInput } from "@waelhabbaldev/next-jwt-auth/client";
 import { useLocale, useTranslations } from "next-intl";
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z from "zod";
+import { z } from "zod";
 
 import { ContactActionSchema } from "../public.schema";
 
@@ -23,21 +23,24 @@ export function ContactForm() {
   const locale = useLocale();
   const [state, formAction, isPending] = useActionState(contactAction, initialFormState);
   const t = useTranslations("Public.contact");
-
-  const commonT = useTranslations("Common");
-
-  const ClientContactSchema = ContactActionSchema.extend({
-    name: z.string().min(2, t("nameRequired")),
-    email: z.email(t("emailInvalid")),
-    message: z.string().min(10, t("messageMinLength", { min: 10 })),
-  });
-
+  const tCommon = useTranslations("Common");
+  const tValidation = useTranslations("Validation");
   const formRef = useRef<HTMLFormElement>(null);
   const { setCsrfToken } = useReactiveCsrf();
 
-  const form = useForm<z.infer<typeof ClientContactSchema>>({
-    resolver: zodResolver(ClientContactSchema),
-    defaultValues: { name: "", email: "", message: "" },
+  const clientContactSchema = useMemo(
+    () =>
+      ContactActionSchema.extend({
+        name: z.string().min(2, tValidation("nameRequired")),
+        email: z.string().email(tValidation("emailInvalid")),
+        message: z.string().min(10, tValidation("messageMinLength", { min: 10 })),
+      }),
+    [tValidation],
+  );
+
+  const form = useForm<z.infer<typeof clientContactSchema>>({
+    resolver: zodResolver(clientContactSchema),
+    defaultValues: { name: "", email: "", message: "", website: "" },
   });
 
   useEffect(() => {
@@ -45,11 +48,13 @@ export function ContactForm() {
       setCsrfToken(state.newCsrfToken);
     }
 
-    if (state.success) {
-      toast.success(t("successMessage"));
-      form.reset();
-    } else if (state.message && form.formState.isSubmitted) {
-      toast.error(t("errorMessage"));
+    if (form.formState.isSubmitted && state.message) {
+      if (state.success) {
+        toast.success(t(state.message as any));
+        form.reset();
+      } else {
+        toast.error(t(state.message as any));
+      }
     }
   }, [state, form, t, setCsrfToken]);
 
@@ -123,7 +128,7 @@ export function ContactForm() {
           )}
         />
         <Button type="submit" className="w-full" size="lg" disabled={isPending}>
-          {isPending ? commonT("saving") : t("sendMessage")}
+          {isPending ? tCommon("saving") : t("sendMessage")}
         </Button>
       </form>
     </Form>

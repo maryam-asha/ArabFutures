@@ -28,9 +28,7 @@ export function DeleteEntityButton({ entityId, entityName, deleteAction, onSucce
   const router = useRouter();
   const { csrfToken } = useReactiveCsrf() || "";
 
-  const tCommon = useTranslations("Common");
-  const tDailog = useTranslations("Dashboard.dialogs");
-  const tToast = useTranslations("Dashboard.toasts");
+  const t = useTranslations();
 
   const handleDelete = () => {
     const formData = new FormData();
@@ -39,7 +37,7 @@ export function DeleteEntityButton({ entityId, entityName, deleteAction, onSucce
 
     startTransition(() => {
       toast.promise(deleteAction({} as any, formData), {
-        loading: tCommon("deleting"),
+        loading: t("Common.deleting"),
         success: (result) => {
           if (result.success) {
             setIsOpen(false);
@@ -48,15 +46,14 @@ export function DeleteEntityButton({ entityId, entityName, deleteAction, onSucce
             } else {
               router.refresh();
             }
-            // Now safely translate server message key
-            return tToast(result.message as any) || tToast("deleteSuccess", { entityName });
+
+            return t(result.message as any) || t("Common.deleteSuccess", { entityName });
           } else {
             throw new Error(result.message);
           }
         },
         error: (error: Error) => {
-          // Also translate server error keys
-          return tToast(error.message as any) || tToast("deleteError", { entityName });
+          return t(error.message as any) || t("Common.deleteError", { entityName });
         },
       });
     });
@@ -82,15 +79,15 @@ export function DeleteEntityButton({ entityId, entityName, deleteAction, onSucce
       </Trigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{tDailog("areYouSure")}</AlertDialogTitle>
+          <AlertDialogTitle>{t("Dashboard.dialogs.areYouSure")}</AlertDialogTitle>
           <AlertDialogDescription>
-            {tDailog("noUndo")} {tDailog("confirmDelete", { entityName })}
+            {t("Dashboard.dialogs.noUndo")} {t("Dashboard.dialogs.confirmDelete", { entityName })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{tCommon("actions.cancel")}</AlertDialogCancel>
+          <AlertDialogCancel>{t("Common.actions.cancel")}</AlertDialogCancel>
           <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90" disabled={isPending}>
-            {isPending ? tCommon("deleting") : tDailog("deletePermanently")}
+            {isPending ? t("Common.deleting") : t("Dashboard.dialogs.deletePermanently")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

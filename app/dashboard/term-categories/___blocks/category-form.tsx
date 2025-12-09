@@ -1,5 +1,6 @@
 "use client";
 
+import { useReactiveCsrf } from "@app/dashboard/___blocks/csrf-provider-client";
 import { Input } from "@components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { setServerErrors } from "@lib/form-helpers";
@@ -28,7 +29,8 @@ interface CategoryFormProps {
 export function CategoryForm({ initialData, children }: CategoryFormProps) {
   const [state, formAction] = useActionState(termCategorySaveAction, initialFormState);
   const locale = useLocale();
-  const tLabels = useTranslations("Dashboard.forms.labels");
+  const t = useTranslations();
+  const { setCsrfToken } = useReactiveCsrf();
 
   const form = useForm<CategoryFormValues>({
     mode: "onBlur",
@@ -42,13 +44,15 @@ export function CategoryForm({ initialData, children }: CategoryFormProps) {
   const { formState, setError } = form;
 
   useEffect(() => {
-    if (state.success) {
-      toast.success(state.message);
-    } else if (state.message && state.errors) {
-      setServerErrors(state.errors, setError);
-      toast.error(state.message);
+    if (state.newCsrfToken) {
+      setCsrfToken(state.newCsrfToken);
     }
-  }, [state, setError]);
+
+    if (!state.success && state.message && state.errors) {
+      setServerErrors(state.errors, setError);
+      toast.error(t(state.message));
+    }
+  }, [state, setError, setCsrfToken]);
 
   return (
     <Form {...form}>
@@ -65,7 +69,7 @@ export function CategoryForm({ initialData, children }: CategoryFormProps) {
                     const hasError = !!formState.errors.translations?.[locale];
                     return (
                       <TabsTrigger key={locale} value={locale} className={cn(hasError && "text-destructive")}>
-                        {locale.toUpperCase()} {hasError && "*"}
+                        {i18nAppConfig.labels[locale]} {hasError && "*"}
                       </TabsTrigger>
                     );
                   })}
@@ -78,7 +82,7 @@ export function CategoryForm({ initialData, children }: CategoryFormProps) {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
-                            {tLabels("name")} - ({locale.toUpperCase()})
+                            {t("Dashboard.forms.labels.name")} - ({i18nAppConfig.labels[locale]})
                           </FormLabel>
                           <FormControl>
                             <Input {...field} value={field.value ?? ""} />
@@ -94,14 +98,14 @@ export function CategoryForm({ initialData, children }: CategoryFormProps) {
 
             <div className="space-y-6">
               <div className="p-6 bg-white rounded-lg border space-y-4">
-                <h3 className="font-semibold text-lg">{tLabels("visibility")}</h3>
+                <h3 className="font-semibold text-lg">{t("Dashboard.forms.labels.visibility")}</h3>
                 <FormField
                   control={form.control}
                   name="isActive"
                   render={({ field }) => (
                     <FormItem className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
                       <FormLabel htmlFor="isActive" className="cursor-pointer mb-0">
-                        {field.value ? tLabels("active") : tLabels("inactive")}
+                        {field.value ? t("Dashboard.forms.labels.active") : t("Dashboard.forms.labels.inactive")}
                       </FormLabel>
                       <FormControl>
                         <Switch id="isActive" name={field.name} checked={field.value} onCheckedChange={field.onChange} />

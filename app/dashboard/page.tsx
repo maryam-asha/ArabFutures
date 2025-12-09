@@ -77,7 +77,7 @@ export default async function DashboardHomePage() {
                       <p className="text-sm text-muted-foreground">{term.categoryName || t("Dashboard.forms.placeholders.selectCategory")}</p>
                     </div>
                     <Badge variant={term.status === "published" ? "secondary" : "outline"} className="capitalize">
-                      {t(`Dashboard.forms.statuses.${term.status.replace("-", "_")}` as any)}
+                      {t(`Dashboard.forms.statuses.${term.status}` as any)}
                     </Badge>
                     <Button asChild variant="outline" size="sm">
                       <Link href={`/dashboard/terms/${term.termId}`}>{t("Common.actions.view")}</Link>

@@ -2,6 +2,7 @@
 
 import { Button } from "@components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@components/ui/card";
+import { Link } from "@i18n/navigation";
 import { ServerCrash } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -39,11 +40,15 @@ export function FailedToLoad({ title, description, retryText }: FailedToLoadProp
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
             <ServerCrash className="h-8 w-8 text-destructive" />
           </div>
-          <CardTitle className="mt-4 text-2xl font-bold">{title || t("loadErrorTitile")}</CardTitle>
+          <CardTitle className="mt-4 text-2xl font-bold">{title || t("loadErrorTitle")}</CardTitle>
           <CardDescription>{description || t("loadErrorDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button>{retryText || t("reload")}</Button>
+          <Button asChild>
+            <Link href={"/"} scroll={false}>
+              {retryText || t("reload")}
+            </Link>
+          </Button>
         </CardContent>
       </Card>
     </div>

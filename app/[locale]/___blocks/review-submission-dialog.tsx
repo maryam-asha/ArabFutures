@@ -32,8 +32,7 @@ interface ReviewSubmissionDialogProps {
 }
 
 export function ReviewSubmissionDialog({ isOpen, onClose, onSuccess, termId }: ReviewSubmissionDialogProps) {
-  const t = useTranslations("Public.reviewDialog");
-  const commonT = useTranslations("Common");
+  const t = useTranslations();
 
   const [state, formAction] = useActionState(submitReviewAction, { success: false, errors: {} as any });
   const [isPending, startTransition] = useTransition();
@@ -52,11 +51,11 @@ export function ReviewSubmissionDialog({ isOpen, onClose, onSuccess, termId }: R
     }
 
     if (state.success && form.formState.isSubmitSuccessful) {
-      toast.success(state.message);
+      toast.success(t(state.message || "Public.reviewDialog.successMessage"));
       onSuccess();
     } else if (!state.success && state.message && form.formState.isSubmitted) {
       setServerErrors(state.errors, setError);
-      toast.error(state.message);
+      toast.error(t(state.message));
     }
   }, [state, form.formState.isSubmitSuccessful, form.formState.isSubmitted, onSuccess, setCsrfToken, setError]);
 
@@ -72,8 +71,8 @@ export function ReviewSubmissionDialog({ isOpen, onClose, onSuccess, termId }: R
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("title")}</DialogTitle>
-          <DialogDescription>{t("description")}</DialogDescription>
+          <DialogTitle>{t("Public.reviewDialog.title")}</DialogTitle>
+          <DialogDescription>{t("Public.reviewDialog.description")}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -103,9 +102,9 @@ export function ReviewSubmissionDialog({ isOpen, onClose, onSuccess, termId }: R
               name="suggestedChange"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("suggestionLabel")}</FormLabel>
+                  <FormLabel>{t("Public.reviewDialog.suggestionLabel")}</FormLabel>
                   <FormControl>
-                    <Textarea {...field} rows={5} placeholder={t("suggestionPlaceholder")} />
+                    <Textarea {...field} rows={5} placeholder={t("Public.reviewDialog.suggestionPlaceholder")} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -117,9 +116,9 @@ export function ReviewSubmissionDialog({ isOpen, onClose, onSuccess, termId }: R
               name="explanation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("explanationLabel")}</FormLabel>
+                  <FormLabel>{t("Public.reviewDialog.explanationLabel")}</FormLabel>
                   <FormControl>
-                    <Textarea {...field} rows={3} placeholder={t("explanationPlaceholder")} />
+                    <Textarea {...field} rows={3} placeholder={t("Public.reviewDialog.explanationPlaceholder")} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -129,7 +128,7 @@ export function ReviewSubmissionDialog({ isOpen, onClose, onSuccess, termId }: R
             <ReferencesField control={form.control} path="references" />
 
             <Button type="submit" disabled={isPending} className="w-full">
-              {isPending ? commonT("saving") : t("submitButton")}
+              {isPending ? t("Common.saving") : t("Public.reviewDialog.submitButton")}
             </Button>
           </form>
         </Form>

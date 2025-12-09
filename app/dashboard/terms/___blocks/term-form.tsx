@@ -15,10 +15,12 @@ import { Textarea } from "@components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import i18nAppConfig, { AppLocale } from "@i18n/config";
 import { setServerErrors } from "@lib/form-helpers";
+import { cn } from "@lib/utils";
 import { TagOption, TermCategoryOption } from "@root/dal/dal.types";
 import { CsrfInput } from "@waelhabbaldev/next-jwt-auth/client";
 import { PlusCircle, Trash2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { Control, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -33,10 +35,15 @@ interface TermFormProps {
   initialData: Partial<TermFormValues>;
   categories: TermCategoryOption[];
   tags: TagOption[];
+  selectedReviewIds?: number[];
   children: React.ReactNode;
 }
 
-export function TermForm({ initialData, categories, tags, children }: TermFormProps) {
+export function TermForm({ initialData, categories, tags, selectedReviewIds, children }: TermFormProps) {
+  const locale = useLocale();
+  const searchParams = useSearchParams();
+  const source = searchParams.get("source");
+
   const [state, formAction] = useActionState(termSaveAction, initialFormState);
 
   const { setCsrfToken } = useReactiveCsrf();
@@ -67,33 +74,25 @@ export function TermForm({ initialData, categories, tags, children }: TermFormPr
   });
 
   useEffect(() => {
-    if (state.success) {
-      toast.success(state.message);
-    } else if (!state.success && state.message) {
-      setServerErrors(state.errors, setError);
-      toast.error(state.message);
-    }
-  }, [state, setError]);
-
-  useEffect(() => {
     if (state.newCsrfToken) {
       setCsrfToken(state.newCsrfToken);
     }
 
-    if (state.success) {
-      toast.success(state.message);
-    } else if (!state.success && state.message) {
+    if (!state.success && state.message && state.errors) {
       setServerErrors(state.errors, setError);
-      toast.error(state.message);
+      toast.error(t(state.message));
     }
   }, [state, setError, setCsrfToken]);
 
   const tagOptions = tags.map((t) => ({ value: t.tagId, label: t.name }));
+
   return (
     <Form {...form}>
       <form action={formAction}>
         <CsrfInput />
         {initialData.termId && <input type="hidden" name="termId" value={initialData.termId} />}
+        <input type="hidden" name="reviewIds" value={JSON.stringify(selectedReviewIds)} />
+        {source && <input type="hidden" name="source" value="reviews" />}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2 space-y-6">
@@ -103,10 +102,17 @@ export function TermForm({ initialData, categories, tags, children }: TermFormPr
                 <CardDescription>{t("Dashboard.forms.helpers.defaultTranslations")}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="en">
+                <Tabs defaultValue={i18nAppConfig.defaultLocale} dir={locale === "ar" ? "rtl" : "ltr"}>
                   <TabsList>
-                    <TabsTrigger value="en">English</TabsTrigger>
-                    <TabsTrigger value="ar">Arabic</TabsTrigger>
+                    {i18nAppConfig.locales.map((locale) => {
+                      const hasError = !!form.formState.errors.content;
+
+                      return (
+                        <TabsTrigger key={locale} value={locale} className={cn(hasError && "text-destructive")}>
+                          {i18nAppConfig.labels[locale]} {hasError && "*"}
+                        </TabsTrigger>
+                      );
+                    })}
                   </TabsList>
                   <TabsContent forceMount value="en" className="pt-4">
                     <TranslationFields control={control} path="content.default.en" />

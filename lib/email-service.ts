@@ -23,7 +23,6 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendContactFormEmail(data: ContactFormData, locale: AppLocale): Promise<void> {
-  // Load translations for the specified locale
   const t = await getTranslations({ locale, namespace: "Email" });
 
   const { name, email, message } = data;

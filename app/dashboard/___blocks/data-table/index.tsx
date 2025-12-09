@@ -60,10 +60,14 @@ export function DataTable<TData, TValue>({ columns, data, totalCount, filterColu
     },
 
     onColumnFiltersChange: (updater) => {
-      const old = table.getState().columnFilters;
-      const next = typeof updater === "function" ? updater(old) : updater;
-      const newQuery = next.find((f) => f.id === filterColumnId)?.value || null;
-      updateUrlParams({ query: newQuery ? String(newQuery) : null, page: 1 });
+      const oldFilters = table.getState().columnFilters;
+      const newFilters = typeof updater === "function" ? updater(oldFilters) : updater;
+
+      const filterObject = newFilters.find((f) => f.id === filterColumnId);
+
+      const newQueryValue = filterObject ? filterObject.value : null;
+
+      updateUrlParams({ query: newQueryValue as string | null, page: 1 });
     },
 
     onSortingChange: setSorting,

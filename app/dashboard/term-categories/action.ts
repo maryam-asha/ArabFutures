@@ -1,8 +1,9 @@
 "use server";
 
-import i18nAppConfig from "@i18n/config";
+import i18nAppConfig, { AppLocale } from "@i18n/config";
 import { createActionParser, createBulkDeleteAction, createDeleteAction, createProtectedAction } from "@lib/action-handler";
 import { dbClient } from "@root/dal/client";
+import { findActiveCategoryOptions, findTermCategories } from "@root/dal/termCategories-dx";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -42,20 +43,24 @@ const termCategorySaveHandler = async (data: CategoryFormValues): Promise<Catego
   });
 
   revalidatePath("/dashboard/term-categories", "layout");
-  redirect(`/dashboard/term-categories`);
 
-  return {
-    success: true,
-    message: `Category successfully ${categoryId ? "updated" : "created"}.`,
-  };
+  revalidatePath("/dashboard/term-categories", "layout");
+  const messageKey = data.categoryId ? "updateSuccess" : "createSuccess";
+  redirect(`/dashboard/term-categories?toast=${messageKey}&entity=term-categories`);
 };
 
 export const termCategorySaveAction = createProtectedAction(CategoryFormSchema, termCategorySaveHandler, termCategoryParser);
-
 export const termCategoryDeleteAction = createDeleteAction({
   tableName: "termCategories",
   pkColumn: "categoryId",
   revalidatePaths: ["/dashboard/categories"],
 });
-
 export const termCategoryBulkDeleteAction = createBulkDeleteAction({ tableName: "termCategories", pkColumn: "categoryId", revalidatePaths: ["/dashboard/categories"] });
+
+export async function getTermCategoriesAction(props: Parameters<typeof findTermCategories>[0]) {
+  return findTermCategories(props);
+}
+
+export async function getActiveCategoryOptionsAction(locale: AppLocale) {
+  return findActiveCategoryOptions(locale);
+}

@@ -76,6 +76,41 @@ export function TermDialogBody({ term, onStartReview }: TermDialogBodyProps) {
                     </Badge>
                     <p className="font-semibold text-foreground text-base">{trans.name}</p>
                     {trans.briefDescription && <p className="text-muted-foreground mt-1">{trans.briefDescription}</p>}
+
+                    {/* --- START OF FIX --- */}
+
+                    {/* 1. Render the Full Description if it exists */}
+                    {trans.fullDescription && (
+                      <div className="prose prose-sm max-w-none text-muted-foreground whitespace-pre-wrap leading-relaxed mt-2">
+                        <p>{trans.fullDescription}</p>
+                      </div>
+                    )}
+
+                    {/* 2. Render the References if they exist */}
+                    {trans.references && trans.references.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">{t("references")}</h4>
+                        <ul className="space-y-4">
+                          {trans.references.map((ref, index) => (
+                            <li key={index} className="flex items-start gap-3 text-sm">
+                              {ref.url ? (
+                                <>
+                                  <LinkIcon className="h-4 w-4 shrink-0 mt-0.5 text-primary" />
+                                  <a href={ref.url} target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline break-all">
+                                    {ref.content || ref.url}
+                                  </a>
+                                </>
+                              ) : (
+                                <>
+                                  <FileTextIcon className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" />
+                                  <span className="text-muted-foreground wrap-break-word">{ref.content}</span>
+                                </>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

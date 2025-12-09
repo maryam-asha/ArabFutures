@@ -10,6 +10,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { BulkAction } from "../___blocks/data-table/data-table.type";
+import { ToastHandler } from "../___blocks/toast-handler";
 import { tagBulkDeleteAction } from "./actions";
 
 interface TagsPageProps {
@@ -35,21 +36,24 @@ export default async function TagsPage(props: TagsPageProps) {
   const tagBulkActions: BulkAction[] = [{ label: "delete", action: tagBulkDeleteAction, isDestructive: true }];
 
   return (
-    <DataTablePage>
-      <DataTablePage.Header>
-        <DataTablePage.Title>{t("pages.tags.title")}</DataTablePage.Title>
-        <DataTablePage.Actions>
-          <Button asChild>
-            <Link href="/dashboard/tags/create">
-              <Plus className="w-4 h-4 me-2" />
-              {t("pages.tags.addTitle")}
-            </Link>
-          </Button>
-        </DataTablePage.Actions>
-      </DataTablePage.Header>
-      <DataTablePage.Table>
-        <DataTable columns={columns} data={tags} totalCount={totalCount} filterColumnId="name" filterColumnPlaceholder={t("forms.placeholders.search")} bulkActions={tagBulkActions} pkColumn="tagId" />
-      </DataTablePage.Table>
-    </DataTablePage>
+    <>
+      <ToastHandler />
+      <DataTablePage>
+        <DataTablePage.Header>
+          <DataTablePage.Title>{t("pages.tags.title")}</DataTablePage.Title>
+          <DataTablePage.Actions>
+            <Button asChild>
+              <Link href="/dashboard/tags/create">
+                <Plus className="w-4 h-4 me-2" />
+                {t("pages.tags.addTitle")}
+              </Link>
+            </Button>
+          </DataTablePage.Actions>
+        </DataTablePage.Header>
+        <DataTablePage.Table>
+          <DataTable columns={columns} data={tags} totalCount={totalCount} filterColumnId="name" filterColumnPlaceholder={t("forms.placeholders.search")} bulkActions={tagBulkActions} pkColumn="tagId" />
+        </DataTablePage.Table>
+      </DataTablePage>
+    </>
   );
 }

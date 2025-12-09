@@ -4,7 +4,7 @@ import { Link, useRouter } from "@i18n/navigation";
 import { Button } from "@ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@ui/dropdown-menu";
 import { Home, MenuIcon } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
 import { LanguageSwitcher } from "./language-switcher";
 
@@ -17,19 +17,20 @@ const navLinks = [
 ];
 
 function moveItemToFront(arr: typeof navLinks, prop: keyof (typeof navLinks)[0], value: string) {
-  const itemIndex = arr.findIndex((item) => item[prop] === value);
+  const newArr = [...arr];
+
+  const itemIndex = newArr.findIndex((item) => item[prop] === value);
 
   if (itemIndex > -1) {
-    const [itemToMove] = arr.splice(itemIndex, 1);
+    const [itemToMove] = newArr.splice(itemIndex, 1);
 
-    arr.unshift(itemToMove);
+    newArr.unshift(itemToMove);
   }
 
-  return arr;
+  return newArr;
 }
 
 const Navbar = () => {
-  const locale = useLocale();
   const router = useRouter();
   const tNav = useTranslations("Public.nav");
 

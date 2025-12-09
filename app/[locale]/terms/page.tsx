@@ -1,5 +1,5 @@
 import { loadMoreTermsAction } from "@app/[locale]/public-actions";
-import { findActiveCategoryOptions } from "@root/dal/termCategories-dx";
+import { getActiveCategoryOptionsAction } from "@app/dashboard/term-categories/action";
 import { AppLocale } from "@root/i18n/config";
 import { SearchParamsProps } from "@root/types";
 import { CheckCircle } from "lucide-react";
@@ -8,7 +8,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { TermList } from "../___blocks/term-list";
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Public.metadata.terms" });
   const siteName = await getTranslations({ locale, namespace: "Public.metadata" }).then((t) => t("siteName"));
 
@@ -59,11 +60,11 @@ export default async function TermsPage(params: { searchParams: SearchParamsProp
           .filter((id) => !isNaN(id))
       : [];
 
-  const [categories, initialTerms] = await Promise.all([findActiveCategoryOptions(locale), loadMoreTermsAction(locale, 0, query, categoryIds, sort as any)]);
+  const [categories, initialTerms] = await Promise.all([getActiveCategoryOptionsAction(locale), loadMoreTermsAction(locale, 0, query, categoryIds, sort as any)]);
   return (
-    <div className="container mx-auto py-16 sm:py-24">
+    <div className="container mx-auto py-16 sm:py-24 px-2 md:px-8">
       {/* Centered header section for title and description. */}
-      <header className="max-w-5xl mx-auto mb-16">
+      <header className="max-w-5xl mx-auto mb-16 p-8">
         <h1 className="text-4xl font-bold tracking-tight md:text-5xl text-center">{t("title")}</h1>
         <p className="mt-4 text-lg text-muted-foreground">{t("description_1")}</p>
         <p className="mt-4 text-lg text-muted-foreground">{t("description_2")}</p>
@@ -85,12 +86,12 @@ export default async function TermsPage(params: { searchParams: SearchParamsProp
         </section>
 
         <section className="space-y-6 p-8 bg-muted/30 rounded-2xl">
-          <h2 className="text-3xl font-bold tracking-tight">{t("what_makes_it_different.title")}</h2>
+          <h2 className="text-3xl font-bold tracking-tight">{t("whatMakesItDifferent.title")}</h2>
           <ul className="space-y-4">
-            <ListItem>{t("what_makes_it_different.points.0")}</ListItem>
-            <ListItem>{t("what_makes_it_different.points.1")}</ListItem>
-            <ListItem>{t("what_makes_it_different.points.2")}</ListItem>
-            <ListItem>{t("what_makes_it_different.points.3")}</ListItem>
+            <ListItem>{t("whatMakesItDifferent.points.0")}</ListItem>
+            <ListItem>{t("whatMakesItDifferent.points.1")}</ListItem>
+            <ListItem>{t("whatMakesItDifferent.points.2")}</ListItem>
+            <ListItem>{t("whatMakesItDifferent.points.3")}</ListItem>
           </ul>
         </section>
       </div>

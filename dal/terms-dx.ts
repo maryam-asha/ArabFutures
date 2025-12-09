@@ -46,10 +46,16 @@ export const findTerms = async (props: {
   const params: (string | number | number[])[] = [];
   let whereConditions: string[] = [];
 
+  //we deal witht has pending to show as publidhed
   if (status) {
-    whereConditions.push("t.status = ?");
-    params.push(status);
+    if (status === "published") {
+      whereConditions.push("t.status IN ('published', 'has-pending-review')");
+    } else {
+      whereConditions.push("t.status = ?");
+      params.push(status);
+    }
   }
+
   if (categoryIds && categoryIds.length > 0) {
     whereConditions.push("t.categoryRef IN (?)");
     params.push(categoryIds);
@@ -60,7 +66,7 @@ export const findTerms = async (props: {
       .split(" ")
       .map((word) => `+${word}`)
       .join(" ");
-    whereConditions.push("(MATCH(name_en, name_ar) AGAINST(? IN BOOLEAN MODE))");
+    whereConditions.push("(MATCH(t.name_en, t.name_ar) AGAINST(? IN BOOLEAN MODE))");
     params.push(searchQuery);
   }
 
@@ -106,7 +112,7 @@ const findFeaturedTermsFn = async (locale: AppLocale): Promise<TermDb[]> => {
   const sql = `
     SELECT ${SQL_SELECT_COLUMNS(locale)}
     ${SQL_STANDARD_JOINS}
-    WHERE t.isFeatured = TRUE AND t.status = 'published'
+    WHERE t.isFeatured = TRUE AND t.status IN ('published', 'has-pending-review')
     ORDER BY t.termId DESC;
   `;
 

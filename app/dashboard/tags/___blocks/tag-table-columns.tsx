@@ -31,8 +31,9 @@ export const columns: ColumnDef<TagWithCount>[] = [
       return t("name");
     },
     cell: ({ row }) => {
+      const tCommon = useTranslations("Common");
       const locale = useLocale() as AppLocale;
-      const name = row.original.name?.[locale] || "N/A";
+      const name = row.original.name?.[locale] || tCommon("notAvailable");
       return <div className="font-medium">{name}</div>;
     },
     filterFn: (row, id, value) => {
@@ -57,7 +58,7 @@ export const columns: ColumnDef<TagWithCount>[] = [
       const tag = row.original;
       const tActions = useTranslations("Common.actions");
       return (
-        <div className="text-right">
+        <div className="text-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">

@@ -1,10 +1,12 @@
 "use client";
 
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem } from "@ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "@ui/sidebar";
 import { BookText, CheckSquare, LayoutGrid, Tag } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import { LogoutButton } from "./logout-button";
 
 interface DashboardSidebarProps {
   pendingReviewCount: number;
@@ -82,6 +84,14 @@ export default function DashboardSidebar({ pendingReviewCount }: DashboardSideba
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter className="mt-auto">
+        <SidebarSeparator />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <LogoutButton />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

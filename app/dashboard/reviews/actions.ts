@@ -2,18 +2,13 @@
 
 import { ActionHandler, createActionParser, createProtectedAction } from "@lib/action-handler";
 import { dbClient } from "@root/dal/client";
-import { findReviewById } from "@root/dal/reviews-dx";
+import { findPendingReviewsByTermId, findReviewById, findReviewsByStatus, getPendingReviewCount } from "@root/dal/reviews-dx";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { ReviewActionSchema } from "./review.schema";
 import { ReviewActionInput } from "./review.type";
-
-/**
- * Handler for an admin approving a review.
- * This is a complex transactional operation.
- */
 
 /**
  * Handler for an admin rejecting a review.
@@ -45,3 +40,16 @@ const rejectReviewHandler: ActionHandler<ReviewActionInput> = async (data) => {
   redirect("/dashboard/reviews");
 };
 export const rejectReviewAction = createProtectedAction(ReviewActionSchema, rejectReviewHandler, createActionParser());
+
+export async function getPendingReviewsByTermId(termId: number) {
+  const reviews = await findPendingReviewsByTermId(termId);
+  return reviews;
+}
+
+export async function getReviewsByStatusAction(status: "pending" | "approved" | "rejected") {
+  return findReviewsByStatus(status);
+}
+
+export async function getPendingReviewCountAction() {
+  return getPendingReviewCount();
+}
