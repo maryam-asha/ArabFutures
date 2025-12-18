@@ -26,7 +26,6 @@ export const authDx: UserIdentityDAL<AppUserIdentity> = {
    */
   async fetchIdentityByCredentials(username, password) {
     const user = await dbClient.selectSingleOrDefault("SELECT userId, username, passwordHash, version, isForbidden FROM users WHERE username = ?", [username], UserSchema);
-    const seed = await bcrypt.hash("admin123", 10);
 
     if (!user) return null;
 
