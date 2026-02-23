@@ -26,7 +26,6 @@ export const authDx: UserIdentityDAL<AppUserIdentity> = {
    */
   async fetchIdentityByCredentials(username, password) {
     const user = await dbClient.selectSingleOrDefault("SELECT userId, username, passwordHash, version, isForbidden FROM users WHERE username = ?", [username], UserSchema);
-
     if (!user) return null;
 
     const passwordMatch = await bcrypt.compare(password, user.passwordHash);

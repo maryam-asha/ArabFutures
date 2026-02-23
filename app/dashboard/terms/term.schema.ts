@@ -57,9 +57,7 @@ export const TermFormSchema = z.object({
   isFeatured: z.coerce.boolean<boolean>(),
   tagIds: z.array(z.coerce.number<number>()).optional(),
   content: TermContentFormSchema,
-
   reviewIds: z.array(z.coerce.number<number>()).optional(),
-  // source: z.literal("reviews").optional(),
   source: z.enum(["reviews", "approvals"]).optional(),
 });
 

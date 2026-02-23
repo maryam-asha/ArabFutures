@@ -31,9 +31,13 @@ export function createActionParser(
 
       if (jsonFields.includes(key)) {
         try {
-          object[key] = JSON.parse(value as string);
+          if (!value || value === "") {
+            object[key] = undefined;
+          } else {
+            object[key] = JSON.parse(value as string);
+          }
         } catch {
-          object[key] = null;
+          object[key] = undefined;
         }
         return;
       }

@@ -91,7 +91,7 @@ export function TermForm({ initialData, categories, tags, selectedReviewIds, chi
       <form action={formAction}>
         <CsrfInput />
         {initialData.termId && <input type="hidden" name="termId" value={initialData.termId} />}
-        <input type="hidden" name="reviewIds" value={JSON.stringify(selectedReviewIds)} />
+        <input type="hidden" name="reviewIds" value={JSON.stringify(selectedReviewIds || [])} />
         {source && <input type="hidden" name="source" value="reviews" />}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">

@@ -1,10 +1,14 @@
 "use server";
 
-import * as Brevo from "@getbrevo/brevo";
+import { BrevoClient } from "@getbrevo/brevo";
 import { createActionParser, createPublicAction } from "@lib/action-handler";
 import env from "@lib/env";
 import { ActionState } from "@root/types";
 import { z } from "zod";
+
+const brevo = new BrevoClient({
+  apiKey: env.BREVO_API_KEY,
+});
 
 const ipRateLimit = new Map<string, { count: number; expires: number }>();
 const RATE_LIMIT_WINDOW = 60 * 1000;
@@ -26,7 +30,7 @@ function checkRateLimit(ip: string = "global") {
 }
 
 const NewsletterSchema = z.object({
-  email: z.email("Please enter a valid email address."),
+  email: z.string().email("Please enter a valid email address."),
 });
 type NewsletterInput = z.infer<typeof NewsletterSchema>;
 
@@ -39,23 +43,23 @@ const subscribeToActionHandler = async (data: NewsletterInput): Promise<ActionSt
     };
   }
 
-  const api = new Brevo.ContactsApi();
-  api.setApiKey(Brevo.ContactsApiApiKeys.apiKey, env.BREVO_API_KEY);
-
-  const createContact = new Brevo.CreateContact();
-  createContact.email = data.email;
-  createContact.listIds = [Number(env.BREVO_LIST_ID)];
-
   try {
-    await api.createContact(createContact);
+    await brevo.contacts.createContact({
+      email: data.email,
+      listIds: [Number(env.BREVO_LIST_ID)],
+      updateEnabled: false,
+    });
+
     return {
       success: true,
       message: "subscribeSuccess",
     };
   } catch (error: any) {
-    console.error("Brevo API Error:", error.body || error);
+    console.error("Brevo API Error:", error.response?.data || error.message);
 
-    if (error.body?.code === "duplicate_parameter") {
+    // check for 'duplicate_parameter' or conflict status 400/409
+    const errorCode = error.response?.data?.code;
+    if (errorCode === "duplicate_parameter") {
       return {
         success: true,
         message: "alreadySubscribed",
