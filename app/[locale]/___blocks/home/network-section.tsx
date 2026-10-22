@@ -1,8 +1,9 @@
 import type { AppLocale } from "@i18n/config";
+import { findActiveMembers } from "@root/dal/members-dx";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { Cta } from "../afs-cta";
-import { NETWORK_MEMBERS } from "./data/members";
+import { NETWORK_MEMBERS, toNetworkMember } from "./data/members";
 import { MemberCard } from "./member-card";
 
 /**
@@ -15,6 +16,10 @@ import { MemberCard } from "./member-card";
 export default async function NetworkSection() {
   const t = await getTranslations("Public.home.network");
   const locale = (await getLocale()) as AppLocale;
+
+  // Real members when any exist; otherwise the placeholder set keeps the section designed.
+  const dbMembers = await findActiveMembers().catch(() => []);
+  const members = dbMembers.length > 0 ? dbMembers.map(toNetworkMember) : NETWORK_MEMBERS;
 
   return (
     <section id="network" data-section="network" aria-labelledby="network-title" className="relative z-[35] overflow-hidden py-20 lg:flex lg:min-h-svh lg:flex-col lg:justify-center lg:py-24">
@@ -42,7 +47,7 @@ export default async function NetworkSection() {
 
       <div data-network-viewport className="mt-10 overflow-x-auto overscroll-x-contain [scrollbar-width:none] lg:mt-4 lg:motion-safe:overflow-visible">
         <ul data-network-track aria-label={t("title")} className="flex w-max snap-x snap-mandatory gap-7 px-[clamp(1.25rem,5.3vw,5rem)] pb-2">
-          {NETWORK_MEMBERS.map((member) => (
+          {members.map((member) => (
             <MemberCard key={member.id} member={member} locale={locale} />
           ))}
         </ul>

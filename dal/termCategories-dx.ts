@@ -1,4 +1,4 @@
-import i18nAppConfig, { AppLocale } from "@i18n/config";
+import i18nAppConfig, { AppLocale, assertAppLocale } from "@i18n/config";
 import { unstable_noStore as noStore } from "next/cache";
 import { cache } from "react";
 import { z } from "zod";
@@ -68,7 +68,8 @@ export const findCategoryById = cache(findCategoryByIdFn);
 /**
  * Fetches active categories for use in form select components. (No changes needed)
  */
-const findActiveCategoryOptionsFn = async (locale: AppLocale): Promise<TermCategoryOption[]> => {
+const findActiveCategoryOptionsFn = async (rawLocale: AppLocale): Promise<TermCategoryOption[]> => {
+  const locale = assertAppLocale(rawLocale);
   const sql = `
     SELECT
       tc.categoryId,

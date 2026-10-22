@@ -34,8 +34,8 @@ function FormPage({ isEditMode, className, ...props }: FormPageProps) {
 export function FormPageHeader(props: React.HTMLAttributes<HTMLDivElement>) {
   return <CardHeader {...props} />;
 }
-export function FormPageTitle(props: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <CardTitle {...props} />;
+export function FormPageTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
+  return <CardTitle className={cn("afs-display text-2xl tracking-tight", className)} {...props} />;
 }
 export function FormPageDescription(props: React.HTMLAttributes<HTMLParagraphElement>) {
   return <CardDescription {...props} />;

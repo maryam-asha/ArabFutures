@@ -1,7 +1,8 @@
-import { NETWORK_MEMBERS } from "@app/[locale]/___blocks/home/data/members";
+import { NETWORK_MEMBERS, toNetworkMember } from "@app/[locale]/___blocks/home/data/members";
 import { MemberCard } from "@app/[locale]/___blocks/home/member-card";
 import { ProjectStage } from "@app/[locale]/___blocks/home/project-stage";
 import type { AppLocale } from "@i18n/config";
+import { findFeaturedMembers } from "@root/dal/members-dx";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { GoldPattern } from "./gold-pattern";
@@ -113,7 +114,10 @@ export async function WhatMakesItDifferent() {
 export async function ReadyToCollaborate() {
   const t = await getTranslations("Public.termsPage.lexicon.collaborate");
   const locale = (await getLocale()) as AppLocale;
-  const contacts = NETWORK_MEMBERS.slice(1, 3);
+
+  // Prefer featured DB members; fall back to placeholders so the section stays populated.
+  const featured = await findFeaturedMembers().catch(() => []);
+  const contacts = featured.length > 0 ? featured.map(toNetworkMember) : NETWORK_MEMBERS.slice(1, 3);
 
   return (
     <section aria-labelledby="collab-title" className="bg-gold text-ink">

@@ -47,7 +47,7 @@ const termSaveHandler: ActionHandler<TermFormValues> = async (data): Promise<Ter
     }
 
     if (reviewIds && reviewIds.length > 0) {
-      trx.update("termReviews", { status: "approved", resolvedAt: new Date() }, { reviewId: { in: reviewIds } });
+      await trx.update("termReviews", { status: "approved", resolvedAt: new Date() }, { reviewId: { in: reviewIds } });
       const otherPendingReviews = await trx.selectSingle("SELECT COUNT(reviewId) as count FROM termReviews WHERE termRef = ? AND status = 'pending' AND reviewId in (?)", [currentTermId, reviewIds], z.object({ count: z.number() }));
 
       if (otherPendingReviews.count === 0) {

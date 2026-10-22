@@ -1,4 +1,4 @@
-import i18nAppConfig, { AppLocale } from "@root/i18n/config";
+import i18nAppConfig, { AppLocale, assertAppLocale } from "@root/i18n/config";
 import { unstable_noStore as noStore } from "next/cache";
 import { cache } from "react";
 import z from "zod";
@@ -67,7 +67,8 @@ export const findTerms = async (props: {
   totalCount: number;
 }> => {
   noStore();
-  const { status, locale, categoryIds, query, letter, orderBy = "newest", limit, offset } = props;
+  const { status, categoryIds, query, letter, orderBy = "newest", limit, offset } = props;
+  const locale = assertAppLocale(props.locale);
 
   const params: (string | number | number[] | string[])[] = [];
   const whereConditions: string[] = [];
@@ -122,7 +123,8 @@ export const findTerms = async (props: {
   return { data, totalCount: countResult.count };
 };
 
-const findTermByIdFn = async ({ termId, locale }: { termId: number; locale: AppLocale }): Promise<TermForEditDb | null> => {
+const findTermByIdFn = async ({ termId, locale: rawLocale }: { termId: number; locale: AppLocale }): Promise<TermForEditDb | null> => {
+  const locale = assertAppLocale(rawLocale);
   const sql = `
     SELECT
       t.*,
@@ -142,7 +144,8 @@ const findTermByIdFn = async ({ termId, locale }: { termId: number; locale: AppL
 };
 export const findTermById = cache(findTermByIdFn);
 
-const findFeaturedTermsFn = async (locale: AppLocale): Promise<TermDb[]> => {
+const findFeaturedTermsFn = async (rawLocale: AppLocale): Promise<TermDb[]> => {
+  const locale = assertAppLocale(rawLocale);
   const sql = `
     SELECT ${SQL_SELECT_COLUMNS(locale)}
     ${SQL_STANDARD_JOINS}
@@ -157,8 +160,9 @@ export const findFeaturedTerms = cache(findFeaturedTermsFn);
 /**
  * Finds the most recently created terms for the dashboard homepage.
  */
-export const findRecentTerms = async (locale: AppLocale, limit: number = 5): Promise<TermDb[]> => {
+export const findRecentTerms = async (rawLocale: AppLocale, limit: number = 5): Promise<TermDb[]> => {
   noStore();
+  const locale = assertAppLocale(rawLocale);
   const sql = `
       SELECT ${SQL_SELECT_COLUMNS(locale)}
       ${SQL_STANDARD_JOINS}

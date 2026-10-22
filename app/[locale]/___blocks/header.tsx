@@ -11,6 +11,7 @@ import { LanguageSwitcher } from "./language-switcher";
 const primaryLinks = [
   { label: "brand", href: "/" },
   { label: "ourProjects", href: "/#projects" },
+  { label: "library", href: "/library" },
   { label: "network", href: "/#network" },
   { label: "aboutUs", href: "/about" },
 ] as const;

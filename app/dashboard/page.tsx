@@ -19,7 +19,7 @@ export default async function DashboardHomePage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t("Dashboard.pages.home.title")}</h1>
+        <h1 className="afs-display text-3xl tracking-tight">{t("Dashboard.pages.home.title")}</h1>
         <p className="mt-1 text-lg text-muted-foreground">{t("Dashboard.pages.home.welcome")}</p>
       </div>
 

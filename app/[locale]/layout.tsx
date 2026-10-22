@@ -97,7 +97,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
       card: "summary_large_image",
       title: siteName,
       description: description,
-      images: ["/og-image.png"],
+      images: ["/og_image.png"],
     },
   };
 }

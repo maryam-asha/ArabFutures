@@ -103,3 +103,130 @@ export const TermReviewDbSchema = z.object({
 export const TermReviewWithTermNameDbSchema = TermReviewDbSchema.extend({
   termName: z.string(),
 });
+
+// =================================================================
+// Members (network / collaborator profiles)
+// =================================================================
+
+export const MemberSocialDbSchema = z.object({
+  email: z.string().optional(),
+  linkedin: z.string().optional(),
+  website: z.string().optional(),
+});
+
+export const MemberWorkDbSchema = z.object({
+  imageUrl: z.string().optional(),
+  type: z.string().optional(),
+  date: z.string().optional(),
+  readTime: z.string().optional(),
+  url: z.string().optional(),
+  title: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  description: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  tags: z
+    .array(z.string())
+    .nullable()
+    .optional()
+    .transform((val) => val ?? []),
+});
+
+export const MemberLinkDbSchema = z.object({
+  label: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  url: z.string().optional(),
+});
+
+export const MemberFavoriteWordDbSchema = z.object({
+  word: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  explanation: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+});
+
+export const MemberContentDbSchema = z.object({
+  photoUrl: z.string().optional(),
+  name: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  role: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  social: z.preprocess((v) => v ?? {}, MemberSocialDbSchema).optional(),
+  roleWithinAsf: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema).optional(),
+  professionalProfile: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema).optional(),
+  favoriteWord: z.preprocess((v) => v ?? {}, MemberFavoriteWordDbSchema).optional(),
+  works: z
+    .array(MemberWorkDbSchema)
+    .nullable()
+    .optional()
+    .transform((val) => val ?? []),
+  links: z
+    .array(MemberLinkDbSchema)
+    .nullable()
+    .optional()
+    .transform((val) => val ?? []),
+});
+
+export const MemberDbSchema = z.object({
+  memberId: z.number(),
+  slug: z.string(),
+  displayOrder: z.number(),
+  isActive: z.coerce.boolean<boolean>(),
+  isFeatured: z.coerce.boolean<boolean>(),
+  content: z.preprocess(safeJsonParse, MemberContentDbSchema),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+
+// =================================================================
+// Library: collections & resources
+// =================================================================
+
+export const CollectionDbSchema = z.object({
+  collectionId: z.number(),
+  displayOrder: z.number(),
+  isActive: z.coerce.boolean<boolean>(),
+  name: z.preprocess(safeJsonParse, TranslatableStringDbSchema),
+});
+
+export const CollectionOptionDbSchema = z.object({
+  collectionId: z.number(),
+  name: z.string(),
+});
+
+export const CollectionWithCountDbSchema = CollectionDbSchema.extend({
+  resourceCount: z.number(),
+});
+
+export const ResourceTypeSchema = z.enum(["book", "article", "report", "video"]);
+
+export const ResourceContentDbSchema = z.object({
+  title: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  description: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  authors: z
+    .array(z.string())
+    .nullable()
+    .optional()
+    .transform((val) => val ?? []),
+  imageUrl: z.string().optional(),
+  url: z.string().optional(),
+  date: z.string().optional(),
+});
+
+export const ResourceDbSchema = z.object({
+  resourceId: z.number(),
+  type: ResourceTypeSchema,
+  categoryRef: z.number().nullable(),
+  language: z.string().nullable(),
+  isActive: z.coerce.boolean<boolean>(),
+  displayOrder: z.number(),
+  content: z.preprocess(safeJsonParse, ResourceContentDbSchema),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+
+  categoryName: z.string().nullable(),
+  tags: z.preprocess(safeJsonParse, z.array(TagDbSchema).nullable()).transform((val) => val || []),
+});
+
+export const ResourceForEditDbSchema = ResourceDbSchema.extend({
+  tagIds: z
+    .preprocess((val) => (typeof val === "string" && val ? JSON.parse(val) : val), z.array(z.number()))
+    .nullable()
+    .transform((arr) => arr || []),
+  collectionIds: z
+    .preprocess((val) => (typeof val === "string" && val ? JSON.parse(val) : val), z.array(z.number()))
+    .nullable()
+    .transform((arr) => arr || []),
+});
