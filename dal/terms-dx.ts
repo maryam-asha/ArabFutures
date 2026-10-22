@@ -28,11 +28,37 @@ const SQL_STANDARD_JOINS = `
   LEFT JOIN termCategories AS tc ON t.categoryRef = tc.categoryId
 `;
 
+/** Arabic letters that share an index entry, as in a printed dictionary (hamza forms under alif, etc.). */
+const ARABIC_LETTER_VARIANTS: Record<string, string[]> = {
+  ا: ["ا", "أ", "إ", "آ"],
+  ه: ["ه", "ة"],
+  ي: ["ي", "ى"],
+};
+
+/**
+ * WHERE fragment for the A–Z / ا–ي index. Latin letters match the English name; Arabic letters match the Arabic
+ * name, ignoring the definite article "ال" the way Arabic dictionaries are ordered.
+ */
+function buildLetterCondition(letter: string): { sql: string; param: string | string[] } | null {
+  if (/^[A-Za-z]$/.test(letter)) {
+    return { sql: "t.name_en LIKE ?", param: `${letter}%` };
+  }
+  if (/^[ء-ي]$/.test(letter)) {
+    return {
+      sql: "LEFT(IF(t.name_ar LIKE 'ال%', SUBSTRING(t.name_ar, 3), t.name_ar), 1) IN (?)",
+      param: ARABIC_LETTER_VARIANTS[letter] ?? [letter],
+    };
+  }
+  return null;
+}
+
 export const findTerms = async (props: {
   locale: AppLocale;
   status?: "pending" | "published" | "rejected" | "has-pending-review";
   categoryIds?: number[];
   query?: string;
+  /** Initial letter, Latin (matched on the English name) or Arabic (matched on the Arabic name). */
+  letter?: string;
   orderBy?: "newest" | "oldest";
   limit?: number;
   offset?: number;
@@ -41,10 +67,10 @@ export const findTerms = async (props: {
   totalCount: number;
 }> => {
   noStore();
-  const { status, locale, categoryIds, query, orderBy = "newest", limit, offset } = props;
+  const { status, locale, categoryIds, query, letter, orderBy = "newest", limit, offset } = props;
 
-  const params: (string | number | number[])[] = [];
-  let whereConditions: string[] = [];
+  const params: (string | number | number[] | string[])[] = [];
+  const whereConditions: string[] = [];
 
   //we deal witht has pending to show as publidhed
   if (status) {
@@ -68,6 +94,14 @@ export const findTerms = async (props: {
       .join(" ");
     whereConditions.push("(MATCH(t.name_en, t.name_ar) AGAINST(? IN BOOLEAN MODE))");
     params.push(searchQuery);
+  }
+
+  if (letter) {
+    const letterCondition = buildLetterCondition(letter);
+    if (letterCondition) {
+      whereConditions.push(letterCondition.sql);
+      params.push(letterCondition.param);
+    }
   }
 
   const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";

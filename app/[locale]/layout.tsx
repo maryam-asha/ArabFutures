@@ -4,7 +4,7 @@ import i18nAppConfig from "@root/i18n/config";
 import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
-import { Inter, Tajawal } from "next/font/google";
+import { Barlow, Barlow_Condensed, Tajawal } from "next/font/google";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import type React from "react";
@@ -14,14 +14,23 @@ import "../globals.css";
 import PublicFooter from "./___blocks/footer";
 import PublicHeader from "./___blocks/header";
 
-const inter = Inter({
+const barlow = Barlow({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-barlow",
+  weight: ["300", "400", "500", "600"],
+});
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-barlow-condensed",
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
 });
 
 const tajawal = Tajawal({
-  subsets: ["arabic"],
+  subsets: ["arabic", "latin"],
   display: "swap",
   variable: "--font-tajawal",
   weight: ["400", "500", "700"],
@@ -93,6 +102,9 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
   };
 }
 
+// Runs before first paint: lets CSS hide intro elements only when GSAP is going to reveal them.
+const MOTION_GATE_SCRIPT = `try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("motion-ok")}catch(e){}`;
+
 export function generateStaticParams() {
   return i18nAppConfig.locales.map((locale) => ({ locale }));
 }
@@ -114,8 +126,12 @@ export default async function LocaleLayout({
   const csrfToken = cookieStore.get("csrf_token")?.value ?? "";
 
   return (
-    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} className={cn("scroll-smooth", locale === "ar" ? `${tajawal.variable} font-sans-arabic` : `${inter.variable} font-sans antialiased`)}>
-      <body className="bg-background text-foreground overflow-x-hidden scroll-smooth">
+    // suppressHydrationWarning: the inline script below adds `motion-ok` before hydration.
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} className={cn("theme-afs", barlow.variable, barlowCondensed.variable, tajawal.variable)} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: MOTION_GATE_SCRIPT }} />
+      </head>
+      <body className="bg-background text-foreground font-sans antialiased overflow-x-hidden">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <CsrfManager initialToken={csrfToken}>
             <div className="flex flex-col min-h-dvh">

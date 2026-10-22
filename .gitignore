@@ -40,9 +40,27 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-#password generator
+# password generator
 generate-hash.js
-
 
 bun.lock
 text-grab.config.json
+
+# design files
+figma/
+
+# archives and large backups
+*.rar
+*.zip
+*.tar.gz
+
+# logs
+logs/
+*.log
+
+# internal tools & analysis
+graphify-out/
+
+# IDE
+.idea/
+.vscode/

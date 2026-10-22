@@ -1,6 +1,6 @@
 "use server";
 
-import { AppLocale } from "@i18n/config";
+import i18nAppConfig, { AppLocale } from "@i18n/config";
 import { createActionParser, createPublicAction } from "@lib/action-handler";
 import { sendContactFormEmail } from "@lib/email-service";
 import { dbClient } from "@root/dal/client";
@@ -105,20 +105,37 @@ const contactHandler = async (data: ContactActionValues): Promise<ActionState<Co
 
 export const contactAction = createPublicAction(ContactActionSchema, contactHandler, createActionParser());
 
-const TERMS_PER_PAGE = 8;
+const TERMS_PER_PAGE = 12;
 
-export async function loadMoreTermsAction(locale: AppLocale, page: number, query?: string, categoryIds?: number[], orderBy?: "newest" | "oldest"): Promise<TermDb[]> {
+const LoadTermsSchema = z.object({
+  page: z.number().int().min(0).default(0),
+  query: z.string().max(200).optional(),
+  categoryIds: z.array(z.number().int().positive()).max(50).optional(),
+  orderBy: z.enum(["newest", "oldest"]).optional(),
+  letter: z
+    .string()
+    .regex(/^[A-Za-zء-ي]$/)
+    .optional(),
+});
+
+export type LoadTermsOptions = z.input<typeof LoadTermsSchema>;
+
+export async function loadMoreTermsAction(locale: AppLocale, options: LoadTermsOptions): Promise<{ terms: TermDb[]; hasMore: boolean; totalCount: number }> {
+  // Both arguments come from the client: the locale is interpolated into SQL JSON paths by the DAL, so it must be a known locale.
+  if (!i18nAppConfig.locales.includes(locale)) throw new Error("Invalid locale");
+  const { page, query, categoryIds, orderBy, letter } = LoadTermsSchema.parse(options);
   const offset = page * TERMS_PER_PAGE;
 
-  const { data: terms } = await findTerms({
+  const { data: terms, totalCount } = await findTerms({
     locale,
     status: "published",
     query,
     categoryIds,
     orderBy,
+    letter,
     limit: TERMS_PER_PAGE,
     offset,
   });
 
-  return terms;
+  return { terms, hasMore: offset + terms.length < totalCount, totalCount };
 }

@@ -1,83 +1,68 @@
 "use client";
 
-import { Link, useRouter } from "@i18n/navigation";
-import { Button } from "@ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@ui/dropdown-menu";
-import { Home, MenuIcon } from "lucide-react";
+import { Link } from "@i18n/navigation";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@ui/sheet";
+import { MenuIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 import { LanguageSwitcher } from "./language-switcher";
 
-const navLinks = [
-  { label: "about", href: "/#about" },
-  { label: "work", href: "/#work" },
-  { label: "home", href: "/" },
-  { label: "projects", href: "/terms" },
-  { label: "contact", href: "/contact" },
-];
+const primaryLinks = [
+  { label: "brand", href: "/" },
+  { label: "ourProjects", href: "/#projects" },
+  { label: "network", href: "/#network" },
+  { label: "aboutUs", href: "/about" },
+] as const;
 
-function moveItemToFront(arr: typeof navLinks, prop: keyof (typeof navLinks)[0], value: string) {
-  const newArr = [...arr];
-
-  const itemIndex = newArr.findIndex((item) => item[prop] === value);
-
-  if (itemIndex > -1) {
-    const [itemToMove] = newArr.splice(itemIndex, 1);
-
-    newArr.unshift(itemToMove);
-  }
-
-  return newArr;
-}
+const linkClass = "afs-label text-light hover:text-gold transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold";
 
 const Navbar = () => {
-  const router = useRouter();
   const tNav = useTranslations("Public.nav");
+  const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 bg-background w-full p-2 md:p-4 z-50">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-8">
-        <div className="text-muted-foreground font-bold text-lg flex-1 items-center gap-8 hidden md:flex md:justify-center lg:gap-16">
-          {navLinks.map((item) =>
-            item.label === "home" ? (
-              <Link key={`${item.label}`} href={item.href} className="ring-2 rounded-full p-1">
-                <Home className="w-5 h-5" />
-              </Link>
-            ) : (
-              <Link className="hover:border-b hover:-mt-1" key={`${item.label}`} href={item.href}>
-                {tNav(item.label)}
-              </Link>
-            ),
-          )}
-        </div>
+    <header className="bg-ink relative z-50 w-full">
+      <div className="afs-container flex h-22 items-center justify-between gap-8">
+        <nav aria-label={tNav("menu-sr")} className="hidden items-center gap-11 md:flex">
+          {primaryLinks.map((item) => (
+            <Link key={item.label} href={item.href} className={linkClass}>
+              {tNav(item.label)}
+            </Link>
+          ))}
+        </nav>
+        <Link href="/" className={`${linkClass} md:hidden`}>
+          {tNav("brand")}
+        </Link>
 
-        <div className=" flex items-center gap-6">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="md:hidden" asChild>
-              <Button variant="outline" size="icon">
-                <MenuIcon />
-                <span className="sr-only">{tNav("menu-sr")}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="center">
-              <DropdownMenuGroup>
-                {moveItemToFront(navLinks, "label", "home").map((item, index) => (
-                  <DropdownMenuItem
-                    key={index}
-                    onClick={() => {
-                      router.push(item.href);
-                    }}
-                    className="cursor-pointer"
-                  >
+        <div className="flex items-center gap-6 md:gap-7">
+          <Link href="/contact" className={`${linkClass} hidden md:inline`}>
+            {tNav("contactUs")}
+          </Link>
+          <Link href="/contact" className="afs-label border-gold text-gold hover:bg-gold hover:text-ink hidden border px-4 py-2 transition-colors sm:inline-block">
+            {tNav("partner")}
+          </Link>
+          <LanguageSwitcher />
+
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger className="text-light hover:text-gold p-1 md:hidden">
+              <MenuIcon className="size-6" />
+              <span className="sr-only">{tNav("menu-sr")}</span>
+            </SheetTrigger>
+            <SheetContent side="top" className="bg-ink border-border border-b">
+              <SheetTitle className="sr-only">{tNav("menu-sr")}</SheetTitle>
+              <nav className="afs-container flex flex-col gap-6 py-10">
+                {[...primaryLinks, { label: "contactUs", href: "/contact" } as const].map((item) => (
+                  <Link key={item.label} href={item.href} onClick={() => setOpen(false)} className={`${linkClass} text-lg`}>
                     {tNav(item.label)}
-                  </DropdownMenuItem>
+                  </Link>
                 ))}
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <div className="fixed end-2 top-2 flex flex-1 items-center justify-end gap-6">
-            <LanguageSwitcher />
-          </div>
+                <Link href="/contact" onClick={() => setOpen(false)} className="afs-label border-gold text-gold self-start border px-4 py-2">
+                  {tNav("partner")}
+                </Link>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

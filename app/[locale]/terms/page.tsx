@@ -2,11 +2,14 @@ import { loadMoreTermsAction } from "@app/[locale]/public-actions";
 import { getActiveCategoryOptionsAction } from "@app/dashboard/term-categories/action";
 import { AppLocale } from "@root/i18n/config";
 import { SearchParamsProps } from "@root/types";
-import { CheckCircle } from "lucide-react";
 import { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 
+import { FailedToLoad } from "../___blocks/failed-to-load";
+import { GetInvolvedSection } from "../___blocks/home/closing-sections";
 import { TermList } from "../___blocks/term-list";
+import { LexiconHero, LexiconStatement, ReadyToCollaborate, WhatMakesItDifferent, WhyItMatters } from "./___blocks/lexicon-sections";
+import { LexiconMotion } from "./___blocks/lexicon-motion";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -38,70 +41,66 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-const ListItem = ({ children }: { children: React.ReactNode }) => (
-  <li className="flex items-start gap-3">
-    <CheckCircle className="h-5 w-5 mt-1 shrink-0 text-primary" />
-    <span className="text-muted-foreground">{children}</span>
-  </li>
-);
+const LETTER_PATTERN = /^[A-Za-zء-ي]$/;
 
-export default async function TermsPage(params: { searchParams: SearchParamsProps }) {
-  const searchParamsObject = await params.searchParams;
-
+/** The term explorer, fed from the database. A failed query degrades to an inline message, not a broken page. */
+async function TermExplorer({ searchParams }: { searchParams: Awaited<SearchParamsProps> }) {
   const locale = (await getLocale()) as AppLocale;
-  const t = await getTranslations("Public.termsPage");
-  const query = searchParamsObject?.query?.toString() || "";
-  const sort = searchParamsObject?.sort?.toString() || "newest";
+  const query = searchParams?.query?.toString() || "";
+  const sort = searchParams?.sort?.toString() === "oldest" ? "oldest" : "newest";
+  const letterParam = searchParams?.letter?.toString() || "";
+  const letter = LETTER_PATTERN.test(letterParam) ? letterParam : "";
   const categoryIds =
-    searchParamsObject?.category && typeof searchParamsObject.category === "string"
-      ? searchParamsObject.category
+    typeof searchParams?.category === "string"
+      ? searchParams.category
           .split(",")
           .map(Number)
-          .filter((id) => !isNaN(id))
+          .filter((id) => Number.isInteger(id) && id > 0)
       : [];
 
-  const [categories, initialTerms] = await Promise.all([getActiveCategoryOptionsAction(locale), loadMoreTermsAction(locale, 0, query, categoryIds, sort as any)]);
+  const data = await Promise.all([
+    getActiveCategoryOptionsAction(locale),
+    loadMoreTermsAction(locale, { page: 0, query: query || undefined, categoryIds, orderBy: sort, letter: letter || undefined }),
+  ]).catch((error) => {
+    console.error("Lexicon: failed to load terms", error);
+    return null;
+  });
+
+  if (!data) {
+    return (
+      <div className="afs-container">
+        <FailedToLoad />
+      </div>
+    );
+  }
+
+  const [categories, initial] = data;
   return (
-    <div className="container mx-auto py-16 sm:py-24 px-2 md:px-8">
-      {/* Centered header section for title and description. */}
-      <header className="max-w-5xl mx-auto mb-16 p-8">
-        <h1 className="text-4xl font-bold tracking-tight md:text-5xl text-center">{t("title")}</h1>
-        <p className="mt-4 text-lg text-muted-foreground">{t("description_1")}</p>
-        <p className="mt-4 text-lg text-muted-foreground">{t("description_2")}</p>
-        <p className="mt-4 text-lg text-muted-foreground">{t("description_3")}</p>
-      </header>
+    <TermList
+      initialTerms={initial.terms}
+      initialHasMore={initial.hasMore}
+      initialTotal={initial.totalCount}
+      categories={categories}
+      initialQuery={query}
+      initialCategoryIds={categoryIds}
+      initialSort={sort}
+      initialLetter={letter}
+    />
+  );
+}
 
-      {/* Grid layout for "Why it Matters" and "What Makes it Different" sections. */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 mb-24">
-        <section className="space-y-6 p-8 bg-muted/30 rounded-2xl">
-          <h2 className="text-3xl font-bold tracking-tight">{t("why_it_matters.title")}</h2>
-          <p className="font-medium text-foreground">{t("why_it_matters.intro")}</p>
-          <p className="text-muted-foreground">{t("why_it_matters.subtitle")}</p>
-          <ul className="space-y-4">
-            <ListItem>{t("why_it_matters.points.0")}</ListItem>
-            <ListItem>{t("why_it_matters.points.1")}</ListItem>
-            <ListItem>{t("why_it_matters.points.2")}</ListItem>
-            <ListItem>{t("why_it_matters.points.3")}</ListItem>
-          </ul>
-        </section>
+export default async function TermsPage(params: { searchParams: SearchParamsProps }) {
+  const searchParams = await params.searchParams;
 
-        <section className="space-y-6 p-8 bg-muted/30 rounded-2xl">
-          <h2 className="text-3xl font-bold tracking-tight">{t("whatMakesItDifferent.title")}</h2>
-          <ul className="space-y-4">
-            <ListItem>{t("whatMakesItDifferent.points.0")}</ListItem>
-            <ListItem>{t("whatMakesItDifferent.points.1")}</ListItem>
-            <ListItem>{t("whatMakesItDifferent.points.2")}</ListItem>
-            <ListItem>{t("whatMakesItDifferent.points.3")}</ListItem>
-          </ul>
-        </section>
-      </div>
-
-      {/* The client component handles all interactivity from here, separated by a title. */}
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-bold tracking-tight">{t("exploreTitle")}</h2>
-        <p className="mt-2 text-muted-foreground">{t("exploreDescription")}</p>
-      </div>
-      <TermList initialTerms={initialTerms} categories={categories} initialQuery={query} initialCategoryIds={categoryIds} initialSort={sort as any} />
-    </div>
+  return (
+    <LexiconMotion>
+      <LexiconHero />
+      <TermExplorer searchParams={searchParams} />
+      <LexiconStatement />
+      <WhyItMatters />
+      <WhatMakesItDifferent />
+      <ReadyToCollaborate />
+      <GetInvolvedSection />
+    </LexiconMotion>
   );
 }

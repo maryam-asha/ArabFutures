@@ -86,7 +86,13 @@
       "projects": "Projects",
       "contact": "Contact",
       "menu-sr": "Toggle main menu",
-      "change-language-sr": "Change language"
+      "change-language-sr": "Change language",
+      "brand": "AFS",
+      "ourProjects": "Our Projects",
+      "network": "Our Network",
+      "aboutUs": "About Us",
+      "contactUs": "Contact Us",
+      "partner": "Partner with us"
     },
     "hero": {
       "title": "Arab Futures Society",
@@ -314,7 +320,116 @@
         ]
       },
       "exploreTitle": "Explore the Terms",
-      "exploreDescription": "Search for specific terms, filter by category, and sort by date to find the information you need."
+      "exploreDescription": "Search for specific terms, filter by category, and sort by date to find the information you need.",
+      "lexicon": {
+        "subtitle": "A living, collaborative, and authoritative reference for Arabic foresight terminology. Explore, add, grow.",
+        "search": "Search terms",
+        "clearSearch": "Clear search",
+        "filter": "Filter",
+        "categories": "Categories",
+        "sortBy": "Sort by",
+        "clearFilters": "Clear filters",
+        "suggestTerm": "Suggest term",
+        "browseLatin": "Browse by English initial",
+        "browseArabic": "Browse by Arabic initial",
+        "showAllLetters": "All letters",
+        "results": "{count, plural, =0 {No terms} one {# term} other {# terms}}",
+        "noResults": "No terms match these filters yet.",
+        "statement": "The Arab Futures Lexicon serves as both <hl>a knowledge base and a community platform,</hl> where experts and contributors work together to shape the evolving language <hl>of Arab futures.</hl>",
+        "collaborate": {
+          "title": "Ready to collaborate?",
+          "description": "We welcome Arab futurists, practitioners, and researchers to join us in shaping the lexicon."
+        }
+      }
+    },
+    "footer": {
+      "projects": "Projects",
+      "afs": "AFS",
+      "lexicon": "Lexicon",
+      "about": "About us",
+      "contact": "Contact",
+      "newsletter": "Newsletter",
+      "rights": "All rights reserved."
+    },
+    "home": {
+      "hero": {
+        "lead": "Building the",
+        "accent": "Foundations",
+        "line2": "of a Foresight Ecosystem",
+        "subtitle": "Across the Arab World",
+        "description": "Connecting institutions, analysts, and decision-makers through a shared infrastructure for strategic anticipation.",
+        "ctaPrimary": "Explore our work",
+        "ctaSecondary": "Join our mission"
+      },
+      "network": {
+        "title": "Our Growing Network",
+        "description": "Actively reaching out to all Arab speakers working on futures or anyone working on Arab futures and connecting them with the wider community.",
+        "viewAll": "View all",
+        "placeholderNote": "Member profiles coming soon"
+      },
+      "language": {
+        "line1": "A language that imagines,",
+        "line2": "transforms the world."
+      },
+      "projects": {
+        "title": "Our Projects",
+        "progress": "Project {current} of {total}",
+        "comingSoon": "Coming Soon",
+        "cta": {
+          "exploreLibrary": "Explore the library",
+          "support": "Support this project",
+          "learnMore": "Learn more",
+          "partner": "Partner with us"
+        },
+        "items": {
+          "library": {
+            "title": [
+              "The Arab",
+              "Futures Library"
+            ],
+            "description": "A digital library of Arabic resources on futures studies and strategic foresight to serve as a knowledge hub and a reference for anyone interested in learning about futures work in the region. We collect this in one space to provide easy access for scholars interested in the field and to help build on the knowledge that already exists."
+          },
+          "lexicon": {
+            "title": [
+              "The Arab",
+              "Futures Lexicon"
+            ],
+            "description": "The lexicon serves as a space for anyone looking for Arabic-English translations of futures studies terminologies. It aims to provide researchers and practitioners with the translations already existing in published literature, saving them the time and effort of having to go through the process of figuring out translations."
+          },
+          "network": {
+            "title": [
+              "Building the Network"
+            ],
+            "description": "Building the network of Arab futures researchers and foresight practitioners with the aim of building a regional community of practice that supports and learns from each other and that helps co-create visions of the futures that represent the region."
+          },
+          "diploma": {
+            "title": [
+              "Graduate",
+              "Futures Diploma"
+            ],
+            "description": "The first and only academic graduate diploma in foresight taught in Arabic."
+          },
+          "children": {
+            "title": [
+              "Futures",
+              "for Children"
+            ],
+            "description": "A working group on engaging teachers in educating children on futures through play and storytelling."
+          }
+        }
+      },
+      "involved": {
+        "title": "Get Involved",
+        "line1": "Want to contribute to our projects?",
+        "line2": "We welcome collaborators, researchers, and practitioners.",
+        "cta": "Partner with us"
+      },
+      "support": {
+        "title": "Support Our Work",
+        "description": "Help us build the foundations of Arab foresight.",
+        "cta": "Partner with us"
+      },
+      "newsletterBar": "Join our newsletter"
     }
   },
   "Dashboard": {

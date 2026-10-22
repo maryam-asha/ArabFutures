@@ -1,64 +1,104 @@
-import { Link } from "@i18n/navigation";
-import { Button } from "@ui/button";
-import { ArrowRight } from "lucide-react";
-import { getLocale, getTranslations } from "next-intl/server";
-import Image from "next/image";
+import { getTranslations } from "next-intl/server";
+import type { ReactNode } from "react";
 
-interface Feature {
-  id: string;
-  heading: string;
-  subheading: string;
-  label: string;
-  description: string;
-  image: string;
-  url: string;
-}
+import { Cta } from "./afs-cta";
+import { PROJECT_ORDER, type ProjectId } from "./home/project-layouts";
+import { ProgressDashes, ProjectStage } from "./home/project-stage";
 
-const ProjectSection = async () => {
-  const t = await getTranslations("Public.projects");
-  const locale = await getLocale();
-  const title = t("title");
-  const features: Feature[] = t.raw("features");
+type CtaKey = "exploreLibrary" | "support" | "learnMore" | "partner";
+type ProjectCta = { key: CtaKey; href: string; variant: "outline" | "text" };
 
-  return (
-    <section id="projects">
-      <div className="container mx-auto">
-        <div className="mx-auto mb-16  text-center">
-          <h2 className="text-4xl font-bold tracking-tight lg:text-5xl">{title}</h2>
-        </div>
+/** Only real destinations are linked; projects without a page yet show "Coming soon" instead of a dead link. */
+const PROJECT_CTAS: Record<ProjectId, { comingSoon?: boolean; ctas: ProjectCta[] }> = {
+  library: { comingSoon: true, ctas: [{ key: "support", href: "/contact", variant: "text" }] },
+  lexicon: {
+    ctas: [
+      { key: "learnMore", href: "/terms", variant: "outline" },
+      { key: "partner", href: "/contact", variant: "text" },
+    ],
+  },
+  network: {
+    ctas: [
+      { key: "learnMore", href: "/#network", variant: "outline" },
+      { key: "partner", href: "/contact", variant: "text" },
+    ],
+  },
+  diploma: { comingSoon: true, ctas: [{ key: "partner", href: "/contact", variant: "text" }] },
+  children: { ctas: [{ key: "partner", href: "/contact", variant: "text" }] },
+};
 
-        <div className="mx-auto ">
-          {features.map((feature) => (
-            <div key={feature.id} className="grid items-center gap-8 overflow-hidden rounded-2xl bg-background shadow-lg md:grid-cols-2 md:gap-0">
-              {/* Image Column */}
-              <div className="relative h-64 md:h-full w-full">
-                <Image src={feature.image} alt={feature.heading} fill className="object-cover object-[25%_100%] " sizes="(max-width: 768px) 100vw, 50vw" />
-                <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent"></div>
-              </div>
+export default async function ProjectsSection() {
+  const t = await getTranslations("Public.home.projects");
+  const total = PROJECT_ORDER.length;
 
-              {/* Content Column */}
-              <div className="flex flex-col justify-between p-8 md:p-10 lg:p-12 h-full">
-                <div>
-                  <span className="text-primary font-semibold uppercase tracking-wider">{feature.label}</span>
-                  <h3 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">{feature.heading}</h3>
-                  <p className="mt-1 text-lg text-muted-foreground">{feature.subheading}</p>
-                  <p className="mt-6 text-base leading-relaxed text-muted-foreground">{feature.description}</p>
-                </div>
-                <div className="mt-8">
-                  <Button asChild size="lg" className="group w-full sm:w-auto">
-                    <Link href={feature.url}>
-                      {t("viewProject")} {/* Assumes 'viewProject' key exists */}
-                      <ArrowRight className={`h-4 w-4 transition-transform group-hover:translate-x-1 ${locale === "ar" ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
+  const panel = (id: ProjectId, index: number): ReactNode => {
+    const title = t.raw(`items.${id}.title`) as string[];
+    const config = PROJECT_CTAS[id];
+    return (
+      <>
+        <h3 data-panel-part className="afs-display text-light text-[clamp(2.2rem,3.9vw,3.6rem)]">
+          {title.map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
+        </h3>
+        <p data-panel-part className="text-light/90 mt-5 max-w-[42rem] text-lg leading-relaxed md:text-[1.35rem]">
+          {t(`items.${id}.description`)}
+          {config.comingSoon && id === "diploma" && <span className="text-gold-pale"> {t("comingSoon")}</span>}
+        </p>
+        <div data-panel-part className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3">
+          {config.comingSoon && id !== "diploma" && <span className="afs-label border-light/30 text-light/60 border px-3 py-2 text-xs">{t("comingSoon")}</span>}
+          {config.ctas.map((cta) => (
+            <Cta key={cta.key} href={cta.href} variant={cta.variant} size="sm" data-project-cta={index}>
+              {t(`cta.${cta.key}`)}
+            </Cta>
           ))}
         </div>
+      </>
+    );
+  };
+
+  return (
+    <section id="projects" data-section="projects" aria-labelledby="projects-title" className="relative">
+      {/* Desktop with motion: one pinned stage, the composition morphs from project to project. */}
+      <div data-projects-pin className="afs-container hidden min-h-svh flex-col justify-center py-14 lg:motion-safe:flex">
+        <h2 id="projects-title" className="afs-display text-light text-center text-[clamp(2.6rem,4.2vw,3.6rem)]">
+          {t("title")}
+        </h2>
+        <div className="mt-[clamp(2rem,6vh,5rem)] grid grid-cols-[minmax(0,0.95fr)_minmax(0,1fr)] items-center gap-[clamp(2rem,4vw,4rem)]">
+          <ProjectStage project={PROJECT_ORDER[0]} shared className="max-h-[62svh] max-w-[38rem] justify-self-start" />
+          <div>
+            <ProgressDashes active={0} total={total} className="mb-6" />
+            <p className="sr-only" data-project-progress aria-live="polite">
+              {t("progress", { current: 1, total })}
+            </p>
+            <div className="grid">
+              {PROJECT_ORDER.map((id, index) => (
+                <div key={id} data-project-panel={index} className="[grid-area:1/1]" style={index > 0 ? { opacity: 0, pointerEvents: "none" } : undefined}>
+                  {panel(id, index)}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile and reduced motion: the same projects as a readable stacked list. */}
+      <div className="afs-container py-20 lg:motion-safe:hidden">
+        <h2 className="afs-display text-light text-center text-[clamp(2.6rem,8vw,3.6rem)]">{t("title")}</h2>
+        <ol className="mt-16 flex flex-col gap-24">
+          {PROJECT_ORDER.map((id, index) => (
+            <li key={id} data-project-item className="grid items-center gap-10 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)]">
+              <ProjectStage project={id} className="mx-auto max-w-[26rem]" />
+              <div>
+                <ProgressDashes active={index} total={total} className="mb-6" />
+                {panel(id, index)}
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );
-};
-
-export default ProjectSection;
+}
