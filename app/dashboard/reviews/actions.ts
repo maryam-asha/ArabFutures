@@ -1,6 +1,7 @@
 "use server";
 
 import { ActionHandler, createActionParser, createProtectedAction } from "@lib/action-handler";
+import { auth } from "@lib/auth";
 import { dbClient } from "@root/dal/client";
 import { findPendingReviewsByTermId, findReviewById, findReviewsByStatus, getPendingReviewCount } from "@root/dal/reviews-dx";
 import { revalidatePath } from "next/cache";
@@ -42,14 +43,18 @@ const rejectReviewHandler: ActionHandler<ReviewActionInput> = async (data) => {
 export const rejectReviewAction = createProtectedAction(ReviewActionSchema, rejectReviewHandler, createActionParser());
 
 export async function getPendingReviewsByTermId(termId: number) {
+  // Admin-only data: server actions are callable independently of the dashboard layout, so guard here.
+  if (!(await auth.getSession())) return [];
   const reviews = await findPendingReviewsByTermId(termId);
   return reviews;
 }
 
 export async function getReviewsByStatusAction(status: "pending" | "approved" | "rejected") {
+  if (!(await auth.getSession())) return [];
   return findReviewsByStatus(status);
 }
 
 export async function getPendingReviewCountAction() {
+  if (!(await auth.getSession())) return 0;
   return getPendingReviewCount();
 }

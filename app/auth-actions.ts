@@ -5,6 +5,18 @@ import { AppUserIdentity } from "@root/dal/auth-dx";
 import { AuthError, AuthSession, InvalidCredentialsError, RateLimitError } from "@waelhabbaldev/next-jwt-auth";
 import { redirect } from "next/navigation";
 
+/**
+ * Only allow redirects to same-origin, relative paths. This blocks open redirects such as
+ * `//evil.com`, `/\evil.com` and absolute URLs with a scheme (`https://evil.com`).
+ */
+function safeCallbackUrl(value: FormDataEntryValue | null): string {
+  const fallback = "/dashboard";
+  if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//") || value.startsWith("/\\")) {
+    return fallback;
+  }
+  return value;
+}
+
 export async function signInAction(prevState: { error: string } | undefined, formData: FormData) {
   try {
     const username = formData.get("username") as string;
@@ -26,7 +38,7 @@ export async function signInAction(prevState: { error: string } | undefined, for
     return { error: "Common.unexpectedError" };
   }
 
-  const callbackUrl = (formData.get("callbackUrl") as string) || "/dashboard";
+  const callbackUrl = safeCallbackUrl(formData.get("callbackUrl"));
   redirect(callbackUrl);
 }
 

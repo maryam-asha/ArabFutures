@@ -4,7 +4,7 @@ import FormPage, { FormPageActions, FormPageContent, FormPageDescription, FormPa
 import { getPendingReviewsByTermId } from "@app/dashboard/reviews/actions";
 import { getTagOptionsAction } from "@app/dashboard/tags/actions";
 import { getActiveCategoryOptionsAction } from "@app/dashboard/term-categories/action";
-import { getTermDetailsAction } from "@app/terms-actions";
+import { getTermForEditAction } from "@app/terms-actions";
 import { Button } from "@components/ui/button";
 import i18nAppConfig from "@i18n/config";
 import { TagOption, TermCategoryOption, TermForEditDb, TermReviewDb } from "@root/dal/dal.types";
@@ -21,7 +21,6 @@ import { TermFormValues } from "../term.types";
 export default function EditTermPage() {
   const params = useParams();
   const termId = Number(params.termId);
-  console.log(termId);
 
   const [term, setTerm] = useState<TermForEditDb | null>(null);
   const [categories, setCategories] = useState<TermCategoryOption[]>([]);
@@ -35,7 +34,7 @@ export default function EditTermPage() {
     async function fetchData() {
       try {
         const [termData, categoriesData, tagsData, reviewsData] = await Promise.all([
-          getTermDetailsAction("ar", termId),
+          getTermForEditAction("ar", termId),
           getActiveCategoryOptionsAction(i18nAppConfig.defaultLocale),
           getTagOptionsAction(i18nAppConfig.defaultLocale),
           getPendingReviewsByTermId(termId),

@@ -22,46 +22,42 @@ INSERT INTO `tags` (`tagId`, `name`) VALUES
 (9, '{\"en\": \"Physics\", \"ar\": \"الفيزياء\"}');
 
 -- =================================================================
--- 50 Sample Terms (No changes needed)
+-- Sample Terms
+-- NOTE: This file historically shipped 50 sample terms, but the middle of the
+-- INSERT block (terms 2–49) was dropped upstream and only terms 1 and 50
+-- survived. The relational data below has been trimmed to reference only the
+-- terms that actually exist, so the seed loads cleanly. Add more real terms
+-- here (with accurate en/ar content) to flesh out the demo dataset.
 -- =================================================================
 
 INSERT INTO `terms` (`termId`, `categoryRef`, `status`, `isFeatured`, `content`) VALUES
--- ... (The entire 50-term insert block remains exactly the same and is correct)
-(1, 1, 'published', 1, CAST('{\"default\": {\"en\": {\"name\": \"Artificial General Intelligence (AGI)\", \"briefDescription\": \"A hypothetical type of AI that possesses the ability to understand or learn any intellectual task that a human being can.\"}, \"ar\": {\"name\": \"الذكاء الاصطناعي العام\", \"briefDescription\": \"نوع افتراضي من الذكاء الاصطناعي لديه القدرة على فهم أو تعلم أي مهمة فكرية يمكن للإنسان القيام بها.\"}}, \"more\": []}' AS JSON)),
--- ... (rest of the 50 terms) ...
+(1, 1, 'has-pending-review', 1, CAST('{\"default\": {\"en\": {\"name\": \"Artificial General Intelligence (AGI)\", \"briefDescription\": \"A hypothetical type of AI that possesses the ability to understand or learn any intellectual task that a human being can.\"}, \"ar\": {\"name\": \"الذكاء الاصطناعي العام\", \"briefDescription\": \"نوع افتراضي من الذكاء الاصطناعي لديه القدرة على فهم أو تعلم أي مهمة فكرية يمكن للإنسان القيام بها.\"}}, \"more\": []}' AS JSON)),
 (50, 2, 'pending', 0, CAST('{\"default\": {\"en\": {\"name\": \"Platform Cooperative\", \"briefDescription\": \"A cooperatively-owned, democratically-governed business that uses a website or mobile app to facilitate the sale of goods and services.\"}, \"ar\": {\"name\": \"التعاونية المنصية\", \"briefDescription\": \"شركة مملوكة بشكل تعاوني وتدار ديمقراطياً تستخدم موقعًا إلكترونيًا أو تطبيقًا لتسهيل بيع السلع والخدمات.\"}}, \"more\": []}' AS JSON));
 
 -- =================================================================
 -- Relational Data
 -- =================================================================
 
--- 1. termTags (No changes needed)
+-- 1. termTags — only pairs that reference existing terms (1, 50) and tags.
 INSERT INTO `termTags` (`termId`, `tagId`) VALUES
-(1, 1), (1, 2), (2, 2), (2, 8), (3, 3), (4, 1), (4, 9), (5, 4), (5, 8), (6, 1), (7, 3),
-(8, 2), (8, 7), (9, 2), (9, 4), (10, 5), (10, 8), (11, 1), (12, 6), (13, 3), (14, 2), (15, 1),
-(16, 2), (16, 7), (17, 9), (18, 5), (19, 4), (21, 1), (21, 3), (22, 1), (22, 2), (24, 5), (24, 8),
-(26, 1), (26, 6), (28, 3), (29, 1), (30, 2), (31, 1), (32, 1), (34, 5), (35, 9), (36, 1), (36, 3),
-(41, 1), (42, 8), (43, 3), (44, 1), (45, 9), (46, 3), (47, 1), (49, 1), (50, 5), (50, 8);
+(1, 1), (1, 2), (50, 5), (50, 8);
 
--- 2. termReviews
--- FIX: Rewrote this entire INSERT statement to match the new `termReviews` schema.
--- The old `suggestedValue` is now the `suggestedChange`.
--- The old context (`translationIdentifier`, `fieldKey`) has been prepended to the explanation.
--- Added an empty 'references' JSON array.
+-- 2. termReviews — pending public suggestions against the published term (1),
+-- which is why term 1 is seeded as 'has-pending-review'.
 INSERT INTO `termReviews` (`reviewId`, `termRef`, `suggestedChange`, `explanation`, `status`, `references`) VALUES
 (
-    1, 
-    36, 
-    'Neuralink BCI', 
-    'Context: default-en, name. Explanation: This is more specific and aligns with industry terminology.', 
+    1,
+    1,
+    'Artificial General Intelligence (Strong AI)',
+    'Context: default-en, name. Explanation: Adds the common synonym "Strong AI" for clarity.',
     'pending',
     '[]'
 ),
 (
-    2, 
-    37, 
-    'ظرف تصبح فيه الحقائق الموضوعية أقل تأثيرًا على الرأي العام من العاطفة والمعتقد الشخصي.', 
-    'Context: default-ar, briefDescription. Explanation: A more fluent and accurate Arabic translation.', 
+    2,
+    1,
+    'ذكاء اصطناعي عام قادر على أداء أي مهمة فكرية بمستوى الإنسان.',
+    'Context: default-ar, briefDescription. Explanation: A more fluent and accurate Arabic phrasing.',
     'pending',
     '[]'
 );
