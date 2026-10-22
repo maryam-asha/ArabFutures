@@ -97,7 +97,7 @@ export function CategoryForm({ initialData, children }: CategoryFormProps) {
             </div>
 
             <div className="space-y-6">
-              <div className="p-6 bg-white rounded-lg border space-y-4">
+              <div className="p-6 bg-card rounded-lg border space-y-4">
                 <h3 className="font-semibold text-lg">{t("Dashboard.forms.labels.visibility")}</h3>
                 <FormField
                   control={form.control}

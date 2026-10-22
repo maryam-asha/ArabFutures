@@ -91,7 +91,7 @@ export function CollectionForm({ initialData, children }: CollectionFormProps) {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white rounded-lg border p-6 space-y-4">
+            <div className="bg-card rounded-lg border p-6 space-y-4">
               <FormField
                 control={form.control}
                 name="isActive"

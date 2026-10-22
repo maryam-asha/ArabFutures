@@ -67,14 +67,14 @@ export default function SigninPage() {
   }, []);
 
   if (isLoading || !csrfToken) {
-    return <div className="w-full max-w-md text-center text-gray-500">{tCommon("loading")}</div>;
+    return <div className="text-light/70 w-full max-w-md text-center">{tCommon("loading")}</div>;
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-md border border-primary rounded-2xl p-16">
-        <h1 className="text-center text-3xl font-bold mb-2 text-gray-800">{t("title")}</h1>
-        <p className="text-center text-gray-500 mb-8">{t("description")}</p>
+    <main className="bg-background flex min-h-screen items-center justify-center p-4">
+      <div className="border-gold/50 bg-card w-full max-w-md border p-10 sm:p-14">
+        <h1 className="afs-display text-gold mb-2 text-center text-3xl">{t("title")}</h1>
+        <p className="text-light/70 mb-8 text-center">{t("description")}</p>
         <CsrfProvider token={csrfToken}>
           <SigninForm />
         </CsrfProvider>

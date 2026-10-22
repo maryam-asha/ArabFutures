@@ -198,8 +198,8 @@
 }
 
 /* ==========================================================================
-   AFS public theme — scoped to the public [locale] layout (<html class="theme-afs">)
-   so the dashboard keeps its own light palette.
+   AFS theme — applied to both the public [locale] layout and the dashboard
+   (<html class="theme-afs">) so the whole product shares one dark/gold identity.
    ========================================================================== */
 @theme {
   --color-ink: #1e1e1e;
@@ -228,7 +228,18 @@
   --border: #3d3d3d;
   --input: #6b6b6b;
   --ring: #cea864;
+  --destructive: #d9534f;
   --radius: 0rem;
+
+  /* Sidebar + admin chrome tokens, so the dashboard's shadcn Sidebar matches the dark identity. */
+  --sidebar: #181818;
+  --sidebar-foreground: #eaeaea;
+  --sidebar-primary: #cea864;
+  --sidebar-primary-foreground: #1e1e1e;
+  --sidebar-accent: #2a2a2a;
+  --sidebar-accent-foreground: #ffe2af;
+  --sidebar-border: #3d3d3d;
+  --sidebar-ring: #cea864;
 
   --afs-font-display: var(--font-barlow-condensed), "Arial Narrow", sans-serif;
   --font-sans: var(--font-barlow), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;

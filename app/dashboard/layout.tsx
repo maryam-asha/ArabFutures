@@ -1,11 +1,12 @@
 import { getCsrfTokenAction } from "@app/auth-actions";
 import { SidebarProvider, SidebarTrigger } from "@components/ui/sidebar";
 import { auth } from "@lib/auth";
+import { cn } from "@lib/utils";
 import { getPendingReviewCount } from "@root/dal/reviews-dx";
 import { Separator } from "@ui/separator";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
-import { Inter, Tajawal } from "next/font/google";
+import { Barlow, Barlow_Condensed, Tajawal } from "next/font/google";
 import { Toaster } from "sonner";
 
 import "../globals.css";
@@ -13,18 +14,10 @@ import CsrfManager from "./___blocks/csrf-provider-client";
 import DashboardSidebar from "./___blocks/dashboard-sidebar";
 import { DynamicBreadcrumb } from "./___blocks/dynamic-breadcrumb";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter",
-});
-
-const tajawal = Tajawal({
-  subsets: ["arabic"],
-  display: "swap",
-  variable: "--font-tajawal",
-  weight: ["400", "500", "700"],
-});
+// Same type family as the public site so the dashboard shares the AFS identity.
+const barlow = Barlow({ subsets: ["latin"], display: "swap", variable: "--font-barlow", weight: ["300", "400", "500", "600"] });
+const barlowCondensed = Barlow_Condensed({ subsets: ["latin"], display: "swap", variable: "--font-barlow-condensed", weight: ["400", "500", "600"] });
+const tajawal = Tajawal({ subsets: ["arabic", "latin"], display: "swap", variable: "--font-tajawal", weight: ["400", "500", "700"] });
 
 export default async function DashboardShell({ children }: { children: React.ReactNode }) {
   await auth.protectPage();
@@ -35,8 +28,8 @@ export default async function DashboardShell({ children }: { children: React.Rea
   const pendingReviewCount = await getPendingReviewCount();
 
   return (
-    <html lang={currentLocale} dir={currentLocale === "ar" ? "rtl" : "ltr"} className={currentLocale === "ar" ? `${tajawal.variable} font-sans-arabic` : `${inter.variable} font-sans antialiased`}>
-      <body>
+    <html lang={currentLocale} dir={currentLocale === "ar" ? "rtl" : "ltr"} className={cn("theme-afs", barlow.variable, barlowCondensed.variable, tajawal.variable)}>
+      <body className="bg-background text-foreground font-sans antialiased">
         <NextIntlClientProvider messages={messages} locale={currentLocale}>
           <div className="flex min-h-dvh w-full">
             <SidebarProvider>
