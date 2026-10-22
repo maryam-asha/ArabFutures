@@ -169,3 +169,64 @@ export const MemberDbSchema = z.object({
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });
+
+// =================================================================
+// Library: collections & resources
+// =================================================================
+
+export const CollectionDbSchema = z.object({
+  collectionId: z.number(),
+  displayOrder: z.number(),
+  isActive: z.coerce.boolean<boolean>(),
+  name: z.preprocess(safeJsonParse, TranslatableStringDbSchema),
+});
+
+export const CollectionOptionDbSchema = z.object({
+  collectionId: z.number(),
+  name: z.string(),
+});
+
+export const CollectionWithCountDbSchema = CollectionDbSchema.extend({
+  resourceCount: z.number(),
+});
+
+export const ResourceTypeSchema = z.enum(["book", "article", "report", "video"]);
+
+export const ResourceContentDbSchema = z.object({
+  title: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  description: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  authors: z
+    .array(z.string())
+    .nullable()
+    .optional()
+    .transform((val) => val ?? []),
+  imageUrl: z.string().optional(),
+  url: z.string().optional(),
+  date: z.string().optional(),
+});
+
+export const ResourceDbSchema = z.object({
+  resourceId: z.number(),
+  type: ResourceTypeSchema,
+  categoryRef: z.number().nullable(),
+  language: z.string().nullable(),
+  isActive: z.coerce.boolean<boolean>(),
+  displayOrder: z.number(),
+  content: z.preprocess(safeJsonParse, ResourceContentDbSchema),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+
+  categoryName: z.string().nullable(),
+  tags: z.preprocess(safeJsonParse, z.array(TagDbSchema).nullable()).transform((val) => val || []),
+});
+
+export const ResourceForEditDbSchema = ResourceDbSchema.extend({
+  tagIds: z
+    .preprocess((val) => (typeof val === "string" && val ? JSON.parse(val) : val), z.array(z.number()))
+    .nullable()
+    .transform((arr) => arr || []),
+  collectionIds: z
+    .preprocess((val) => (typeof val === "string" && val ? JSON.parse(val) : val), z.array(z.number()))
+    .nullable()
+    .transform((arr) => arr || []),
+});

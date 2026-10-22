@@ -92,7 +92,8 @@
       "network": "شبكتنا",
       "aboutUs": "من نحن",
       "contactUs": "تواصل معنا",
-      "partner": "كن شريكًا لنا"
+      "partner": "كن شريكًا لنا",
+      "library": "المكتبة"
     },
     "hero": {
       "title": "جمعية المستقبل العربي",
@@ -430,6 +431,36 @@
       "email": "البريد الإلكتروني",
       "linkedin": "لينكدإن",
       "website": "الموقع الإلكتروني"
+    },
+    "library": {
+      "title": "مكتبة المستقبلات العربية",
+      "subtitle": "مركز معرفي يضم آلاف الموارد لكل مهتم بتعلّم العمل المستقبلي والاستشراف في المنطقة العربية.",
+      "explore": "استكشف:",
+      "search": "بحث",
+      "clearSearch": "مسح البحث",
+      "noResults": "لا توجد موارد.",
+      "results": "{count} نتيجة",
+      "loadMore": "تحميل المزيد",
+      "tabs": {
+        "all": "الكل",
+        "book": "كتب",
+        "article": "مقالات",
+        "report": "تقارير",
+        "video": "فيديوهات",
+        "collections": "مجموعات"
+      },
+      "filters": {
+        "authors": "المؤلفون",
+        "language": "اللغة",
+        "category": "التصنيف",
+        "themes": "الثيمات"
+      },
+      "types": {
+        "book": "كتاب",
+        "article": "مقال",
+        "report": "تقرير",
+        "video": "فيديو"
+      }
     }
   },
   "Dashboard": {
@@ -446,7 +477,9 @@
       "approvals": "الموافقات",
       "create": "إنشاء",
       "logout": "تسجيل الخروج",
-      "members": "الأعضاء"
+      "members": "الأعضاء",
+      "resources": "المكتبة",
+      "collections": "المجموعات"
     },
     "pages": {
       "home": {
@@ -507,6 +540,20 @@
         "addDescription": "إنشاء ملف عضو جديد في الشبكة.",
         "editTitle": "تعديل العضو",
         "editDescription": "أنت تعدّل العضو: {entityName}"
+      },
+      "resources": {
+        "title": "موارد المكتبة",
+        "addTitle": "إضافة مورد",
+        "addDescription": "أضف مورداً جديداً إلى المكتبة.",
+        "editTitle": "تعديل المورد",
+        "editDescription": "أنت تعدّل المورد: {entityName}"
+      },
+      "collections": {
+        "title": "المجموعات",
+        "addTitle": "إضافة مجموعة",
+        "addDescription": "أنشئ مجموعة جديدة في المكتبة.",
+        "editTitle": "تعديل المجموعة",
+        "editDescription": "أنت تعدّل المجموعة: {entityName}"
       }
     },
     "forms": {
@@ -557,13 +604,23 @@
         "socialLinks": "روابط التواصل",
         "email": "البريد الإلكتروني",
         "linkedin": "لينكدإن",
-        "website": "الموقع الإلكتروني"
+        "website": "الموقع الإلكتروني",
+        "resources": "الموارد",
+        "resourceContent": "المحتوى",
+        "authors": "المؤلفون (مفصولون بفواصل)",
+        "resourceUrl": "رابط المورد",
+        "resourceDate": "التاريخ",
+        "resourceType": "النوع",
+        "themes": "الثيمات",
+        "collections": "المجموعات",
+        "language": "اللغة"
       },
       "placeholders": {
         "search": "ابحث بالاسم...",
         "selectCategory": "اختر فئة",
         "selectTags": "اختر وسوم",
-        "selectLocale": "اختر لغة"
+        "selectLocale": "اختر لغة",
+        "selectCollections": "اختر المجموعات"
       },
       "helpers": {
         "defaultTranslations": "الترجمتان الإنجليزية والعربية مطلوبتان لجميع المصطلحات.",
@@ -581,6 +638,12 @@
         "pending": "معلق",
         "rejected": "مرفوض",
         "has-pending-review": "لديه مراجعة معلقة"
+      },
+      "resourceTypes": {
+        "book": "كتاب",
+        "article": "مقال",
+        "report": "تقرير",
+        "video": "فيديو"
       }
     },
     "tables": {

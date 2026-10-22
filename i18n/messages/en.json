@@ -92,7 +92,8 @@
       "network": "Our Network",
       "aboutUs": "About Us",
       "contactUs": "Contact Us",
-      "partner": "Partner with us"
+      "partner": "Partner with us",
+      "library": "Library"
     },
     "hero": {
       "title": "Arab Futures Society",
@@ -430,6 +431,36 @@
       "email": "Email",
       "linkedin": "LinkedIn",
       "website": "Website"
+    },
+    "library": {
+      "title": "The Arab Futures Library",
+      "subtitle": "A knowledge hub filled with thousands of resources for anyone interested in learning about futures work and foresight in the Arab region.",
+      "explore": "Explore:",
+      "search": "Search",
+      "clearSearch": "Clear search",
+      "noResults": "No resources found.",
+      "results": "{count} results",
+      "loadMore": "Load more",
+      "tabs": {
+        "all": "All",
+        "book": "Books",
+        "article": "Articles",
+        "report": "Reports",
+        "video": "Videos",
+        "collections": "Collections"
+      },
+      "filters": {
+        "authors": "Authors",
+        "language": "Language",
+        "category": "Category",
+        "themes": "Themes"
+      },
+      "types": {
+        "book": "Book",
+        "article": "Article",
+        "report": "Report",
+        "video": "Video"
+      }
     }
   },
   "Dashboard": {
@@ -446,7 +477,9 @@
       "approvals": "Approvals",
       "create": "Create",
       "logout": "Logout",
-      "members": "Members"
+      "members": "Members",
+      "resources": "Library",
+      "collections": "Collections"
     },
     "pages": {
       "home": {
@@ -507,6 +540,20 @@
         "addDescription": "Create a new network member profile.",
         "editTitle": "Edit Member",
         "editDescription": "You are editing the member: {entityName}"
+      },
+      "resources": {
+        "title": "Library Resources",
+        "addTitle": "Add Resource",
+        "addDescription": "Add a new resource to the library.",
+        "editTitle": "Edit Resource",
+        "editDescription": "You are editing the resource: {entityName}"
+      },
+      "collections": {
+        "title": "Collections",
+        "addTitle": "Add Collection",
+        "addDescription": "Create a new library collection.",
+        "editTitle": "Edit Collection",
+        "editDescription": "You are editing the collection: {entityName}"
       }
     },
     "forms": {
@@ -557,13 +604,23 @@
         "socialLinks": "Social Links",
         "email": "Email",
         "linkedin": "LinkedIn",
-        "website": "Website"
+        "website": "Website",
+        "resources": "Resources",
+        "resourceContent": "Content",
+        "authors": "Authors (comma separated)",
+        "resourceUrl": "Link URL",
+        "resourceDate": "Date",
+        "resourceType": "Type",
+        "themes": "Themes",
+        "collections": "Collections",
+        "language": "Language"
       },
       "placeholders": {
         "search": "Search by name...",
         "selectCategory": "Select a category",
         "selectTags": "Select tags",
-        "selectLocale": "Select a locale"
+        "selectLocale": "Select a locale",
+        "selectCollections": "Select collections"
       },
       "helpers": {
         "defaultTranslations": "English and Arabic are required for all terms.",
@@ -581,6 +638,12 @@
         "pending": "Pending",
         "rejected": "Rejected",
         "has-pending-review": "Has Pending Review"
+      },
+      "resourceTypes": {
+        "book": "Book",
+        "article": "Article",
+        "report": "Report",
+        "video": "Video"
       }
     },
     "tables": {

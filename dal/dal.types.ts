@@ -26,3 +26,12 @@ export type MemberWorkDb = z.infer<typeof schema.MemberWorkDbSchema>;
 export type MemberLinkDb = z.infer<typeof schema.MemberLinkDbSchema>;
 export type MemberContentDb = z.infer<typeof schema.MemberContentDbSchema>;
 export type MemberDb = z.infer<typeof schema.MemberDbSchema>;
+
+export type CollectionDb = z.infer<typeof schema.CollectionDbSchema>;
+export type CollectionOption = z.infer<typeof schema.CollectionOptionDbSchema>;
+export type CollectionWithCount = z.infer<typeof schema.CollectionWithCountDbSchema>;
+
+export type ResourceType = z.infer<typeof schema.ResourceTypeSchema>;
+export type ResourceContentDb = z.infer<typeof schema.ResourceContentDbSchema>;
+export type ResourceDb = z.infer<typeof schema.ResourceDbSchema>;
+export type ResourceForEditDb = z.infer<typeof schema.ResourceForEditDbSchema>;
