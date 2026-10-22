@@ -98,3 +98,24 @@ CREATE TABLE `termReviews` (
   CONSTRAINT `FK_termReviews_termRef` FOREIGN KEY (`termRef`) REFERENCES `terms` (`termId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Table: members (network / collaborator profiles)
+-- All translatable text, social links, selected works and additional links live in the `content`
+-- JSON blob (see dal/dal.schema.ts: MemberContentDbSchema). name_en/name_ar are generated for
+-- search and ordering, mirroring the `terms` table.
+
+CREATE TABLE `members` (
+  `memberId` INT NOT NULL AUTO_INCREMENT,
+  `slug` VARCHAR(255) NOT NULL,
+  `displayOrder` INT NOT NULL DEFAULT 0,
+  `isActive` TINYINT NOT NULL DEFAULT 1,
+  `isFeatured` TINYINT NOT NULL DEFAULT 0,
+  `content` JSON DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `name_en` VARCHAR(255) GENERATED ALWAYS AS (content->>'$.name.en') STORED,
+  `name_ar` VARCHAR(255) GENERATED ALWAYS AS (content->>'$.name.ar') STORED,
+  PRIMARY KEY (`memberId`),
+  UNIQUE KEY `UQ_members_slug` (`slug`),
+  FULLTEXT INDEX `ft_members_name` (name_en, name_ar)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

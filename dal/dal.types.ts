@@ -20,3 +20,9 @@ export type TermForEditDb = z.infer<typeof schema.TermForEditDbSchema>;
 
 export type TermReviewDb = z.infer<typeof schema.TermReviewDbSchema>;
 export type TermReviewWithTermName = z.infer<typeof schema.TermReviewWithTermNameDbSchema>;
+
+export type MemberSocialDb = z.infer<typeof schema.MemberSocialDbSchema>;
+export type MemberWorkDb = z.infer<typeof schema.MemberWorkDbSchema>;
+export type MemberLinkDb = z.infer<typeof schema.MemberLinkDbSchema>;
+export type MemberContentDb = z.infer<typeof schema.MemberContentDbSchema>;
+export type MemberDb = z.infer<typeof schema.MemberDbSchema>;

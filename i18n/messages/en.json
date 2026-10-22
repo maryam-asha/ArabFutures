@@ -383,37 +383,23 @@
         },
         "items": {
           "library": {
-            "title": [
-              "The Arab",
-              "Futures Library"
-            ],
+            "title": ["The Arab", "Futures Library"],
             "description": "A digital library of Arabic resources on futures studies and strategic foresight to serve as a knowledge hub and a reference for anyone interested in learning about futures work in the region. We collect this in one space to provide easy access for scholars interested in the field and to help build on the knowledge that already exists."
           },
           "lexicon": {
-            "title": [
-              "The Arab",
-              "Futures Lexicon"
-            ],
+            "title": ["The Arab", "Futures Lexicon"],
             "description": "The lexicon serves as a space for anyone looking for Arabic-English translations of futures studies terminologies. It aims to provide researchers and practitioners with the translations already existing in published literature, saving them the time and effort of having to go through the process of figuring out translations."
           },
           "network": {
-            "title": [
-              "Building the Network"
-            ],
+            "title": ["Building the Network"],
             "description": "Building the network of Arab futures researchers and foresight practitioners with the aim of building a regional community of practice that supports and learns from each other and that helps co-create visions of the futures that represent the region."
           },
           "diploma": {
-            "title": [
-              "Graduate",
-              "Futures Diploma"
-            ],
+            "title": ["Graduate", "Futures Diploma"],
             "description": "The first and only academic graduate diploma in foresight taught in Arabic."
           },
           "children": {
-            "title": [
-              "Futures",
-              "for Children"
-            ],
+            "title": ["Futures", "for Children"],
             "description": "A working group on engaging teachers in educating children on futures through play and storytelling."
           }
         }
@@ -430,6 +416,20 @@
         "cta": "Partner with us"
       },
       "newsletterBar": "Join our newsletter"
+    },
+    "member": {
+      "roleWithinAsf": "Role Within AFS",
+      "professionalProfile": "Professional Profile",
+      "favoriteWord": "Favorite Arabic Word",
+      "selectedWorks": "Selected Works",
+      "selectedWorksIntro": "Actively reaching out to all Arab speakers working on futures and connecting them with the wider community.",
+      "additionalLinks": "Additional Links",
+      "additionalLinksIntro": "Actively reaching out to all Arab speakers working on futures and connecting them with the wider community.",
+      "blogLabel": "Blog",
+      "link": "Link",
+      "email": "Email",
+      "linkedin": "LinkedIn",
+      "website": "Website"
     }
   },
   "Dashboard": {
@@ -445,7 +445,8 @@
       "reviews": "Reviews",
       "approvals": "Approvals",
       "create": "Create",
-      "logout": "Logout"
+      "logout": "Logout",
+      "members": "Members"
     },
     "pages": {
       "home": {
@@ -499,6 +500,13 @@
       "approvals": {
         "title": "Pending Approvals",
         "description": "These are new terms suggested by users that are awaiting publication."
+      },
+      "members": {
+        "title": "Members",
+        "addTitle": "Add Member",
+        "addDescription": "Create a new network member profile.",
+        "editTitle": "Edit Member",
+        "editDescription": "You are editing the member: {entityName}"
       }
     },
     "forms": {
@@ -523,7 +531,33 @@
         "organization": "Organization",
         "visibility": "Visibility",
         "suggestedChange": "Suggested Change",
-        "explanation": "Explanation"
+        "explanation": "Explanation",
+        "memberIdentity": "Identity",
+        "slug": "Slug",
+        "photoUrl": "Photo URL",
+        "role": "Role / Title",
+        "memberProfile": "Profile",
+        "roleWithinAsf": "Role within AFS",
+        "professionalProfile": "Professional Profile",
+        "favoriteWord": "Favorite Arabic Word",
+        "favoriteWordWhy": "Why?",
+        "selectedWorks": "Selected Works",
+        "addWork": "Add work",
+        "imageUrl": "Image URL",
+        "workUrl": "Link URL",
+        "workType": "Type (e.g. Blog)",
+        "workDate": "Date",
+        "workReadTime": "Read time",
+        "title": "Title",
+        "workTags": "Tags (comma separated)",
+        "additionalLinks": "Additional Links",
+        "addLink": "Add link",
+        "linkLabel": "Label",
+        "displayOrder": "Display order",
+        "socialLinks": "Social Links",
+        "email": "Email",
+        "linkedin": "LinkedIn",
+        "website": "Website"
       },
       "placeholders": {
         "search": "Search by name...",
@@ -534,7 +568,13 @@
       "helpers": {
         "defaultTranslations": "English and Arabic are required for all terms.",
         "moreTranslations": "Add translations for other languages if needed.",
-        "noExtraTranslations": "No additional translations added."
+        "noExtraTranslations": "No additional translations added.",
+        "memberIdentity": "The member's name, role and portrait.",
+        "memberProfile": "Bilingual profile sections shown on the member page.",
+        "selectedWorks": "Featured works, reports or articles by this member.",
+        "noWorks": "No works added yet.",
+        "additionalLinks": "Extra links such as a media kit or contact.",
+        "noLinks": "No links added yet."
       },
       "statuses": {
         "published": "Published",
