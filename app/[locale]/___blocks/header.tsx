@@ -12,6 +12,7 @@ const primaryLinks = [
   { label: "brand", href: "/" },
   { label: "ourProjects", href: "/#projects" },
   { label: "library", href: "/library" },
+  { label: "blog", href: "/blog" },
   { label: "network", href: "/#network" },
   { label: "aboutUs", href: "/about" },
 ] as const;

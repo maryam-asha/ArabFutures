@@ -35,3 +35,7 @@ export type ResourceType = z.infer<typeof schema.ResourceTypeSchema>;
 export type ResourceContentDb = z.infer<typeof schema.ResourceContentDbSchema>;
 export type ResourceDb = z.infer<typeof schema.ResourceDbSchema>;
 export type ResourceForEditDb = z.infer<typeof schema.ResourceForEditDbSchema>;
+
+export type BlogPostContentDb = z.infer<typeof schema.BlogPostContentDbSchema>;
+export type BlogPostDb = z.infer<typeof schema.BlogPostDbSchema>;
+export type BlogPostForEditDb = z.infer<typeof schema.BlogPostForEditDbSchema>;

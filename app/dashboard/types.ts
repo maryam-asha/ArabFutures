@@ -4,8 +4,8 @@ import z from "zod";
 import { BulkDeleteSchema, BulkUpdateSchema, singleUpdateSchema } from "./schemas";
 
 export type DeleteActionParams = {
-  tableName: "termCategories" | "tags" | "terms" | "members" | "resources" | "collections";
-  pkColumn: "categoryId" | "tagId" | "termId" | "memberId" | "resourceId" | "collectionId";
+  tableName: "termCategories" | "tags" | "terms" | "members" | "resources" | "collections" | "blogPosts";
+  pkColumn: "categoryId" | "tagId" | "termId" | "memberId" | "resourceId" | "collectionId" | "postId";
   revalidatePaths: string[];
 };
 

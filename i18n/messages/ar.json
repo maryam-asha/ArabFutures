@@ -93,7 +93,8 @@
       "aboutUs": "من نحن",
       "contactUs": "تواصل معنا",
       "partner": "كن شريكًا لنا",
-      "library": "المكتبة"
+      "library": "المكتبة",
+      "blog": "المدوّنة"
     },
     "hero": {
       "title": "جمعية المستقبل العربي",
@@ -461,6 +462,25 @@
         "report": "تقرير",
         "video": "فيديو"
       }
+    },
+    "blog": {
+      "title": "مدوّنتنا ورؤانا",
+      "subtitle": "نبني شبكة الباحثين العرب في المستقبلات وممارسي الاستشراف بهدف تكوين مجتمع إقليمي.",
+      "featured": "مميّزة",
+      "exploreAll": "استكشف الكل",
+      "search": "بحث",
+      "clearSearch": "مسح البحث",
+      "category": "التصنيف",
+      "allCategories": "كل التصنيفات",
+      "order": "الترتيب",
+      "noResults": "لا توجد مقالات.",
+      "loadMore": "تحميل المزيد",
+      "badge": "مدوّنة",
+      "backToBlog": "العودة إلى المدوّنة",
+      "sort": {
+        "newest": "الأحدث",
+        "oldest": "الأقدم"
+      }
     }
   },
   "Dashboard": {
@@ -479,7 +499,8 @@
       "logout": "تسجيل الخروج",
       "members": "الأعضاء",
       "resources": "المكتبة",
-      "collections": "المجموعات"
+      "collections": "المجموعات",
+      "blog": "المدوّنة"
     },
     "pages": {
       "home": {
@@ -554,6 +575,13 @@
         "addDescription": "أنشئ مجموعة جديدة في المكتبة.",
         "editTitle": "تعديل المجموعة",
         "editDescription": "أنت تعدّل المجموعة: {entityName}"
+      },
+      "blog": {
+        "title": "مقالات المدوّنة",
+        "addTitle": "إضافة مقال",
+        "addDescription": "اكتب مقالاً جديداً في المدوّنة.",
+        "editTitle": "تعديل المقال",
+        "editDescription": "أنت تعدّل المقال: {entityName}"
       }
     },
     "forms": {
@@ -613,7 +641,12 @@
         "resourceType": "النوع",
         "themes": "الثيمات",
         "collections": "المجموعات",
-        "language": "اللغة"
+        "language": "اللغة",
+        "postContent": "المحتوى",
+        "excerpt": "المقتطف",
+        "body": "النص",
+        "coverImageUrl": "رابط صورة الغلاف",
+        "readTime": "مدة القراءة"
       },
       "placeholders": {
         "search": "ابحث بالاسم...",
