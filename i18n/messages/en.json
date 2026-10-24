@@ -93,7 +93,8 @@
       "aboutUs": "About Us",
       "contactUs": "Contact Us",
       "partner": "Partner with us",
-      "library": "Library"
+      "library": "Library",
+      "blog": "Blog"
     },
     "hero": {
       "title": "Arab Futures Society",
@@ -461,6 +462,25 @@
         "report": "Report",
         "video": "Video"
       }
+    },
+    "blog": {
+      "title": "Our Blogs & Insights",
+      "subtitle": "Building the network of Arab futures researchers and foresight practitioners with the aim of building a regional community.",
+      "featured": "Featured",
+      "exploreAll": "Explore All",
+      "search": "Search",
+      "clearSearch": "Clear search",
+      "category": "Category",
+      "allCategories": "All categories",
+      "order": "Order",
+      "noResults": "No posts found.",
+      "loadMore": "Load more",
+      "badge": "Blog",
+      "backToBlog": "Back to blog",
+      "sort": {
+        "newest": "Newest",
+        "oldest": "Oldest"
+      }
     }
   },
   "Dashboard": {
@@ -479,7 +499,8 @@
       "logout": "Logout",
       "members": "Members",
       "resources": "Library",
-      "collections": "Collections"
+      "collections": "Collections",
+      "blog": "Blog"
     },
     "pages": {
       "home": {
@@ -554,6 +575,13 @@
         "addDescription": "Create a new library collection.",
         "editTitle": "Edit Collection",
         "editDescription": "You are editing the collection: {entityName}"
+      },
+      "blog": {
+        "title": "Blog Posts",
+        "addTitle": "Add Post",
+        "addDescription": "Write a new blog post.",
+        "editTitle": "Edit Post",
+        "editDescription": "You are editing the post: {entityName}"
       }
     },
     "forms": {
@@ -613,7 +641,12 @@
         "resourceType": "Type",
         "themes": "Themes",
         "collections": "Collections",
-        "language": "Language"
+        "language": "Language",
+        "postContent": "Content",
+        "excerpt": "Excerpt",
+        "body": "Body",
+        "coverImageUrl": "Cover image URL",
+        "readTime": "Read time"
       },
       "placeholders": {
         "search": "Search by name...",

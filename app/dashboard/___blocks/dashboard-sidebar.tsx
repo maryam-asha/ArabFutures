@@ -1,7 +1,7 @@
 "use client";
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "@ui/sidebar";
-import { BookText, CheckSquare, Layers, LayoutGrid, Library, Tag, Users } from "lucide-react";
+import { BookText, CheckSquare, Layers, LayoutGrid, Library, Newspaper, Tag, Users } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -32,6 +32,7 @@ export default function DashboardSidebar({ pendingReviewCount }: DashboardSideba
         { href: "/dashboard/members", icon: Users, label: t("members") },
         { href: "/dashboard/resources", icon: Library, label: t("resources") },
         { href: "/dashboard/collections", icon: Layers, label: t("collections") },
+        { href: "/dashboard/blog", icon: Newspaper, label: t("blog") },
         {
           href: "/dashboard/reviews",
           icon: CheckSquare,

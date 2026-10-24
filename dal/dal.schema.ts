@@ -230,3 +230,38 @@ export const ResourceForEditDbSchema = ResourceDbSchema.extend({
     .nullable()
     .transform((arr) => arr || []),
 });
+
+// =================================================================
+// Blog posts
+// =================================================================
+
+export const BlogPostContentDbSchema = z.object({
+  title: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  excerpt: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  body: z.preprocess((v) => v ?? {}, TranslatableStringDbSchema),
+  coverImageUrl: z.string().optional(),
+  date: z.string().optional(),
+  readTime: z.string().optional(),
+});
+
+export const BlogPostDbSchema = z.object({
+  postId: z.number(),
+  slug: z.string(),
+  categoryRef: z.number().nullable(),
+  isActive: z.coerce.boolean<boolean>(),
+  isFeatured: z.coerce.boolean<boolean>(),
+  displayOrder: z.number(),
+  content: z.preprocess(safeJsonParse, BlogPostContentDbSchema),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+
+  categoryName: z.string().nullable(),
+  tags: z.preprocess(safeJsonParse, z.array(TagDbSchema).nullable()).transform((val) => val || []),
+});
+
+export const BlogPostForEditDbSchema = BlogPostDbSchema.extend({
+  tagIds: z
+    .preprocess((val) => (typeof val === "string" && val ? JSON.parse(val) : val), z.array(z.number()))
+    .nullable()
+    .transform((arr) => arr || []),
+});
